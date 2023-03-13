@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous" />
+    <title>login page</title>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+        crossorigin="anonymous"></script>
+</head>
+<style>
+    h1 {
+        height: 80px;
+        background: #433cc2;
+        text-align: center;
+        margin: 0;
+    }
+
+    .mainContain {
+        background: #242424;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .loginBox {
+        background: #1c1c21;
+        height: 400px;
+       width: 50%;
+        border: solid 2px #333;
+        border-radius: 40px;
+        margin: 30px 20px;
+    }
+    .loginBox2 {
+        background: #1c1c21;
+        height: 400px;
+       width: 30%;
+        border: solid 2px #333;
+        border-radius: 40px;
+        margin: 30px 20px;
+    }
+    @media screen and (max-width: 850px) {
+        .loginBox {
+        background: #1c1c21;
+        height: 400px;
+       width: 90%;
+        border: solid 2px #333;
+        border-radius: 40px;
+        margin: 30px;
+    }
+
+        
+    }
+
+
+    .loginTitle {
+        font-size: 40px;
+        margin: 20px 20px;
+        color: white;
+    }
+
+    .inputText {
+        margin: 10px 5%;
+        padding: 10px;
+        width: 90%;
+        border: solid 2px #4b4b4b;
+        border-radius: 10px;
+    }
+
+    .LoginButton {
+    }
+</style>
+
+<body>
+    <h1>title</h1>
+    <div class="mainContain">
+        <div class="loginBox">
+            <div class="loginTitle">Login</div>
+            <input class="inputText" placeholder="Email address" />
+            <input class="inputText" placeholder="Password" />
+            <div class="d-flex justify-content-between m-3">
+                <div style="line-height: 18px; color: rgb(76, 88, 255);">
+                    <input class="form-check-input mt-0" type="checkbox" value=""
+                        aria-label="Checkbox for following text input"  />Remember me
+                </div>
+                <a href="">Forget Password</a>
+            </div>
+            <div class="d-flex justify-content-center mt-4"><button type="button" class="btn btn-primary LoginButton">Login</button></div>
+        </div>
+        <div class="loginBox2"></div>
+    </div>
+</body>
+
+</html>
