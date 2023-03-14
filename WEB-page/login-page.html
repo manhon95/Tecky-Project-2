@@ -42,6 +42,7 @@
         border: solid 2px #333;
         border-radius: 40px;
         margin: 30px 20px;
+        color: white;
     }
     @media screen and (max-width: 850px) {
         .loginBox {
@@ -52,6 +53,18 @@
         border-radius: 40px;
         margin: 30px;
     }
+
+    .loginBox2{
+        background: #1c1c21;
+        height: 400px;
+       width: 90%;
+        border: solid 2px #333;
+        border-radius: 40px;
+        margin: 30px;
+        
+
+    }
+
 
         
     }
@@ -70,9 +83,17 @@
         border: solid 2px #4b4b4b;
         border-radius: 10px;
     }
-
-    .LoginButton {
+    .LoginButton{
+        padding: 10px 60px;
+        border-radius: 18px;
     }
+    .registerText{
+        font-size: 20px;
+        margin: 20px 20px;
+        height: 170px;
+
+    }
+
 </style>
 
 <body>
@@ -89,10 +110,18 @@
                 </div>
                 <a href="">Forget Password</a>
             </div>
-            <div class="d-flex justify-content-center mt-4"><button type="button" class="btn btn-primary LoginButton">Login</button></div>
+            <div class="d-flex justify-content-center mt-4">
+                <a href="" type="button" class="btn btn-primary LoginButton">Login</a>
+            </div>
         </div>
-        <div class="loginBox2"></div>
+        <div class="loginBox2">
+            <div class="loginTitle">Register</div>
+            <div class="registerText">some textsome textsome textsome textsome textsome textsome textsome textsome textsome textsome textsome textsome textsome textsome textsome textsome textsome textsomsome textsome textsome textssome textsome textsome textsome textome textsome texte text</div>
+            <div class="d-flex justify-content-center mt-4">
+                <a href="register-page.html" type="button" class="btn btn-primary LoginButton">Register</a>
+            </div>
+        </div>
     </div>
 </body>
-
+<script src="Function.js"></script>
 </html>
