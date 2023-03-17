@@ -1,14 +1,20 @@
-import express from "express";
-import { Request, Response } from "express";
+import express, { Request, Response } from 'express'
+import {saveUserDetails} from "./manageUserAccount"
+import {print} from "listening-on"
+//  import {}
+let app = express()
 
-const app = express();
+app.use(express.static("public"))
+app.use(express.urlencoded())
 
-app.get("/", function (req: Request, res: Response) {
-  res.end("Hello World");
-});
 
-const PORT = 8080;
+app.post("/contact", (req,res)=>{
+ saveUserDetails(req, res)
+   res.end("done")
+})
 
+app.get("/submit" )
+const PORT = 8080
 app.listen(PORT, () => {
-  console.log(`Listening at http://localhost:${PORT}/`);
-});
+ print(PORT)
+})
