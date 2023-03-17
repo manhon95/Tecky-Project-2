@@ -4,56 +4,58 @@ import jsonfile from "jsonfile";
 let users: User[] = jsonfile.readFileSync("userDetail.json");
 // let usersFile = "userDetail.j"
 type User = {
-  id: string;
   Title: string;
   firstName: string;
   lastName: string;
   monthOfBirth: number;
   yearOfBirth: number;
   email: string;
-  areaCode: string;
-  phoneNumber: string;
   password: string;
 };
 
 //This function get info from http request and save as use detail
 export async function saveUserDetails(req: Request, res: Response) {
   let checkStatus = true;
-  let id = "hbnznk58r6"
-  // Math.random().toString(36).substring(3);
   let Title = req.body.Title;
   let firstName = req.body.firstName;
   let lastName = req.body.lastName;
   let monthOfBirth = req.body.monthOfBirth;
   let yearOfBirth = req.body.yearOfBirth;
   let email = req.body.email;
-  let areaCode = req.body.areaCode;
-  let phoneNumber = req.body.phoneNumber;
   let password = req.body.password;
+  let confirmPassword = req.body.confirmPassword
+  let emailFormat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
-  for (let userId of users) {
-    // check if req msg id in userId array
-    console.log(userId.id, id);
+  if(password!=confirmPassword||password.length<8){
+    console.log("not valid")
+          res.status(400)
+          checkStatus = false;
+  }
+  console.log(password.length, confirmPassword, password)
 
-    if (userId.id == id) {
+  if(!email.match(emailFormat)){
+
+    res.status(400)
+    checkStatus = false;
+  }
+  for (let user of users) {
+      if (user.email == email) {
+      console.log("Email already in used")
+      res.status(400)
       checkStatus = false;
-      console.log("id in users")
       break;
     }
   }
 console.log(checkStatus);
   if (checkStatus) {
     users.push({
-      id,
       Title,
       firstName,
       lastName,
       monthOfBirth,
       yearOfBirth,
       email,
-      areaCode,
-      phoneNumber,
-      password,
+      password
     });
     await jsonfile.writeFile("userDetail.json", users);
     res.end("done");
@@ -62,4 +64,4 @@ console.log(checkStatus);
   }
 }
 
-export async function passwordChecker(req: Request, res: Response) {}
+// export async function passwordChecker(req: Request, res: Response) {}
