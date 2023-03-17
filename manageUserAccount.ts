@@ -1,36 +1,10 @@
-import express, { Request, Response } from 'express'
-import fs from "fs"
+import { Request, Response } from 'express'
 import jsonfile from 'jsonfile'
-import { loadavg } from 'os'
 
 
 
-// type  User= {
-//     id: number
-//     name:string
-//     email:string
-// }
-
-// export async function saveUserDetails(name:string, email:string){
-    
-// }
-// let users: User[] 
-// if(users){users = jsonfile.readFileSync("detail.json")}else
-// if(!users){users=[]}
-
-// let id: number = users.length + 1
-// export async function saveUserDetails(req: Request, res: Response) {
-// console.log(req.body.id, req.body.pw)
-//     let name = req.body.id
-//     let email = req.body.pw
-//     let detail = [id, name, email]
-// users.push({id,name,email})
-//     await jsonfile.writeFile('detail.json', users)
-//     res.end("done")
-//     id++
-//   }
 let users: User[] = []
-let usersFile = "userDetail.j"
+// let usersFile = "userDetail.j"
   type  User= {
     id: string
     Title: string

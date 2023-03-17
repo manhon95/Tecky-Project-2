@@ -8,12 +8,12 @@ app.use(express.static("public"))
 app.use(express.urlencoded())
 
 
-app.post("/contact", (req,res)=>{
+app.post("/contact", (req: Request,res: Response)=>{
  saveUserDetails(req, res)
    res.end("done")
 })
 
-app.get("/submit" )
+// app.get("/submit" )
 const PORT = 8080
 app.listen(PORT, () => {
  print(PORT)
