@@ -10,7 +10,6 @@ app.use(express.urlencoded())
 
 app.post("/contact", (req: Request,res: Response)=>{
  saveUserDetails(req, res)
-   res.end("done")
 })
 
 // app.get("/submit" )
