@@ -30,98 +30,114 @@
     .loginBox {
         background: #1c1c21;
         height: 400px;
-       width: 50%;
+        padding: 0 30px;
+
+        width: 50%;
         border: solid 2px #333;
         border-radius: 40px;
         margin: 30px 20px;
     }
+
     .loginBox2 {
         background: #1c1c21;
         height: 400px;
-       width: 30%;
+        width: 30%;
         border: solid 2px #333;
         border-radius: 40px;
         margin: 30px 20px;
         color: white;
     }
-    @media screen and (max-width: 850px) {
-        .loginBox {
-        background: #1c1c21;
-        height: 400px;
-       width: 90%;
-        border: solid 2px #333;
-        border-radius: 40px;
-        margin: 30px;
+
+    .form-check-input {
+        border: solid 2px #fff;
+        margin-right: 5px;
     }
 
-    .loginBox2{
-        background: #1c1c21;
-        height: 400px;
-       width: 90%;
-        border: solid 2px #333;
-        border-radius: 40px;
-        margin: 30px;
-        
-
+    .wrongPasswordMessage {
+        text-align: center;
+        color: rgb(255, 0, 0);
     }
-
-
-        
-    }
-
 
     .loginTitle {
         font-size: 40px;
-        margin: 20px 20px;
+        margin: 20px 0px;
         color: white;
     }
 
     .inputText {
-        margin: 10px 5%;
+        margin: 10px 0;
         padding: 10px;
-        width: 90%;
+        width: 100%;
         border: solid 2px #4b4b4b;
         border-radius: 10px;
     }
-    .LoginButton{
+
+    .loginButton,
+    .registerButton {
         padding: 10px 60px;
         border-radius: 18px;
     }
-    .registerText{
+
+    .registerText {
         font-size: 20px;
         margin: 20px 20px;
         height: 170px;
-
     }
 
+    @media screen and (max-width: 850px) {
+        .loginBox {
+            background: #1c1c21;
+            padding: 0 30px;
+            height: 400px;
+            width: 90%;
+            border: solid 2px #333;
+            border-radius: 40px;
+            margin: 30px;
+        }
+
+        .loginBox2 {
+            background: #1c1c21;
+            height: 400px;
+            width: 90%;
+            border: solid 2px #333;
+            border-radius: 40px;
+            margin: 30px;
+        }
+    }
 </style>
 
 <body>
     <h1>title</h1>
     <div class="mainContain">
-        <div class="loginBox">
-            <div class="loginTitle">Login</div>
-            <input class="inputText" placeholder="Email address" />
-            <input class="inputText" placeholder="Password" />
-            <div class="d-flex justify-content-between m-3">
+        <form action="/login" method="post" class="loginBox loginForm">
+            <div class="loginTitle ">Login</div>
+            <input name="email" class="inputText" placeholder="Email address" />
+            <input name="password" class="inputText" placeholder="Password" />
+            <div class="wrongPasswordMessage" name="wrongPasswordMessage"></div>
+            <div class="d-flex justify-content-between my-3 ">
                 <div style="line-height: 18px; color: rgb(76, 88, 255);">
-                    <input class="form-check-input mt-0" type="checkbox" value=""
-                        aria-label="Checkbox for following text input"  />Remember me
+                    <input class="form-check-input mt-0  " type="checkbox" value=""
+                        aria-label="Checkbox for following text input" />Remember me
                 </div>
                 <a href="">Forget Password</a>
             </div>
             <div class="d-flex justify-content-center mt-4">
-                <a href="" type="button" class="btn btn-primary LoginButton">Login</a>
+                <input type="submit" class="btn btn-primary loginButton" value="Login">
             </div>
-        </div>
+        </form>
         <div class="loginBox2">
             <div class="loginTitle">Register</div>
-            <div class="registerText">some textsome textsome textsome textsome textsome textsome textsome textsome textsome textsome textsome textsome textsome textsome textsome textsome textsome textsomsome textsome textsome textssome textsome textsome textsome textome textsome texte text</div>
+            <div class="registerText">some textsome textsome textsome textsome textsome textsome textsome textsome
+                textsome textsome textsome textsome textsome textsome textsome textsome textsome textsomsome textsome
+                textsome textssome textsome textsome textsome textome textsome texte text</div>
             <div class="d-flex justify-content-center mt-4">
-                <a href="register-page.html" type="button" class="btn btn-primary LoginButton">Register</a>
+                <a href="register-page.html" type="button" class="btn btn-primary registerButton">Register</a>
             </div>
         </div>
     </div>
 </body>
-<script src="Function.js"></script>
+<script src="js/passwordChecker.js"></script>
+<script>
+</script>
+
 </html>

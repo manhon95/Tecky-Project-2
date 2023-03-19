@@ -1,16 +1,34 @@
 import express, { Request, Response } from 'express'
 import {saveUserDetails} from "./manageUserAccount"
+import {passwordChecker} from "./LoginAuthenticate"
 import {print} from "listening-on"
+// import Session from "express-session";
 //  import {}
 let app = express()
 
 app.use(express.static("public"))
 app.use(express.urlencoded())
+app.use(express.json())
+// app.use(Session({
+//       secret: Math.random().toString(36),
+//       resave: false,
+//       saveUninitialized: false,
+//     })
+//   );
+//   declare module "express-session" {
+//     interface SessionData {
+//       user: {email: string}
+//     }
+//   }
 
-
-app.post("/contact", (req: Request,res: Response)=>{
+// app.post()
+app.post("/register", (req: Request,res: Response)=>{
  saveUserDetails(req, res)
 })
+app.post("/login", (req: Request,res: Response)=>{
+  passwordChecker(req, res)
+ })
+ 
 
 // app.get("/submit" )
 const PORT = 8080

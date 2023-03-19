@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import jsonfile from "jsonfile";
 
 let users: User[] = jsonfile.readFileSync("userDetail.json");
-// let usersFile = "userDetail.j"
 type User = {
   Title: string;
   firstName: string;
@@ -27,11 +26,9 @@ export async function saveUserDetails(req: Request, res: Response) {
   let emailFormat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
   if(password!=confirmPassword||password.length<8){
-    console.log("not valid")
           res.status(400)
           checkStatus = false;
   }
-  console.log(password.length, confirmPassword, password)
 
   if(!email.match(emailFormat)){
 
@@ -40,13 +37,11 @@ export async function saveUserDetails(req: Request, res: Response) {
   }
   for (let user of users) {
       if (user.email == email) {
-      console.log("Email already in used")
       res.status(400)
       checkStatus = false;
       break;
     }
   }
-console.log(checkStatus);
   if (checkStatus) {
     users.push({
       Title,
@@ -64,4 +59,3 @@ console.log(checkStatus);
   }
 }
 
-// export async function passwordChecker(req: Request, res: Response) {}
