@@ -52,11 +52,13 @@
     color: white;
   }
 
-  .form-select {}
-
   .form-control {
     margin-right: 10px;
     border-radius: 0.375rem !important;
+  }
+  .errorMessage{
+    color: red;
+    text-align: center;
   }
 </style>
 
@@ -65,7 +67,7 @@
     <h1>title</h1>
   </div>
   <div class="mainContain1">
-    <form action="/contact" method="post" class="loginBox registerForm">
+    <form action="/register" method="post" class="loginBox registerForm">
       <div class="loginTitle">Register</div>
       <div class="row g-3">
         <div class="col-lg-3 col-sm-4">
@@ -80,10 +82,13 @@
           </div>
         </div>
         <div class="col-lg-3 col-sm-8">
-          <input class="form-control" type="TEXT" name="firstName" placeholder="First Name*" />
+          <div class="errorMessageFirstName errorMessage"></div>
+          <input class="form-control firstName" type="TEXT" name="firstName" placeholder="First Name*" />
         </div>
         <div class="col-lg-6">
-          <input class="form-control" type="TEXT" name="lastName" placeholder="Last Name*" />
+          <div class="errorMessageLastName errorMessage"></div>
+
+          <input class="form-control lastName" type="TEXT" name="lastName" placeholder="Last Name*" />
         </div>
         <div class="col-6">
           <div class="input-group">
@@ -100,7 +105,9 @@
           </div>
         </div>
         <div class="col-12">
-          <input name="email" class="form-control" type="text" placeholder="Email*" />
+          <div class="errorMessageEmail errorMessage"></div>
+          <div class="duplicateEmail errorMessage"></div>
+          <input name="email" class="form-control email" type="text" placeholder="Email*" />
         </div>
         <div></div>
         <div class="col-12">
@@ -109,6 +116,9 @@
         <div class="col-12">
           <input name="confirmPassword" class="form-control" type="text" placeholder="Confirm Password*" />
         </div>
+        <div class="passwordErrorMessage errorMessage"></div>
+        <div class="passwordLength errorMessage"></div>
+
       </div>
 
       <div class="d-flex justify-content-center m-4">
@@ -117,6 +127,6 @@
     </form>
   </div>
 </body>
-<script src="Function.js"></script>
+<script src="js/registerChecker.js"></script>
 
 </html>
