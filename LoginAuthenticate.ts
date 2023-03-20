@@ -16,12 +16,11 @@ export function passwordChecker(req: Request, res: Response) {
   }
 
   if (status) {
-    res.redirect("gameroom.html");
-    res.json()
+    res.json({});
     // req.session.email = req.body.email
     // req.session.save()
   } else {
-    res.status(403); 
-    res.json({ "error": "invalid Username or Passsword" })
+    res.status(403);
+    res.json({ error: "invalid Username or Passsword" });
   }
 }
