@@ -31,7 +31,7 @@ app.post("/login", (req: Request, res: Response) => {
 });
 
 app.get("/login", (req: Request, res: Response) => {
-  res.sendFile(path.join("public", "login-page.html"));
+  res.sendFile(path.resolve("public", "login-page.html"));
 });
 
 app.use((req: Request, res: Response) => {
