@@ -1,11 +1,20 @@
 [
-    {
+  {
     "Title": "Mr.",
     "firstName": "tester1",
     "lastName": "noob",
     "monthOfBirth": "3",
     "yearOfBirth": "2008",
     "email": "noob@gmail.com",
+    "password": "12345678"
+  },
+  {
+    "title": "Mr.",
+    "firstName": "",
+    "lastName": "",
+    "monthOfBirth": "2",
+    "yearOfBirth": "2009",
+    "email": "V@gmail.com",
     "password": "12345678"
   }
 ]

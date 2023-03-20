@@ -27,43 +27,40 @@ export async function saveUserDetails(req: Request, res: Response) {
   let report = {}
   
   // let body = req.body
-  //  for(let i of body){
-  //   console.log(i)
+  //  for(let i in body){
   // }
 
   if(password.length<8){
           res.status(400)
-          report["passwordLength"] = "Password must be 8 or more character*"
+          report["passwordLength-password"] = "Password must be 8 or more character*"
           checkStatus = false;
   }else{
-    report["passwordLength"] = ""
+    report["passwordLength-password"] = ""
 
   }
   if(password!=confirmPassword){
-    report["confirmPassword"] = "Confirm password is different*"
+    report["pwCheck-confirmPassword"] = "Confirm password is different*"
     checkStatus = false;
 }else{
-  report["confirmPassword"] = ""
+  report["pwCheck-confirmPassword"] = ""
 
 }
 
 
   if(!email.match(emailFormat)){
-    console.log("emailFormat")
-report["emailFormat"] = "invalid Email*"
+report["Format-email"] = "invalid Email*"
    checkStatus = false;
   }else{
-    report["emailFormat"] = ""
+    report["Format-email"] = ""
 
   }
   for (let user of users) {
       if (user.email == email) {
-        console.log("email already used")
-        report["duplicateEmail"] = "Email already used*"
+        report["duplicate-email"] = "Email already used*"
         checkStatus = false;
-      break;
+      continue
     }else{
-      report["duplicateEmail"] = ""
+      report["duplicate-email"] = ""
     }
   }
   if (checkStatus) {
@@ -81,6 +78,5 @@ report["emailFormat"] = "invalid Email*"
   } else {
     res.status(400)
     res.json(report)
-    res.end("not submit");
   }
 }

@@ -22,14 +22,29 @@ document
     });
 
     const result = await res.json(); // { success: true }
-console.log(result)
-    document.querySelector(".errorMessageFirstName").textContent = result.firstName
-    document.querySelector(".errorMessageLastName").textContent = result.lastName
-    document.querySelector(".errorMessageEmail").textContent = result.emailFormat 
-    document.querySelector(".duplicateEmail").textContent = result.duplicateEmail
-    document.querySelector(".passwordLength").textContent = result.passwordLength
-    document.querySelector(".passwordErrorMessage").textContent = result.confirmPassword
+    console.log(result)
+
+    for (const key in result) {
+      console.log(key)
+      console.log(result[key])
+
+        document.querySelector(`.${key}`).textContent = result[key]
+
+let elementBorder = key.split("-")
+console.log('test: '+elementBorder[1])
+
+        // if (result[key] === '') {
+        //   const div = document.querySelector(`.${elementBorder[1]}`);
+        //   div.style.border = '2px solid red';
+        // }
+        // else{
+        //     div.style.border = '2px solid green';
+        // }
+      }
+
   });
+
+
 
 //to create the drop down options
 let date = new Date()

@@ -72,7 +72,7 @@
       <div class="row g-3">
         <div class="col-lg-3 col-sm-4">
           <div class="input-group">
-            <select name="Title" class="form-select" id="validationDefault04" required>
+            <select name="title" class="form-select" id="validationDefault04" required>
               <option selected disabled value="">Title*</option>
               <option>Mr.</option>
               <option>Ms.</option>
@@ -82,11 +82,11 @@
           </div>
         </div>
         <div class="col-lg-3 col-sm-8">
-          <div class="errorMessageFirstName errorMessage"></div>
+          <div class="error-firstName errorMessage"></div>
           <input class="form-control firstName" type="TEXT" name="firstName" placeholder="First Name*" />
         </div>
         <div class="col-lg-6">
-          <div class="errorMessageLastName errorMessage"></div>
+          <div class="error-lastName errorMessage"></div>
 
           <input class="form-control lastName" type="TEXT" name="lastName" placeholder="Last Name*" />
         </div>
@@ -105,19 +105,19 @@
           </div>
         </div>
         <div class="col-12">
-          <div class="errorMessageEmail errorMessage"></div>
-          <div class="duplicateEmail errorMessage"></div>
+          <div class="Format-email errorMessage"></div>
+          <div class="duplicate-email errorMessage"></div>
           <input name="email" class="form-control email" type="text" placeholder="Email*" />
         </div>
         <div></div>
         <div class="col-12">
-          <input name="password" class="form-control" type="text" placeholder="Password*" />
+          <input name="password" class="form-control password" type="text" placeholder="Password*" />
         </div>
         <div class="col-12">
-          <input name="confirmPassword" class="form-control" type="text" placeholder="Confirm Password*" />
+          <input name="confirmPassword" class="form-control confirmPassword" type="text" placeholder="Confirm Password*" />
         </div>
-        <div class="passwordErrorMessage errorMessage"></div>
-        <div class="passwordLength errorMessage"></div>
+        <div class="pwCheck-confirmPassword errorMessage"></div>
+        <div class="passwordLength-password errorMessage"></div>
 
       </div>
 

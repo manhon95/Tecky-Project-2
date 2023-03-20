@@ -11,7 +11,6 @@ export function passwordChecker(req: Request, res: Response) {
   for (let user of users) {
     if (user.email == email && user.password == password) {
       status = true;
-      console.log("login success");
       break;
     }
   }
