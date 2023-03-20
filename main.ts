@@ -26,6 +26,7 @@ app.post("/register", (req: Request,res: Response)=>{
  saveUserDetails(req, res)
 })
 app.post("/login", (req: Request,res: Response)=>{
+  
   passwordChecker(req, res)
  })
  

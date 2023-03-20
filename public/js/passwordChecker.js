@@ -18,5 +18,8 @@ document
     });
 
     const result = await res.json(); // { success: true }
-    document.querySelector(".wrongPasswordMessage").textContent = result.error
+    if(res.status==403){    document.querySelector(".wrongPasswordMessage").textContent = result.error
+  }else{
+    window.location.href = "gameroom.html"
+  }
   });

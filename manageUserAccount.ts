@@ -39,10 +39,10 @@ export async function saveUserDetails(req: Request, res: Response) {
 
   }
   if(password!=confirmPassword){
-    report["pwCheck-confirmPassword"] = "Confirm password is different*"
+    report["pwCheck-password"] = "Confirm password is different*"
     checkStatus = false;
 }else{
-  report["pwCheck-confirmPassword"] = ""
+  report["pwCheck-password"] = ""
 
 }
 
