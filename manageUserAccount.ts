@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
 import jsonfile from "jsonfile";
 
-let users: User[] = jsonfile.readFileSync("userDetail.json");
+let users: User[] = jsonfile.readFileSync("userDetail.json")
+
 type User = {
+  id: string
   title: string;
   firstName: string;
   lastName: string;
@@ -15,6 +17,7 @@ type User = {
 //This function get info from http request and save as use detail
 export async function saveUserDetails(req: Request, res: Response) {
   let checkStatus = true;
+  let id = Math.random().toString(36)+Math.random().toString(36)
   let title = req.body.title;
   let firstName = req.body.firstName;
   let lastName = req.body.lastName;
@@ -65,6 +68,7 @@ report["Format-email"] = "invalid Email*"
   }
   if (checkStatus) {
     users.push({
+      id: id,
       title: title,
       firstName,
       lastName,

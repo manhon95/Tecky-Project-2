@@ -23,7 +23,7 @@ document
 
     const result = await res.json(); // { success: true }
     console.log(result);
-let 
+
     for (const key in result) {
       document.querySelector(`.${key}`).textContent = result[key];
       let elementBorder = key.split("-");

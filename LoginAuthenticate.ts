@@ -17,7 +17,7 @@ export function passwordChecker(req: Request, res: Response) {
 
   if (status) {
     res.json({});
-    // req.session.email = req.body.email
+    // req.session.id = req.body.id
     // req.session.save()
   } else {
     res.status(403);
