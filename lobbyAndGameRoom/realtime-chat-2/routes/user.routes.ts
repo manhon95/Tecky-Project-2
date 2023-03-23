@@ -34,12 +34,15 @@ userRoutes.post('/login', (req, res) => {
     id: user.id,
     username,
   }
+  req.session.save();
+
   // should be redirecting to the game lobby page
+  // res.end("login success")
   res.redirect('/user/lobby.html')
 })
 
 userRoutes.get('/role', (req, res) => {
-  console.log("having get role req")
+  // console.log("having get role req")
   res.json({
     user: req.session.user,
   })

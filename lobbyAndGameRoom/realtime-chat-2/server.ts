@@ -8,11 +8,14 @@ import { sessionMiddleware } from './session-middleware';
 
 import { formatMessage } from './utils/messages';
 import { getCurrentUser, getRoomUsers, userJoin, userLeave } from './utils/users';
-import { userRoutes } from './routes/user.routes'
+
+
 
 let app = express()
 let server = http.createServer(app)
-let io = new socketIO.Server(server)
+export let io = new socketIO.Server(server)
+import { userRoutes } from './routes/user.routes';
+import { roomRoutes } from './routes/room.routes';
 
 // counter for socketio connection
 let onlineCount = 0
@@ -58,20 +61,9 @@ const botName = "Coup Bot";
 
 // other resources routing
 app.use(userRoutes)
+app.use(roomRoutes)
 
-// Error handling middleware
-app.use((error: any, req: Request, res: Response, next: NextFunction) => {
-  if ('statusCode' in error) {
-    res.status(error.statusCode)
-  } else {
-    res.status(500)
-  }
-  let message = String(error)
-  message = message.replace(/\w+: /, '')
-  res.json({
-    error: message,
-  })
-})
+
 // Report route not found
 app.use((req, res, next) => {
   res.status(404)
@@ -139,6 +131,24 @@ io.on("connection", (socket) => {
   });
 });
 
+// Error handling middleware
+app.use((error: any, req: Request, res: Response, next: NextFunction) => {
+  if ('statusCode' in error) {
+    res.status(error.statusCode)
+  } else {
+    res.status(500)
+  }
+  let message = String(error)
+  message = message.replace(/\w+: /, '')
+  res.json({
+    error: message,
+  })
+})
+
+app.use((req, res) => {
+  res.status(404);
+  res.json({ error: 'route not found' });
+})
 const PORT = 8100;
 
 server.listen(PORT, () => {
