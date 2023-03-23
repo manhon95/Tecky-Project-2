@@ -22,16 +22,27 @@ document
     });
 
     const result = await res.json(); // { success: true }
-    console.log(result);
 
     for (const key in result) {
       document.querySelector(`.${key}`).textContent = result[key];
       let elementBorder = key.split("-");
       const div = document.querySelector(`.${elementBorder[1]}`);
+      let borderCheck = false;
 
-      if (result[key] == "") {
-        borderCheck = true;
+      console.log(key + borderCheck+"--key");
+      if (!borderCheck) {
+        console.log(key + result[key]+"--invalid");
+
+        if (result[key] == "") {
+          console.log(key + result[key]+"--valid");
+          borderCheck = true;
+        }
       }
+
+      if(div.style.border.includes("red")){
+        continue;
+      }
+      
       if (borderCheck) {
         div.style.border = "solid 5px green";
       } else {

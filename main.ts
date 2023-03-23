@@ -3,6 +3,18 @@ import { saveUserDetails } from "./manageUserAccount";
 import { passwordChecker } from "./LoginAuthenticate";
 import { print } from "listening-on";
 import path from "path";
+// import { Client } from "pg";
+// import dotenv from "dotenv";
+
+
+// dotenv.config();
+// export  const client = new Client({
+//   database: process.env.DB_NAME,
+//   user: process.env.DB_USERNAME,
+//   password: process.env.DB_PASSWORD,
+// });
+// client.connect()
+
 // import Session from "express-session";
 //  import {}
 let app = express();

@@ -1,25 +1,36 @@
 import { Request, Response } from "express";
 import jsonfile from "jsonfile";
+import fs from "fs"
+import { Client } from "pg";
+import dotenv from "dotenv";
+
+dotenv.config();
+export  const client = new Client({
+  database: process.env.DB_NAME,
+  user: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+});
+
 
 /* --------------------------- bug fix suggestion --------------------------- */
 
 //import fs from "fs";
 
-// const filePath = "userDetail.json"; //filePath wil use several times
+const filePath = "userDetail.json"; //filePath wil use several times
 
-// try {
-//   fs.accessSync(filePath, fs.constants.F_OK); //this function will return error if user file is not accessible
-// } catch (error) {
-//   fs.writeFileSync(filePath, JSON.stringify([])); // it error happen, create a new file with json empty array
-// }
+try {
+  fs.accessSync(filePath, fs.constants.F_OK); //this function will return error if user file is not accessible
+} catch (error) {
+  fs.writeFileSync(filePath, JSON.stringify([])); // it error happen, create a new file with json empty array
+}
 
-// export let users: User[] = jsonfile.readFileSync(filePath); //load the user array from user file, export them so that it can be reused in other files
+export let users: User[] = jsonfile.readFileSync(filePath); //load the user array from user file, export them so that it can be reused in other files
 
 /* ----------------------------------- end ---------------------------------- */
-
-let users: User[] = jsonfile.readFileSync("userDetail.json");
+let maxId = 0
+// export let users: User[] = jsonfile.readFileSync("userDetail.json");
 type User = {
-  id: string
+  id: number
   title: string;
   firstName: string;
   lastName: string;
@@ -28,11 +39,14 @@ type User = {
   email: string;
   password: string;
 };
-
 //This function get info from http request and save as use detail
 export async function saveUserDetails(req: Request, res: Response) {
+
+  for(let user of users){
+    maxId = Math.max(maxId, user.id||0)
+  }
   let checkStatus = true;
-  let id = Math.random().toString(36)+Math.random().toString(36)
+  let id = maxId + 1
   let title = req.body.title;
   let firstName = req.body.firstName;
   let lastName = req.body.lastName;
@@ -42,11 +56,10 @@ export async function saveUserDetails(req: Request, res: Response) {
   let password = req.body.password;
   let confirmPassword = req.body.confirmPassword;
   let emailFormat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+
   let report = {};
 
-  // let body = req.body
-  //  for(let i in body){
-  // }
+
 
   if (password.length < 8) {
     res.status(400);
@@ -55,13 +68,14 @@ export async function saveUserDetails(req: Request, res: Response) {
   } else {
     report["passwordLength-password"] = "";
   }
+  
   if (password != confirmPassword) {
-    report["pwCheck-confirmPassword"] = "Confirm password is different*";
+    report["pwCheck-password"] = "Confirm password is different*";
   if(password!=confirmPassword){
     report["pwCheck-password"] = "Confirm password is different*"
     checkStatus = false;
   } else {
-    report["pwCheck-confirmPassword"] = "";
+    report["pwCheck-password"] = "";
   }
 }else{
   report["pwCheck-password"] = ""
@@ -85,8 +99,8 @@ export async function saveUserDetails(req: Request, res: Response) {
   }
   if (checkStatus) {
     users.push({
-      id: id,
-      title: title,
+      id,
+      title,
       firstName,
       lastName,
       monthOfBirth,
@@ -95,9 +109,23 @@ export async function saveUserDetails(req: Request, res: Response) {
       password,
     });
     await jsonfile.writeFile("userDetail.json", users);
+
+    //----------------------------------------------------------------------------------------------
+    //using ajax
+main().catch(e => console.error(e))
+
+
     res.end("done");
   } else {
     res.status(400);
     res.json(report);
+  }
+  async function main(){
+    await client.connect()
+  await client.query(/* sql */'insert into "user" (id, email, user_name, password) values ($1,$2,$3,$4)', [id, email, firstName, password]) 
+  
+  
+    await client.end()
+    console.log("account create success")
   }
 }
