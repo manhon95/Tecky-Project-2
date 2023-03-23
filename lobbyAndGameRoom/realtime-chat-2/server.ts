@@ -13,6 +13,11 @@ import { userRoutes } from './routes/user.routes'
 let app = express()
 let server = http.createServer(app)
 let io = new socketIO.Server(server)
+
+// counter for socketio connection
+let onlineCount = 0
+
+// decode middleware definition(added some error checking)
 let urlencoded = (req: Request, res: Response, next: NextFunction) => {
   let type = req.headers['content-type']
   if (type !== 'application/x-www-form-urlencoded') {
@@ -74,6 +79,11 @@ app.use((req, res, next) => {
 })
 // Run when client connects
 io.on("connection", (socket) => {
+  // Alert server upon new connection & increment the counter
+  console.log('connection established, id:', socket.id);
+  onlineCount++
+  io.emit('online-count', onlineCount);
+
   socket.on("joinRoom", ({ username, room }) => {
     console.log(socket.id);
     const user = userJoin(socket.id, username, room);
@@ -107,6 +117,12 @@ io.on("connection", (socket) => {
 
   // Runs when client disconnects
   socket.on("disconnect", () => {
+    // game lobby part
+    console.log('disconnected , id:', socket.id)
+    onlineCount--
+    io.emit('online-count', onlineCount);
+
+    // chatroom demo part
     const user = userLeave(socket.id);
     if (user) {
       io.to(user.room).emit(

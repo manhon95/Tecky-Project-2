@@ -1,6 +1,7 @@
 import '../session-middleware';
 import { getString, HttpError } from '../utils/express';
-import { Request, Router } from 'express';
+import express, { Request, Router } from 'express';
+import { hasLogin } from '../guard';
 
 export let userRoutes = Router();
 
@@ -34,7 +35,7 @@ userRoutes.post('/login', (req, res) => {
     username,
   }
   // should be redirecting to the game lobby page
-  res.redirect('/temp.html')
+  res.redirect('/user/lobby.html')
 })
 
 userRoutes.get('/role', (req, res) => {
@@ -43,3 +44,5 @@ userRoutes.get('/role', (req, res) => {
     user: req.session.user,
   })
 })
+
+userRoutes.use('/user', hasLogin, express.static('protected'))
