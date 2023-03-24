@@ -1,8 +1,8 @@
-import '../lobbyAndGameRoom/prototype/session-middleware';
+import '../session-middleWare';
 import { getString, HttpError } from '../utils/express';
-import express, { Request, Router } from 'express';
-import { getSessionUser, hasLogin } from '../lobbyAndGameRoom/prototype/guard';
-import { io } from '../lobbyAndGameRoom/prototype/server';
+import { Router } from 'express';
+import { isLoggedIn } from '../guard';
+import { io } from '../main';
 
 type Room = {
   id: number
@@ -17,10 +17,10 @@ const roomCapacity = 2;
 export let roomRoutes = Router();
 
 // handling room creation request
-roomRoutes.post('/rooms', hasLogin, ((req, res) => {
+roomRoutes.post('/rooms', isLoggedIn, ((req, res) => {
   let roomName = getString(req, 'name')
-  if (getSessionUser(req)) {
-    let owner = getSessionUser(req).username;
+  if (req.session.user) {
+    let owner = req.session.user?.firstName;
     if (rooms.find(room => room.owner === owner) !== undefined) {
       throw new HttpError(400, 'You already own a room')
     }

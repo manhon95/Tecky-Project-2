@@ -1,7 +1,7 @@
-import '../session-middleware';
+import '../lobbyAndGameRoom/prototype/session-middleware';
 import { getString, HttpError } from '../utils/express';
 import express, { Request, Router } from 'express';
-import { getSessionUser, hasLogin } from '../guard';
+import { getSessionUser, hasLogin } from '../lobbyAndGameRoom/prototype/guard';
 import path from 'path';
 import { ParsedQs } from 'qs';
 

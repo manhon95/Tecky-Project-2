@@ -6,16 +6,16 @@ import socketIO from 'socket.io';
 import { print } from 'listening-on';
 import { sessionMiddleware } from './session-middleware';
 
-import { formatMessage } from './utils/messages';
-import { getCurrentPlayer, getRoomPlayers, playerJoin, playerLeave } from './utils/players';
+import { formatMessage } from '../../utils/messages';
+import { getCurrentPlayer, getRoomPlayers, playerJoin, playerLeave } from '../../utils/players';
 
 
 
 let app = express()
 let server = http.createServer(app)
 export let io = new socketIO.Server(server)
-import { userRoutes } from './routes/user.routes';
-import { rooms, roomRoutes } from './routes/room.routes';
+import { userRoutes } from '../../routes/user.routes';
+import { rooms, roomRoutes } from '../../routes/room.routes';
 
 // counter for socketio connection
 let onlineCount = 0
