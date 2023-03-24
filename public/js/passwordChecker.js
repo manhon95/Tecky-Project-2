@@ -21,6 +21,6 @@ document
       document.querySelector(".wrongPasswordMessage").textContent =
         result.error;
     } else {
-      location.href = "/gameroom.html";
+      location.href = "/gameroom";
     }
   });

@@ -1,57 +1,59 @@
 import { Request, Response } from "express";
-import jsonfile from "jsonfile";
-import fs from "fs"
+// import jsonfile from "jsonfile";
+// import fs from "fs"
 import { Client } from "pg";
 import dotenv from "dotenv";
 
 dotenv.config();
-export  const client = new Client({
-  database: process.env.DB_NAME,
-  user: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-});
 
 
 /* --------------------------- bug fix suggestion --------------------------- */
 
 //import fs from "fs";
 
-const filePath = "userDetail.json"; //filePath wil use several times
+// const filePath = "userDetail.json"; //filePath wil use several times
 
-try {
-  fs.accessSync(filePath, fs.constants.F_OK); //this function will return error if user file is not accessible
-} catch (error) {
-  fs.writeFileSync(filePath, JSON.stringify([])); // it error happen, create a new file with json empty array
-}
+// try {
+//   fs.accessSync(filePath, fs.constants.F_OK); //this function will return error if user file is not accessible
+// } catch (error) {
+//   fs.writeFileSync(filePath, JSON.stringify([])); // it error happen, create a new file with json empty array
+// }
 
-export let users: User[] = jsonfile.readFileSync(filePath); //load the user array from user file, export them so that it can be reused in other files
+// export let users: User[] = jsonfile.readFileSync(filePath); //load the user array from user file, export them so that it can be reused in other files
 
 /* ----------------------------------- end ---------------------------------- */
-let maxId = 0
+// let maxId = 0
 // export let users: User[] = jsonfile.readFileSync("userDetail.json");
-type User = {
-  id: number
-  title: string;
-  firstName: string;
-  lastName: string;
-  monthOfBirth: number;
-  yearOfBirth: number;
-  email: string;
-  password: string;
-};
+// type User = {
+//   id: number
+//   title: string;
+//   firstName: string;
+//   lastName: string;
+//   monthOfBirth: number;
+//   yearOfBirth: number;
+//   email: string;
+//   password: string;
+// };
 //This function get info from http request and save as use detail
 export async function saveUserDetails(req: Request, res: Response) {
+     const client = new Client({
+    database: process.env.DB_NAME,
+    user: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+  });
+  await client.connect()
 
-  for(let user of users){
-    maxId = Math.max(maxId, user.id||0)
-  }
+  // for(let user of users){
+  //   maxId = Math.max(maxId, user.id||0)
+  // }
+
+
   let checkStatus = true;
-  let id = maxId + 1
-  let title = req.body.title;
-  let firstName = req.body.firstName;
-  let lastName = req.body.lastName;
-  let monthOfBirth = req.body.monthOfBirth;
-  let yearOfBirth = req.body.yearOfBirth;
+  // let id = maxId + 1
+  let emailFromDB = await client.query(/* sql */'select email from "user" where email=($1)',[req.body.email]) 
+  let elo = 1000
+   let userName = req.body.userName;
+  let birthday = req.body.monthOfBirth+"/"+req.body.yearOfBirth;
   let email = req.body.email;
   let password = req.body.password;
   let confirmPassword = req.body.confirmPassword;
@@ -88,44 +90,39 @@ export async function saveUserDetails(req: Request, res: Response) {
   } else {
     report["Format-email"] = "";
   }
-  for (let user of users) {
-    if (user.email == email) {
+
+  if (emailFromDB.rows[0]==undefined) {
+    report["duplicate-email"] = "";
+  } else {
       report["duplicate-email"] = "Email already used*";
       checkStatus = false;
-      continue;
-    } else {
-      report["duplicate-email"] = "";
+
     }
-  }
   if (checkStatus) {
-    users.push({
-      id,
-      title,
-      firstName,
-      lastName,
-      monthOfBirth,
-      yearOfBirth,
-      email,
-      password,
-    });
-    await jsonfile.writeFile("userDetail.json", users);
+    // users.push({
+    //   id,
+    //   title,
+    //   firstName,
+    //   lastName,
+    //   monthOfBirth,
+    //   yearOfBirth,
+    //   email,
+    //   password,
+    // });
+    // await jsonfile.writeFile("userDetail.json", users);
 
     //----------------------------------------------------------------------------------------------
     //using ajax
-main().catch(e => console.error(e))
 
+    await client.query(/* sql */`insert into "user" (email, user_name, password, birthday, elo) 
+    values ($1,$2,$3,to_date('${birthday}','MM/YYYY'),$4)`, [ email, userName, password,elo]) 
 
     res.end("done");
   } else {
     res.status(400);
     res.json(report);
   }
-  async function main(){
-    await client.connect()
-  await client.query(/* sql */'insert into "user" (id, email, user_name, password) values ($1,$2,$3,$4)', [id, email, firstName, password]) 
   
   
     await client.end()
-    console.log("account create success")
-  }
 }

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Online Board Game Room</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f0f0f0;
+      }
+
+      .game-room {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        width: 50%;
+        height: 80%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .game-info,
+      .player-info,
+      .chat-area {
+        margin-bottom: 20px;
+      }
+
+      .game-info {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .game-info div {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 10px;
+        text-align: center;
+      }
+
+      .player-info {
+        flex-grow: 1;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 10px;
+      }
+
+      .player {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px 0;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .chat-area {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 10px;
+      }
+
+      .message {
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="game-room">
+      <div class="game-info">
+        <div>Map Type: Forest</div>
+        <div>Players: 4/4</div>
+        <div>Room Name: Room 1</div>
+      </div>
+      <div class="player-info">
+        <div class="player">
+          <span class="playerName">Player 1</span>
+          <span>Level 10</span>
+        </div>
+        <div class="player">
+          <span>Player 2</span>
+          <span>Level 3</span>
+        </div>
+        <div class="player">
+          <span>Player 3是；否啊</span>
+          <span>Level 4</span>
+        </div>
+      </div>
+      <div class="chat-area">
+        <div class="message">
+          <span>Player 1: I am ready</span>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script src="gameroom.js"></script>
+</html>

@@ -6,8 +6,7 @@ document
     const formObject = {};
 
     formObject["title"] = form.title.value;
-    formObject["firstName"] = form.firstName.value;
-    formObject["lastName"] = form.lastName.value;
+    formObject["userName"] = form.userName.value;
     formObject["monthOfBirth"] = form.monthOfBirth.value;
     formObject["yearOfBirth"] = form.yearOfBirth.value;
     formObject["email"] = form.email.value;
@@ -29,12 +28,9 @@ document
       const div = document.querySelector(`.${elementBorder[1]}`);
       let borderCheck = false;
 
-      console.log(key + borderCheck+"--key");
       if (!borderCheck) {
-        console.log(key + result[key]+"--invalid");
 
         if (result[key] == "") {
-          console.log(key + result[key]+"--valid");
           borderCheck = true;
         }
       }
