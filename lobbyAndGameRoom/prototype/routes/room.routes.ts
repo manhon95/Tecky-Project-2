@@ -21,10 +21,10 @@ roomRoutes.post('/rooms', hasLogin, ((req, res) => {
   if (getSessionUser(req)) {
     let owner = getSessionUser(req).username;
     if (rooms.find(room => room.owner === owner) !== undefined) {
-      throw new HttpError(400, 'Repeated room')
+      throw new HttpError(400, 'You already own a room')
     }
 
-    let room: Room = { id: maxRoomId, name: roomName, owner, count: 1 };
+    let room: Room = { id: maxRoomId, name: roomName, owner, count: 0 };
     rooms.push(room)
     res.json({ maxRoomId });
     maxRoomId++;
