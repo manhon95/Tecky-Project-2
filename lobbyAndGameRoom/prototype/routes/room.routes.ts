@@ -13,6 +13,7 @@ type Room = {
 
 export let rooms: Room[] = [];
 let maxRoomId = rooms.reduce((id, item) => Math.max(id, item.id), 0)
+const roomCapacity = 2;
 export let roomRoutes = Router();
 
 // handling room creation request
@@ -41,3 +42,7 @@ roomRoutes.get('/rooms', (req, res) => {
   res.json({ rooms })
 })
 
+// getting room max capacity 
+roomRoutes.get('/capacity', (req, res) => {
+  res.json({ roomCapacity });
+})

@@ -58,7 +58,9 @@
             <span class="name">test123</span>
             <div>房主 <span class="owner">Ivan</span></div>
             <button class="join-room">join</button>
-            <div>::<span class="count">1</span>/4</div>
+            <div>
+              ::<span class="count">1</span>/<span class="capacity">3</span>
+            </div>
           </div>
         </template>
       </main>
@@ -66,7 +68,7 @@
     <script src="./js/alert.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-      let username = document.querySelector(".username");
+      let usernameDisplay = document.querySelector(".username");
       let status = document.querySelector(".status");
       let onlineCount = document.querySelector(".online-count");
       let newRoomName = document.querySelector("#new-room-name");
@@ -74,51 +76,28 @@
       let template = document.querySelector("template");
       let roomTemplate = template.content.querySelector(".room");
 
+      // Global variables;
+      let username = "";
+      let roomCapacity = 0;
       // adding press enter to submit
       newRoomName.addEventListener("keypress", (event) => {
         if (event.key == "Enter") {
           createRoom();
         }
       });
-      // trigger function for create room button --> send ajax request
-      async function createRoom() {
-        let res = await fetch("/rooms", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: newRoomName.value,
-          }),
-        });
-        let json = await res.json();
-        if (json.error) {
-          showError({
-            title: "Create room fail",
-            text: json.error,
-          });
-          return;
-        } else {
-          // redirect to the chatroom
-          location.href = `/user/chat.html?username=${role}&room=${newRoomName.value}&rid=${json.maxRoomId}`;
-        }
-        // let roomsRes = await fetch("/rooms");
-        // let roomsJson = await res.json();
+      async function loadInfoFromServer() {
+        // update the user name when pages refresh
+        username = await getUsername();
+        usernameDisplay.textContent = username;
+
+        roomCapacity = await getRoomCapacity();
+
+        loadRoomList();
       }
 
-      // Update the login username and display in the welcome page
-      async function updateRole() {
-        console.log("getting role");
-        const usernameRes = await fetch("/role");
-        const usernameResult = await usernameRes.json();
+      loadInfoFromServer().catch((e) => console.error(e));
+      //debug msg to see if I can room capacity
 
-        username.textContent = usernameResult.user.username;
-        role = usernameResult.user.username;
-      }
-
-      let role = "";
-      updateRole().catch((e) => console.error(e));
-      loadRoomList().catch((e) => console.error(e));
       let socket = io.connect();
 
       // on connect update status content
@@ -145,20 +124,28 @@
         roomCount.textContent = room.count;
       });
 
-      function showNewRoom(room) {
-        let roomNode = roomTemplate.cloneNode(true);
-        roomNode.dataset.id = room.id;
-        roomNode.querySelector(".id").textContent = room.id;
-        roomNode.querySelector(".name").textContent = room.name;
-        roomNode.querySelector(".owner").textContent = room.owner;
-        roomNode.querySelector(".count").textContent = room.count;
-        roomNode
-          .querySelector(".join-room")
-          .addEventListener("click", async (e) => {
-            joinRoom(room.id);
-            location.href = `/user/chat.html?username=${role}&room=${room.name}&rid=${room.id}`;
+      // trigger function for create room button --> send ajax request
+      async function createRoom() {
+        let res = await fetch("/rooms", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: newRoomName.value,
+          }),
+        });
+        let json = await res.json();
+        if (json.error) {
+          showError({
+            title: "Create room fail",
+            text: json.error,
           });
-        roomList.appendChild(roomNode);
+          return;
+        } else {
+          // redirect to the chatroom
+          location.href = `/user/chat.html?username=${username}&room=${newRoomName.value}&rid=${json.maxRoomId}`;
+        }
       }
 
       // emit message to update others through SIO when join room
@@ -166,16 +153,57 @@
         socket.emit("inc-room-count", room_id);
       }
 
+      function showNewRoom(room) {
+        let roomNode = roomTemplate.cloneNode(true);
+        roomNode.dataset.id = room.id;
+        roomNode.querySelector(".id").textContent = room.id;
+        roomNode.querySelector(".name").textContent = room.name;
+        roomNode.querySelector(".owner").textContent = room.owner;
+        roomNode.querySelector(".count").textContent = room.count;
+        roomNode.querySelector(".capacity").textContent = roomCapacity;
+        roomNode
+          .querySelector(".join-room")
+          .addEventListener("click", async (e) => {
+            let currentCount = +roomNode.querySelector(".count").textContent;
+            if (currentCount + 1 > roomCapacity) {
+              showError({ title: "Cannot join room", text: "the room is max" });
+            } else {
+              joinRoom(room.id);
+              location.href = `/user/chat.html?username=${username}&room=${room.name}&rid=${room.id}`;
+            }
+          });
+        roomList.appendChild(roomNode);
+      }
+
       async function loadRoomList() {
         let res = await fetch("/rooms");
         let json = await res.json();
         if (json.error) {
-          sweetAlertShowError(json.error);
+          showError(json.error);
           return;
         }
         for (let room of json.rooms) {
           showNewRoom(room);
         }
+      }
+
+      // get roomCapacity through get method
+      async function getRoomCapacity() {
+        let res = await fetch("/capacity");
+        let json = await res.json();
+        if (json.error) {
+          showError(json.error);
+          return;
+        }
+        return json.roomCapacity;
+      }
+
+      // Update the login username and display in the welcome page
+      async function getUsername() {
+        const usernameRes = await fetch("/username");
+        const usernameResult = await usernameRes.json();
+
+        return usernameResult.username;
       }
     </script>
   </body>

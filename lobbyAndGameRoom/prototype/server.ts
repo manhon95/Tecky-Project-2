@@ -7,7 +7,7 @@ import { print } from 'listening-on';
 import { sessionMiddleware } from './session-middleware';
 
 import { formatMessage } from './utils/messages';
-import { getCurrentUser, getRoomUsers, userJoin, userLeave } from './utils/users';
+import { getCurrentPlayer, getRoomPlayers, playerJoin, playerLeave } from './utils/players';
 
 
 
@@ -83,26 +83,26 @@ io.on("connection", (socket) => {
   })
   socket.on("joinRoom", ({ username, room, rid }) => {
     // console.log(socket.id);
-    const user = userJoin(socket.id, username, room);
-    console.log(`room${rid} has new comer`);
+    const user = playerJoin(socket.id, username, room, false);
+    // console.log(`room${rid} has new comer`);
     rooms[rid].count++;
     io.emit('new-inc', rooms[rid]);
     socket.join(user.room);
     // Welcome current user
-    socket.emit("message", formatMessage(botName, "Welcome to ChatCord!"));
+    socket.emit("message", formatMessage(botName, "Welcome to Coup!, enjoy the game!"));
 
     // Broadcast when a user connects
     socket.broadcast
       .to(user.room)
       .emit(
         "message",
-        formatMessage(botName, `${user.username} has joined the chat!`)
+        formatMessage(botName, `${user.username} has joined the game!`)
       );
 
     // Send users and room info
     io.to(user.room).emit("roomUsers", {
       room: user.room,
-      users: getRoomUsers(user.room),
+      users: getRoomPlayers(user.room),
     });
   });
 
@@ -115,7 +115,7 @@ io.on("connection", (socket) => {
   })
   // Listen for chatMessage
   socket.on("chatMessage", (msg) => {
-    const user = getCurrentUser(socket.id);
+    const user = getCurrentPlayer(socket.id);
     if (user) {
       io.to(user.room).emit("message", formatMessage(user.username, msg));
     }
@@ -128,7 +128,7 @@ io.on("connection", (socket) => {
     io.emit('online-count', onlineCount);
 
     // chatroom demo part
-    const user = userLeave(socket.id);
+    const user = playerLeave(socket.id);
     if (user) {
       io.to(user.room).emit(
         "message",
@@ -138,7 +138,7 @@ io.on("connection", (socket) => {
       // Send users and room info
       io.to(user.room).emit("roomUsers", {
         room: user.room,
-        users: getRoomUsers(user.room),
+        users: getRoomPlayers(user.room),
       });
     }
   });

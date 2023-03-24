@@ -44,11 +44,11 @@ userRoutes.post('/login', (req, res) => {
 
 })
 
-userRoutes.get('/role', hasLogin, (req, res) => {
+userRoutes.get('/username', hasLogin, (req, res) => {
   // console.log("having get role req")
-  let user = getSessionUser(req)
+  let username = getSessionUser(req).username
   res.json({
-    user
+    username
   })
 })
 
