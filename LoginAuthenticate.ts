@@ -5,14 +5,7 @@ import "./session-middleWare";
 
 
 export let loginRouter = Router();
-// import jsonfile from "jsonfile";
-
-// let users = jsonfile.readFileSync("userDetail.json");
 dotenv.config();
-
-// let userPassword =
-// let user = main()
-// console.log(user)
 
 export async function passwordChecker(req: Request, res: Response) {
   let email: string = req.body.email;

@@ -1,6 +1,6 @@
 import express, { NextFunction, Request, Response } from "express";
-import { saveUserDetails } from "./manageUserAccount";
-import { passwordChecker } from "./LoginAuthenticate";
+import { saveUserDetails } from "./createUserAccount";
+import { passwordChecker } from "./loginAuthenticate";
 import { print } from "listening-on";
 import path from "path";
 import { sessionMiddleWare } from "./session-middleWare";
@@ -97,16 +97,22 @@ io.on("connection", (socket) => {
   });
 });
 
-// app.post()
 app.post("/register", (req: Request, res: Response) => {
   saveUserDetails(req, res);
 });
-app.post("/login", (req: Request, res: Response) => {
+
+app.post("/login", (req: Request, res: Response,) => {
   passwordChecker(req, res);
 });
+
 app.get("/login", (req: Request, res: Response) => {
   res.sendFile(path.resolve("public", "login-page.html"));
 });
+
+app.use((req: Request, res: Response) => {
+  res.redirect("/login");
+});
+
 app.use(isLoggedIn, express.static('protected'))
 
 app.get('/gameroom', (req: Request, res: Response) => {
@@ -134,12 +140,6 @@ app.use((error: any, req: Request, res: Response, next: NextFunction) => {
   })
 })
 
-
-// app.use((req: Request, res: Response) => {
-//   res.redirect("/login");
-// });
-
-// app.get("/submit" )
 const PORT = 8080;
 server.listen(PORT, () => {
   print(PORT);
