@@ -3,7 +3,7 @@ import socketIO from 'socket.io';
 import { botName } from '../socketIOManager';
 import { formatMessage } from '../utils/messages';
 import { getCurrentPlayer, getRoomPlayers, togglePlayerReady } from '../utils/players';
-import { roomCapacity } from './room.routes';
+
 
 export function createPlayerRoutes(io: socketIO.Server) {
   let playerRoutes = Router();

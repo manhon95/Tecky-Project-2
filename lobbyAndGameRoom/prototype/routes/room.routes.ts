@@ -1,13 +1,8 @@
-import '../lobbyAndGameRoom/prototype/session-middleware';
+import '../session-middleware';
 import { getString, HttpError } from '../utils/express';
 import express, { Request, Router } from 'express';
-<<<<<<< HEAD
-import { getSessionUser, hasLogin } from '../lobbyAndGameRoom/prototype/guard';
-import { io } from '../lobbyAndGameRoom/prototype/server';
-=======
 import { getSessionUser, hasLogin } from '../guard';
 import socketIO from 'socket.io';
->>>>>>> 55cbb7ba6c89a153ddfc9cc2912def97e723e015
 
 type Room = {
   id: number

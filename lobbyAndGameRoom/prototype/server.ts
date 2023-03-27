@@ -4,27 +4,15 @@ import path from 'path';
 import http from 'http';
 import { print } from 'listening-on';
 import { sessionMiddleware } from './session-middleware';
-<<<<<<< HEAD
-
-import { formatMessage } from '../../utils/messages';
-import { getCurrentPlayer, getRoomPlayers, playerJoin, playerLeave } from '../../utils/players';
-=======
 import { initSocketServer } from './socketIOManager';
 import { createRoomRoutes } from './routes/room.routes';
 import { userRoutes } from './routes/user.routes';
->>>>>>> 55cbb7ba6c89a153ddfc9cc2912def97e723e015
+import { createPlayerRoutes } from './routes/player.routes';
 
 
 
 let app = express()
-<<<<<<< HEAD
-let server = http.createServer(app)
-export let io = new socketIO.Server(server)
-import { userRoutes } from '../../routes/user.routes';
-import { rooms, roomRoutes } from '../../routes/room.routes';
-=======
 let server = http.createServer(app);
->>>>>>> 55cbb7ba6c89a153ddfc9cc2912def97e723e015
 
 // Initialize Socket.IO server
 let io = initSocketServer(app, server);
