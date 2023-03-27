@@ -1,17 +1,16 @@
-     async function alert(){
- 
-    const res = await fetch("/register", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+async function alert() {
+  const res = await fetch("/register", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 
-    const result = await res.json(); 
-    console.log("result");
-    console.log(result)
-  }
-  alert()
+  const result = await res.json();
+  console.log("result");
+  console.log(result);
+}
+alert();
 document
   .querySelector(".loginForm")
   .addEventListener("submit", async function (event) {
@@ -35,6 +34,6 @@ document
       document.querySelector(".wrongPasswordMessage").textContent =
         result.error;
     } else {
-      location.href = "/gameroom";
+      location.href = "/user/gameroom";
     }
   });

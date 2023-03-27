@@ -1,17 +1,11 @@
 import { Request, Response } from "express";
-import { Client } from "pg";
 import dotenv from "dotenv";
+import { client } from "./db";
 
 dotenv.config();
 
 //This function get info from http request and save as use detail
 export async function saveUserDetails(req: Request, res: Response) {
-  const client = new Client({
-    database: process.env.DB_NAME,
-    user: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
-  });
-  await client.connect();
 
   let checkStatus = true;
   let emailFromDB = await client.query(
@@ -81,5 +75,4 @@ export async function saveUserDetails(req: Request, res: Response) {
     res.status(400);
     res.json(report);
   }
-  await client.end();
 }

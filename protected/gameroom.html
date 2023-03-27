@@ -10,7 +10,7 @@
       integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk="
       crossorigin="anonymous"
     />
-    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="css/style.css" />
     <title>Coup Game Lobby(Protected)</title>
     <style>
       .username {
@@ -65,7 +65,7 @@
         </template>
       </main>
     </div>
-    <script src="/js/alert.js"></script>
+    <script src="./js/alert.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script>
       let usernameDisplay = document.querySelector(".username");
@@ -144,7 +144,7 @@
           return;
         } else {
           // redirect to the chatroom
-          location.href = `/chat.html?username=${username}&room=${newRoomName.value}&rid=${json.maxRoomId}`;
+          location.href = `/user/chat.html?username=${username}&room=${newRoomName.value}&rid=${json.maxRoomId}`;
         }
       }
 
@@ -169,7 +169,7 @@
               showError({ title: "Cannot join room", text: "the room is max" });
             } else {
               joinRoom(room.id);
-              location.href = `/chat.html?username=${username}&room=${room.name}&rid=${room.id}`;
+              location.href = `/user/chat.html?username=${username}&room=${room.name}&rid=${room.id}`;
             }
           });
         roomList.appendChild(roomNode);

@@ -1,14 +1,24 @@
 {
-    "sqltools.connections": [
-        {
-            "previewLimit": 50,
-            "server": "localhost",
-            "port": 5432,
-            "driver": "PostgreSQL",
-            "name": "gameroom",
-            "database": "game_room",
-            "username": "admin1",
-            "password": "12345678"
-        }
-    ]
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "name": "gameroom",
+      "database": "game_room",
+      "username": "admin1",
+      "password": "12345678"
+    },
+    {
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "name": "project",
+      "database": "project",
+      "username": "wsp010",
+      "password": "wsp010"
+    }
+  ]
 }

@@ -1,15 +1,18 @@
-import { Router } from 'express';
-import socketIO from 'socket.io';
-import { botName } from '../socketIOManager';
-import { formatMessage } from '../utils/messages';
-import { getCurrentPlayer, getRoomPlayers, togglePlayerReady } from '../utils/players';
-
+import { Router } from "express";
+import socketIO from "socket.io";
+import { botName } from "../socketIOManager";
+import { formatMessage } from "../utils/messages";
+import {
+  getCurrentPlayer,
+  getRoomPlayers,
+  togglePlayerReady,
+} from "../utils/players";
 
 export function createPlayerRoutes(io: socketIO.Server) {
   let playerRoutes = Router();
 
   // handling patch player ready state request
-  playerRoutes.patch('/player/ready', (req, res) => {
+  playerRoutes.patch("/player/ready", (req, res) => {
     let allPlayerReady = togglePlayerReady(req, res);
     // Send players and room info
     let player = getCurrentPlayer(req.body.id);
@@ -19,27 +22,30 @@ export function createPlayerRoutes(io: socketIO.Server) {
         players: getRoomPlayers(player.room),
       });
 
-      // count down and force redirect 
+      // count down and force redirect
       if (allPlayerReady) {
         console.log("all ready, game start");
         let countdown = 3;
 
         const countdownInterval = setInterval(() => {
           if (player) {
-            io.to(player.room).emit("message", formatMessage(botName, `${countdown} second to the game start`));
+            io.to(player.room).emit(
+              "message",
+              formatMessage(botName, `${countdown} second to the game start`)
+            );
           }
           countdown--;
 
           if (countdown < 0) {
             clearInterval(countdownInterval);
-            io.emit('redirect-to-game');
+            io.emit("redirect-to-game");
           }
         }, 1000);
       }
     }
 
     res.json({ success: true });
-  })
+  });
 
-  return playerRoutes
+  return playerRoutes;
 }
