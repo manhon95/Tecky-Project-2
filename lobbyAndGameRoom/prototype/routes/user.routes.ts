@@ -2,8 +2,7 @@ import '../session-middleware';
 import { getString, HttpError } from '../utils/express';
 import express, { Request, Router } from 'express';
 import { getSessionUser, hasLogin } from '../guard';
-import path from 'path';
-import { ParsedQs } from 'qs';
+
 
 export let userRoutes = Router();
 
@@ -53,5 +52,7 @@ userRoutes.get('/username', hasLogin, (req, res) => {
 })
 
 userRoutes.use('/user', hasLogin, express.static('protected'))
+
+
 
 

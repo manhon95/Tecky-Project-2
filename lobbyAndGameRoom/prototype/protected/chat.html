@@ -11,16 +11,16 @@
     />
     <link rel="stylesheet" href="css/style.css" />
     <style>
-      .user {
+      .player {
         display: flex;
         gap: 1rem;
       }
-      .ready-state {
+      .player-ready-state {
         background-color: white;
         border: 1px solid black;
         color: red;
       }
-      .ready-state.ready {
+      .player-ready-state.ready {
         color: green;
       }
     </style>
@@ -30,6 +30,7 @@
     <div class="chat-container">
       <header class="chat-header">
         <h1><i class="fas fa-smile"></i> Coup Game</h1>
+        <button class="ready-btn">toggle ready state</button>
         <button class="btn leave-btn">Leave Room</button>
       </header>
       <main class="chat-main">
@@ -76,6 +77,21 @@
       const playerList = document.querySelector("#player-list");
       const leaveBtn = document.querySelector(".leave-btn");
       let template = document.querySelector("template");
+      let readyBtn = document.querySelector(".ready-btn");
+      let clientSocketID = "";
+      // create a post request to change the player ready status
+      readyBtn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const obj = {};
+        obj.id = clientSocketID;
+        const res = await fetch("/player/ready", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(obj),
+        });
+      });
 
       // emit a leave event when the user refreshed the page
       window.addEventListener("beforeunload", (event) => {
@@ -88,12 +104,16 @@
 
       const socket = io();
 
+      // socket on connect get the socketID
+      socket.on("connect", () => {
+        clientSocketID = socket.id;
+      });
+
       // Join chatroom
       socket.emit("join-room", { username, room, rid });
 
       // Get room and users
       socket.on("room-players", ({ room, players }) => {
-        console.log({ players });
         outputRoomName(room);
         outputPlayers(players);
       });
@@ -119,7 +139,10 @@
         e.target.elements.msg.value = "";
         e.target.elements.msg.focus();
       });
-
+      // start the game when all ready
+      socket.on("redirect-to-game", () => {
+        location.href = "game.html";
+      });
       // Leave button decrement room count and direct back to lobby
       leaveBtn.addEventListener("click", () => {
         socket.emit("leave-room", rid);
@@ -158,10 +181,10 @@
           playerNode.querySelector(".player-ready-state");
           if (player.ready) {
             playerReadyState.textContent = "READY";
-            playerReadyState.classList.remove("ready");
+            playerReadyState.classList.add("ready");
           } else {
             playerReadyState.textContent = "NOT READY";
-            playerReadyState.classList.add("ready");
+            playerReadyState.classList.remove("ready");
           }
           playerList.appendChild(playerNode);
         });

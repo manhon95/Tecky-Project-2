@@ -1,3 +1,6 @@
+import { Request, Response } from 'express';
+import { roomCapacity } from '../routes/room.routes';
+
 // this user is for chatroom, not the session stuff from db
 type Player = {
   id: string
@@ -34,10 +37,21 @@ export function getRoomPlayers(room: string) {
 
 // toggle player ready state
 
-export function togglePlayerReady(id: string) {
+export function togglePlayerReady(req: Request, res: Response) {
   players.map((player) => {
-    if (player.id = id) {
+    if (player.id == req.body?.id) {
       player.ready = !player.ready;
     }
   })
+  let currentRoom = getCurrentPlayer(req.body?.id)?.room;
+  // get the player in the "just ready room" and do the checking
+  if (currentRoom) {
+    let playerInRoom = getRoomPlayers(currentRoom);
+    let result = playerInRoom.reduce((acc, curr) => {
+      return acc && curr.ready;
+    }, true)
+    return result && playerInRoom.length == roomCapacity;
+  }
+
+
 } 

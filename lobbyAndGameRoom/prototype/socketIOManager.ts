@@ -8,7 +8,7 @@ import { rooms } from './routes/room.routes';
 let onlineCount = 0
 
 // displaying system message with this name
-const botName = "Coup Bot";
+export const botName = "Coup Bot";
 
 export function initSocketServer(app: Application, httpServer: any) {
   const io = new SocketIO.Server(httpServer);
@@ -40,14 +40,13 @@ export function initSocketServer(app: Application, httpServer: any) {
       io.to(player.room).emit("room-players", {
         room: player.room,
         players: getRoomPlayers(player.room),
-
       });
     });
 
     // User leave the room 
     socket.on("leave-room", (room_id) => {
       console.log(`${room_id} has people left`)
-      rooms[room_id].count--;
+      if (rooms[room_id].count !== undefined) rooms[room_id].count--;
       io.emit('new-inc', rooms[room_id]);
     })
 

@@ -7,6 +7,7 @@ import { sessionMiddleware } from './session-middleware';
 import { initSocketServer } from './socketIOManager';
 import { createRoomRoutes } from './routes/room.routes';
 import { userRoutes } from './routes/user.routes';
+import { createPlayerRoutes } from './routes/player.routes';
 
 
 
@@ -28,7 +29,7 @@ app.use(sessionMiddleware)
 // other resources routing
 app.use(userRoutes)
 app.use(createRoomRoutes(io))
-
+app.use(createPlayerRoutes(io))
 
 // Report route not found
 app.use((req, res, next) => {

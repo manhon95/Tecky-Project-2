@@ -12,6 +12,7 @@ type Room = {
 }
 // Make the rooms global such that the socketIO manager can get them
 export let rooms: Room[] = [];
+export const roomCapacity = 2;
 
 export function createRoomRoutes(io: socketIO.Server) {
 
@@ -19,7 +20,7 @@ export function createRoomRoutes(io: socketIO.Server) {
 
 
   let maxRoomId = rooms.reduce((id, item) => Math.max(id, item.id), 0)
-  const roomCapacity = 2;
+
 
 
   // handling room creation request --> emit & create new room
