@@ -2,7 +2,6 @@ import express, { json, NextFunction, Request, Response, urlencoded } from 'expr
 
 import path from 'path';
 import http from 'http';
-import socketIO from 'socket.io';
 import { print } from 'listening-on';
 import { sessionMiddleware } from './session-middleware';
 import { initSocketServer } from './socketIOManager';

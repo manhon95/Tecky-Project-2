@@ -18,28 +18,29 @@ export function initSocketServer(app: Application, httpServer: any) {
     onlineCount++
     io.emit('online-count', onlineCount);
 
-    socket.on("joinRoom", ({ username, room, rid }) => {
+    socket.on("join-room", ({ username, room, rid }) => {
       // console.log(socket.id);
-      const user = playerJoin(socket.id, username, room, false);
+      const player = playerJoin(socket.id, username, room, false);
       // console.log(`room${rid} has new comer`);
       rooms[rid].count++;
       io.emit('new-inc', rooms[rid]);
-      socket.join(user.room);
-      // Welcome current user
+      socket.join(player.room);
+      // Welcome current player
       socket.emit("message", formatMessage(botName, "Welcome to Coup!, enjoy the game!"));
 
-      // Broadcast when a user connects
+      // Broadcast when a player connects
       socket.broadcast
-        .to(user.room)
+        .to(player.room)
         .emit(
           "message",
-          formatMessage(botName, `${user.username} has joined the game!`)
+          formatMessage(botName, `${player.username} has joined the game!`)
         );
 
-      // Send users and room info
-      io.to(user.room).emit("roomUsers", {
-        room: user.room,
-        users: getRoomPlayers(user.room),
+      // Send players and room info
+      io.to(player.room).emit("room-players", {
+        room: player.room,
+        players: getRoomPlayers(player.room),
+
       });
     });
 
@@ -52,9 +53,9 @@ export function initSocketServer(app: Application, httpServer: any) {
 
     // Listen for chatMessage
     socket.on("chatMessage", (msg) => {
-      const user = getCurrentPlayer(socket.id);
-      if (user) {
-        io.to(user.room).emit("message", formatMessage(user.username, msg));
+      const player = getCurrentPlayer(socket.id);
+      if (player) {
+        io.to(player.room).emit("message", formatMessage(player.username, msg));
       }
     });
 
@@ -65,17 +66,17 @@ export function initSocketServer(app: Application, httpServer: any) {
       io.emit('online-count', onlineCount);
 
       // chatroom demo part
-      const user = playerLeave(socket.id);
-      if (user) {
-        io.to(user.room).emit(
+      const player = playerLeave(socket.id);
+      if (player) {
+        io.to(player.room).emit(
           "message",
-          formatMessage(botName, `${user.username} has left the chat`)
+          formatMessage(botName, `${player.username} has left the chat`)
         );
 
-        // Send users and room info
-        io.to(user.room).emit("roomUsers", {
-          room: user.room,
-          users: getRoomPlayers(user.room),
+        // Send players and room info
+        io.to(player.room).emit("room-players", {
+          room: player.room,
+          players: getRoomPlayers(player.room),
         });
       }
     });
