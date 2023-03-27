@@ -6,8 +6,7 @@ document
     const formObject = {};
 
     formObject["title"] = form.title.value;
-    formObject["firstName"] = form.firstName.value;
-    formObject["lastName"] = form.lastName.value;
+    formObject["userName"] = form.userName.value;
     formObject["monthOfBirth"] = form.monthOfBirth.value;
     formObject["yearOfBirth"] = form.yearOfBirth.value;
     formObject["email"] = form.email.value;
@@ -22,31 +21,20 @@ document
     });
 
     const result = await res.json(); // { success: true }
-
+    if(result.success=="success"){
+      location.href = "/login";
+    }
     for (const key in result) {
-      document.querySelector(`.${key}`).textContent = result[key];
-      let elementBorder = key.split("-");
-      const div = document.querySelector(`.${elementBorder[1]}`);
-      let borderCheck = false;
-
-      console.log(key + borderCheck+"--key");
-      if (!borderCheck) {
-        console.log(key + result[key]+"--invalid");
-
-        if (result[key] == "") {
-          console.log(key + result[key]+"--valid");
-          borderCheck = true;
-        }
-      }
-
-      if(div.style.border.includes("red")){
-        continue;
-      }
-      
-      if (borderCheck) {
-        div.style.border = "solid 5px green";
-      } else {
-        div.style.border = "solid 5px red";
+      const div = document.querySelectorAll(`.${key}`);
+      if(key=="email"||key=="password"){
+        for(let i of div){
+        if (result[key]) {
+          i.style.border = "solid 5px green";
+        } else {
+          i.style.border = "solid 5px red";
+        }}
+      }else{
+        document.querySelector(`.${key}`).textContent = result[key];
       }
     }
   });
