@@ -1,19 +1,19 @@
 import { Request, Response } from "express";
 import dotenv from "dotenv";
 import { client } from "./db";
+import "./session-middleware";
 
 dotenv.config();
 
 //This function get info from http request and save as use detail
 export async function saveUserDetails(req: Request, res: Response) {
-
   let checkStatus = true;
   let emailFromDB = await client.query(
     /* sql */ 'select email from "user" where email=($1)',
     [req.body.email]
   );
   let elo = 1000;
-  let userName = req.body.userName;
+  let userName: string = req.body.userName;
   let birthday = req.body.monthOfBirth + "/" + req.body.yearOfBirth;
   let email = req.body.email;
   let password = req.body.password;
@@ -69,7 +69,12 @@ export async function saveUserDetails(req: Request, res: Response) {
     values ($1,$2,$3,to_date('${birthday}','MM/YYYY'),$4)`,
       [email, userName, password, elo]
     );
+    let id = await client.query(`select id from "user" where user_name=($1)`, [
+      userName,
+    ]);
     report["success"] = "success";
+    req.session.user = { id: id.rows[0].id, username: userName };
+    req.session.save();
     res.json(report);
   } else {
     res.status(400);

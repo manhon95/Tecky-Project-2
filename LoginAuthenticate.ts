@@ -26,7 +26,7 @@ export async function login(req: Request, res: Response) {
   }
 }
 
-async function getDetail(email: string) {
+export async function getDetail(email: string) {
   let userDetails = await client.query(
     'select id, email, user_name, password from "user" where email=($1)',
     [email]

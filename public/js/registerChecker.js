@@ -23,7 +23,7 @@ document.querySelector(".registerForm")
 
     const result = await res.json();
     if (result.success == "success") {
-      location.href = "/login";
+      location.href = "/user/gameroom";
     }
     for (const key in result) {
       const div = document.querySelectorAll(`.${key}`);
