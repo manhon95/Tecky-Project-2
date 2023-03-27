@@ -17,17 +17,27 @@ export function playerJoin(id: string, username: string, room: string, ready: bo
 }
 
 export function getCurrentPlayer(id: string) {
-  return players.find((user) => user.id === id);
+  return players.find((player) => player.id === id);
 }
 
 // User leaves chat
 export function playerLeave(id: string) {
-  const index = players.findIndex((user) => user.id === id);
+  const index = players.findIndex((player) => player.id === id);
   if (index === -1) return;
   return players.splice(index, 1)[0];
 }
 
 // Get room players
 export function getRoomPlayers(room: string) {
-  return players.filter((user) => user.room === room);
+  return players.filter((player) => player.room === room);
 }
+
+// toggle player ready state
+
+export function togglePlayerReady(id: string) {
+  players.map((player) => {
+    if (player.id = id) {
+      player.ready = !player.ready;
+    }
+  })
+} 
