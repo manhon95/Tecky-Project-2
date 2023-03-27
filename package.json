@@ -24,7 +24,8 @@
     "jsonfile": "^6.1.0",
     "listening-on": "^2.0.9",
     "moment": "^2.29.4",
-    "pg": "^8.10.0"
+    "pg": "^8.10.0",
+    "sweetalert2": "^11.7.3"
   },
   "devDependencies": {
     "@types/express": "^4.17.17",

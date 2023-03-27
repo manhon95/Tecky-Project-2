@@ -1,3 +1,17 @@
+     async function alert(){
+ 
+    const res = await fetch("/register", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const result = await res.json(); 
+    console.log("result");
+    console.log(result)
+  }
+  alert()
 document
   .querySelector(".loginForm")
   .addEventListener("submit", async function (event) {

@@ -109,15 +109,15 @@ app.get("/login", (req: Request, res: Response) => {
   res.sendFile(path.resolve("public", "login-page.html"));
 });
 
-app.use((req: Request, res: Response) => {
-  res.redirect("/login");
-});
-
 app.use(isLoggedIn, express.static('protected'))
 
 app.get('/gameroom', (req: Request, res: Response) => {
   res.sendFile(path.resolve("protected", "gameroom.html"));
 });
+
+app.use((req: Request, res: Response) => {
+  res.redirect("/login");
+});  
 
 app.get('/username', (req, res) => {
   // console.log("having get role req")
