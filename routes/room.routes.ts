@@ -13,7 +13,7 @@ type Room = {
 
 export let rooms: Room[] = [];
 let maxRoomId = rooms.reduce((id, item) => Math.max(id, item.id), 0)
-const roomCapacity = 6;
+export const roomCapacity = 6;
 export let roomRoutes = Router();
 
 // handling room creation request
