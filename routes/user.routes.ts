@@ -51,7 +51,7 @@ userRoutes.patch("/usernames/:id", async (req, res) => {
   let newName = req.body.newName;
   let id = req.params.id;
   // check duplicate
-  console.log("before check duplicate");
+  // console.log("before check duplicate");
   let result = await client.query(
     /* sql */ `
 select user_name from "user" where user_name = $1
