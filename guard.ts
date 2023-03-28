@@ -3,7 +3,7 @@ import { HttpError } from "./utils/express";
 import "./session-middleware";
 
 export function isLoggedIn(req: Request, res: Response, next: NextFunction) {
-  console.log("ok", req.session.user);
+  // console.log("ok", req.session.user);
   if (req.session.user?.id) {
     next();
   } else {

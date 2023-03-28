@@ -40,7 +40,7 @@ userRoutes.get("/profiles/:id", async (req, res) => {
   const userId = +req.params.id;
   let result = await getInfoFromDB(userId);
   result.birthday = dayjs(result.birthday).format("DD/MM/YYYY");
-  console.log(result);
+  // console.log(result);
   // change the date format
 
   res.json(result);
