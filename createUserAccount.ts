@@ -15,7 +15,10 @@ export async function saveUserDetails(req: Request, res: Response) {
   );
   let elo = 1000;
   let userName: string = req.body.userName;
-  let birthday = req.body.monthOfBirth + "/" + req.body.yearOfBirth;
+  // let birthday2 = req.body.monthOfBirth + "/" + req.body.yearOfBirth;
+  let birthday = new Date();
+  birthday.setFullYear(req.body.yearOfBirth, req.body.monthOfBirth - 1, 1);
+  birthday.setHours(0, 0, 0, 0);
   let email = req.body.email;
   let password = req.body.password;
   let confirmPassword = req.body.confirmPassword;
@@ -68,8 +71,8 @@ export async function saveUserDetails(req: Request, res: Response) {
     //save email, userName, password,elo into database
     await client.query(
       /* sql */ `insert into "user" (email, user_name, password, birthday, elo) 
-    values ($1,$2,$3,to_date('${birthday}','MM/YYYY'),$4)`,
-      [email, userName, newPassword, elo]
+    values ($1,$2,$3,$4,$5)`,
+      [email, userName, newPassword, birthday, elo]
     );
     let id = await client.query(`select id from "user" where user_name=($1)`, [
       userName,
