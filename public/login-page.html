@@ -11,6 +11,7 @@
       crossorigin="anonymous"
     />
     <title>login page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
@@ -22,11 +23,13 @@
     body {
       background: #242424;
     }
-    h1 {
+    .tileContainer {
       height: 80px;
       background: #433cc2;
-      text-align: center;
       margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .mainContain {
@@ -91,7 +94,8 @@
     }
 
     .registerText {
-      font-size: 20px;
+      font-size: 30px;
+      text-align: center;
       margin: 20px 0px;
       height: 170px;
       overflow: auto;
@@ -117,11 +121,16 @@
         border-radius: 40px;
         margin: 30px;
       }
+      .fa-face-smile-wink{
+        color: aliceblue;
+      }
     }
   </style>
 
   <body>
-    <h1>title</h1>
+    <div class="tileContainer">
+      <h1>Coup Game</h1></div>
+
     <div class="mainContain">
       <form action="/login" method="post" class="loginBox loginForm">
         <div class="loginTitle">Login</div>
@@ -159,10 +168,9 @@
       <div class="loginBox2">
         <div class="loginTitle">Register</div>
         <div class="registerText">
-          some textsome textsome textsome textsome textsome textsome textsome
-          textsome textsome textsome textsome textsome textsome textsome
-          textsome textsome textsome textsomsome textsome textsome textssome
-          textsome textsome textsome textome textsome texte text
+          Free card game website!!!<br>
+          Sign in NOW<br>
+          <i class="fa-regular fa-face-smile-wink fa-bounce"></i>
         </div>
         <div class="d-flex justify-content-center mt-4">
           <a

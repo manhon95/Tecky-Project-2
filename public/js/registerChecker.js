@@ -57,4 +57,6 @@ for (let y = 1; y <= 12; y++) {
   createMonth.value = y;
   createMonth.text = y;
   selectMonthDropDown.appendChild(createMonth);
-}
+}document.querySelector(".backArrow").addEventListener("click",()=>{
+  location.href = "/login"
+})
