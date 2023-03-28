@@ -1,0 +1,72 @@
+a {
+  text-decoration: none;
+  color: currentColor;
+}
+
+a:hover {
+  color: currentColor;
+  text-decoration: none;
+}
+
+header.navbar {
+  width: 100vw;
+  height: 100px;
+  background-color: #fff;
+  box-shadow: 0px 3px 8px rgba(0, 0, 0, 25%);
+  display: flex;
+  align-items: center;
+}
+
+header .container-fluid {
+  width: 100%;
+  padding: 0 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+header .navb-logo img {
+  width: 180px;
+  height: 60px;
+}
+
+header .navb-items {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  letter-spacing: 3px;
+}
+
+header .item {
+  text-align: center;
+  font-size: 20px;
+  letter-spacing: 3px;
+  color: #102447;
+  padding: 5px 0;
+  transition: all 0.1s ease;
+  border-bottom: 0px solid #64d6f4;
+  border-top: 0px solid #64d6f4;
+  cursor: pointer;
+}
+
+header .item:hover {
+  border-bottom: 3px solid #64d6f4;
+  border-top: 3px solid #64d6f4;
+}
+
+header .item-button a {
+  background-color: #2478da;
+  width: 150px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  transition: all 0.5s ease;
+}
+
+header .item-button a:hover {
+  background-color: #64d6f4;
+}
