@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css
+    "
+    />
+    <link rel="stylesheet" href="css/nav-bar-style.css" />
+    <style>
+      table {
+        margin-top: 1rem;
+      }
+      table,
+      th,
+      td {
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="navbar"></header>
+    <table>
+      <tr>
+        <th>id</th>
+        <th>username</th>
+        <th>birthday</th>
+        <th>elo</th>
+      </tr>
+      <tr>
+        <td class="user-id"></td>
+        <td class="user-name"></td>
+        <td class="user-birthday"></td>
+        <td class="user-elo"></td>
+      </tr>
+    </table>
+  </body>
+  <script src="./js/loadNavBar.js"></script>
+  <script>
+    async function main() {
+      let result = await loadProfile();
+      let userIdData = document.querySelector(".user-id");
+      let userNameData = document.querySelector(".user-name");
+      let userBirthdayData = document.querySelector(".user-birthday");
+      let userEloData = document.querySelector(".user-elo");
+
+      userIdData.textContent = result.id;
+      userNameData.textContent = result.user_name;
+      userBirthdayData.textContent = result.birthday;
+      userEloData.textContent = result.elo;
+    }
+    async function loadProfile() {
+      const res = await fetch("/profile");
+      const result = await res.json();
+      return result;
+    }
+
+    main().catch((e) => console.error(e));
+  </script>
+</html>

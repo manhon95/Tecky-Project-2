@@ -38,6 +38,7 @@ export function createPlayerRoutes(io: socketIO.Server) {
 
           if (countdown < 0) {
             clearInterval(countdownInterval);
+            // create game function (io, playerIdList)
             io.emit("redirect-to-game");
           }
         }, 1000);
