@@ -17,30 +17,80 @@ export type User = {
 
 userRoutes.post("/login", login);
 
-userRoutes.get("/username", hasLogin, (req, res) => {
+userRoutes.get("/username", hasLogin, async (req, res) => {
   // console.log("having get role req")
-  let username = req.session.user?.username;
+  let username = await getUsernameFromDB(req.session.user?.id);
   res.json({
     username,
   });
 });
 
-userRoutes.get("/profile", async (req, res) => {
-  let result = await getInfoFromDB(req.session.user?.id);
+// return user-id stored in the session data(back-end)
+userRoutes.get("/user-id", hasLogin, async (req, res) => {
+  let id = req.session.user?.id;
+  if (id === undefined) {
+    res.json({ error: "id not exist" });
+    return;
+  }
+  res.json({ id });
+});
+
+// Restful API profile handler
+userRoutes.get("/profiles/:id", async (req, res) => {
+  const userId = +req.params.id;
+  let result = await getInfoFromDB(userId);
   result.birthday = dayjs(result.birthday).format("DD/MM/YYYY");
-  // console.log(result);
+  console.log(result);
   // change the date format
 
   res.json(result);
+});
+
+// change username
+userRoutes.patch("/usernames/:id", async (req, res) => {
+  let newName = req.body.newName;
+  let id = req.params.id;
+  // check duplicate
+  console.log("before check duplicate");
+  let result = await client.query(
+    /* sql */ `
+select user_name from "user" where user_name = $1
+`,
+    [newName]
+  );
+  let row = result.rows[0];
+  if (!row) {
+    // if no existing same name
+    await client.query(
+      /*sql*/ `
+update "user" set user_name = $1 where id = ${id}
+    `,
+      [newName]
+    );
+    res.json({ success: true });
+    return;
+  }
+  res.json({ success: false });
 });
 
 async function getInfoFromDB(id: number | undefined) {
   if (id === undefined) return "error, id not exist";
   let result = await client.query(
     /*sql*/ `
-select id, user_name, birthday, elo from public.user where id= $1
+select id, user_name, birthday, elo from "user" where id= $1
   `,
     [id]
   );
   return result.rows[0];
+}
+
+async function getUsernameFromDB(id: number | undefined) {
+  if (id === undefined) return "error, id not exist";
+  let result = await client.query(
+    /*sql*/ `
+select user_name from "user" where id= $1
+  `,
+    [id]
+  );
+  return result.rows[0].user_name;
 }
