@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import dotenv from "dotenv";
 import { client } from "./db";
 import "./session-middleware";
+import { hashPassword } from "./hash";
 
 dotenv.config();
 
@@ -63,11 +64,12 @@ export async function saveUserDetails(req: Request, res: Response) {
   }
 
   if (checkStatus) {
+    let newPassword = await hashPassword(password);
     //save email, userName, password,elo into database
     await client.query(
       /* sql */ `insert into "user" (email, user_name, password, birthday, elo) 
     values ($1,$2,$3,to_date('${birthday}','MM/YYYY'),$4)`,
-      [email, userName, password, elo]
+      [email, userName, newPassword, elo]
     );
     let id = await client.query(`select id from "user" where user_name=($1)`, [
       userName,

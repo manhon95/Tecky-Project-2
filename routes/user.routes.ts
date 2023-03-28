@@ -15,10 +15,11 @@ export type User = {
 
 userRoutes.post("/login", login);
 
-userRoutes.get("/username", hasLogin, (req, res) => {
-  // console.log("having get role req")
-  let username = req.session.user?.username;
-  res.json({
-    username,
-  });
-});
+//--------------------can it be remove?-----------------
+// userRoutes.get("/username", hasLogin, (req, res) => {
+//   // console.log("having get role req")
+//   let username = req.session.user?.username;
+//   res.json({
+//     username,
+//   });
+// });

@@ -36,7 +36,6 @@ document.querySelector(".registerForm")
           }
         }
       } else {
-        console.log(key, result[key])
         document.querySelector(`.${key}`).textContent = result[key];
       }
     }

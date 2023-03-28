@@ -2,6 +2,7 @@ import { Request, Response, Router } from "express";
 import dotenv from "dotenv";
 import "./session-middleware";
 import { client } from "./db";
+import { checkPassword } from "./hash";
 
 export let loginRouter = Router();
 dotenv.config();
@@ -13,9 +14,15 @@ export async function login(req: Request, res: Response) {
   let status = false;
   let id = users[0]?.id;
   let username = users[0]?.user_name;
-  if (users[0]?.email == email && users[0].password == password) {
+  if (
+    users[0]?.email == email &&
+    (await checkPassword(password, users[0].password))
+  ) {
     status = true;
   }
+
+  //remember me button
+
   if (status) {
     req.session.user = { id, username };
     req.session.save();
