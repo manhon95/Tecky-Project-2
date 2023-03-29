@@ -59,5 +59,5 @@ WHERE fr.receiver_id = 5
   AND fr.accept_time IS NULL;
 -- trying to send request from 4 to 6
 insert into "friend_request" (sender_id, receiver_id, message)
-values (4, 6, 'trying to create request');
+values (4, 6, 'default message');
 -- reject friend request query
