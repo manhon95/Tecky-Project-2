@@ -24,6 +24,7 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
+    "grant": "^5.4.21",
     "jsonfile": "^6.1.0",
     "listening-on": "^2.0.9",
     "moment": "^2.29.4",

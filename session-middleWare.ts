@@ -1,4 +1,5 @@
 import session from "express-session";
+import { GrantSession } from "grant";
 
 export let sessionMiddleware = session({
   secret:
@@ -15,8 +16,9 @@ export let sessionMiddleware = session({
 declare module "express-session" {
   interface SessionData {
     user: {
-      id: number;
+      id: number|null;
       username: string;
     };
+    grant?: GrantSession
   }
 }
