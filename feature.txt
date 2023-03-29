@@ -1,0 +1,12 @@
+1. user is able to add friend, unlock certain functionalities
+  a. able to see their profile after adding friend
+  b. accept/reject friend request in a separate "social page"
+
+2. add shop in the game
+  a. when registered, each user have 10 coins
+  b. buy item with coins, unlock badge
+  c. badge will be shown in the chatroom, next their name(player can only choose
+     to equip with one badge at a time)
+
+3. store match history after the game played
+  a. 2-6 player in game, only one winner

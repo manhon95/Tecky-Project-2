@@ -9,3 +9,4 @@ create table "user"(
 
 alter TABLE "user" ALTER COLUMN PASSWORD DROP NOT NULL;
 alter TABLE "user" ALTER COLUMN birthday DROP NOT NULL;
+alter table "user" add unique (user_name);
