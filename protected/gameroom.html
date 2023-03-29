@@ -32,9 +32,19 @@
         display: flex;
         gap: 15px;
       }
+      .logOutButton{
+        position: absolute;
+        font-size: 20px;
+        right: 30px;
+        top: 130px;
+        z-index: 2;
+        border-radius: 10px;
+        background: none;
+      }
     </style>
   </head>
   <body>
+    <button type="button" class="logOutButton">Log Out</button>
     <header class="navbar"></header>
     <p>status: <span class="status">connecting...</span></p>
     <p>online users: <span class="online-count"></span></p>
@@ -71,6 +81,7 @@
             </div>
           </div>
         </template>
+
       </main>
     </div>
     <script src="./js/loadNavBar.js"></script>
@@ -95,13 +106,19 @@
         }
       });
 
+      //Log out function
+document.querySelector(".logOutButton")
+  .addEventListener("click", async function () {
+      const res = await fetch("/login/logout", {
+      method: "post"});
+      location.href = "/login"
+    })
+
       async function loadInfoFromServer() {
         // update the user name when pages refresh
         username = await getUsername();
         usernameDisplay.textContent = username;
-
         roomCapacity = await getRoomCapacity();
-
         loadRoomList();
       }
 

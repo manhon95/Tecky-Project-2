@@ -5,4 +5,7 @@ create table "user"(
     birthday date not null,
     password varchar(255) not null,
     elo smallint not null
-)
+);
+
+alter TABLE "user" ALTER COLUMN PASSWORD DROP NOT NULL;
+alter TABLE "user" ALTER COLUMN birthday DROP NOT NULL;

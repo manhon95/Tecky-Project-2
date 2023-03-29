@@ -9,6 +9,8 @@ import { createRoomRoutes } from "./routes/room.routes";
 import { userRoutes } from "./routes/user.routes";
 import { createPlayerRoutes } from "./routes/player.routes";
 import { isLoggedIn } from "./guard";
+import grant from "grant";
+import { env } from "./env";
 
 let app = express();
 let server = http.createServer(app);
@@ -22,6 +24,20 @@ app.use(express.urlencoded());
 app.use(express.json());
 
 app.use(sessionMiddleware);
+
+app.use(grant.express({
+  defaults: {
+    origin: 'http://localhost:'+env.port,
+    transport: "session",
+    state: true,
+  },
+  google: {
+    key: env.GOOGLE_CLIENT_ID || "",
+    secret: env.GOOGLE_CLIENT_SECRET || "",
+    scope: ["profile", "email"],
+    callback: "/login/google",
+  },
+}))
 
 app.use(userRoutes);
 app.use(createRoomRoutes(io));

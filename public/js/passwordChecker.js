@@ -31,7 +31,7 @@ document
     formObject["email"] = form.email.value;
     formObject["password"] = form.password.value;
     formObject["errorMessage"] = "";
-    const res = await fetch("/login", {
+    const res = await fetch("/login/password", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
