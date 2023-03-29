@@ -13,7 +13,7 @@ type Room = {
 };
 // Make the rooms global such that the socketIO manager can get them
 export let rooms: Room[] = [];
-export const roomCapacity = 2;
+export const roomCapacity = 4;
 
 export function createRoomRoutes(io: socketIO.Server) {
   let roomRoutes = Router();

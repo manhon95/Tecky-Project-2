@@ -8,3 +8,15 @@ create table "user"(
 )
 
 alter table "user" add unique (user_name);
+
+create table "friend_request" (
+    id serial primary key
+    ,sender_id integer
+    ,FOREIGN KEY (sender_id) REFERENCES "user"(id)
+    ,receiver_id integer
+    ,FOREIGN KEY (receiver_id) REFERENCES "user"(id)
+    ,message TEXT
+    ,accept_time timestamp null
+    ,reject_time timestamp null
+)
+

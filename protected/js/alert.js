@@ -7,7 +7,6 @@ function showError({ title, text }) {
     icon: "error",
     title,
     text,
-    footer: "try again later",
   });
 }
 
