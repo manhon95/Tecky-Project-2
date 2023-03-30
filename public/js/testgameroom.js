@@ -15,6 +15,6 @@ btn.addEventListener("click", function () {
   socket.emit("gameStart");
 });
 
-socket.on("gameCreated", () => {
-  location.href = "/coup";
+socket.on("gameCreated", (arg) => {
+  location.href = `/coup?game=${arg.game.id}`;
 });

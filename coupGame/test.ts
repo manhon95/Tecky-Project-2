@@ -6,9 +6,11 @@ import socket from "socket.io";
 import path from "path";
 import { Game } from "./coupGame";
 import { addCoupSocketFunction } from "./coupSocketFunction";
+import { createCoupGame, getGameById } from "./coupGameList";
+import "../session-middleWare";
+
 declare module "express-session" {
   interface SessionData {
-    user: { id: string; firstName: string };
     socketList: string[];
   }
 }
@@ -36,12 +38,19 @@ io.use((socket, next) => {
   sessionMiddleware(req, res, next as express.NextFunction);
 });
 
-app.get("/test", (req: Request, res: Response) => {
+app.get("/", (req: Request, res: Response) => {
   res.sendFile(path.resolve("../Public", "testgameroom.html"));
 });
 
 app.get("/coup", (req: Request, res: Response) => {
-  res.sendFile(path.resolve("../Public", "coup-game.html"));
+  try {
+    if (typeof req.query.game == "string") {
+      getGameById(req.query.game);
+    }
+    res.sendFile(path.resolve("../Public", "coup-game.html"));
+  } catch (e) {
+    res.redirect("/");
+  }
 });
 
 type GameJson = {
@@ -54,29 +63,32 @@ io.on("connection", (socket) => {
   // setup user id
   req.session.user = {
     id: req.sessionID.slice(0, 4),
-    firstName: req.sessionID.slice(5, 8),
+    username: req.sessionID.slice(5, 8),
   };
   req.session.save();
+  if (req.session.user.id == null) {
+    throw new Error("user not found");
+  }
+  let myId = req.session.user.id;
   // player join room
   socket.on("askPlayerIn", () => {
     req.session.socketList = req.session.socketList
       ? [...req.session.socketList, socket.id]
       : [socket.id];
-    console.log("socketList: ", req.session.socketList);
     // every session contain a socketList contain all the socket.id from the session
     req.session.save();
-    if (req.session.user && !roomPlayerList.includes(req.session.user.id)) {
-      roomPlayerList.push(req.session.user.id);
+    if (req.session.user && !roomPlayerList.includes(myId)) {
+      roomPlayerList.push(myId);
     }
     io.emit("playerIn", { roomPlayerList: roomPlayerList });
   });
   socket.on("gameStart", () => {
-    console.log(roomPlayerList);
+    let gameId = "1";
     /* -------------------------------- important ------------------------------- */
-    game = new Game("1", roomPlayerList, io);
+    createCoupGame(gameId, roomPlayerList, io);
     /* ----------------------------------- end ---------------------------------- */
     //game.playerList[0].setSocket(socket);
-    io.emit("gameCreated");
+    io.emit("gameCreated", { game: { id: gameId } });
   });
 
   socket.on("disconnect", () => {
@@ -88,17 +100,15 @@ io.on("connection", (socket) => {
     req.session.save();
     if (
       req.session.user &&
-      roomPlayerList.includes(req.session.user.id) &&
+      roomPlayerList.includes(myId) &&
       req.session.socketList?.length == 0
     ) {
-      roomPlayerList = roomPlayerList.filter(
-        (player) => player !== req.session.user?.id
-      );
+      roomPlayerList = roomPlayerList.filter((player) => player !== myId);
     }
     io.emit("playerIn", { roomPlayerList: roomPlayerList });
   });
   /* -------------------------------- important ------------------------------- */
-  addCoupSocketFunction(io, socket, game, req.session);
+  addCoupSocketFunction(io, socket, req.session);
   /* ----------------------------------- end ---------------------------------- */
 });
 app.get("/checkSession", (req, res) => {

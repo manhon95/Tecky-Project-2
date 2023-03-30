@@ -1,6 +1,7 @@
 import { Session, SessionData } from "express-session";
 import socket from "socket.io";
 import { Game, createIoFunction } from "./coupGame";
+import { getGameById } from "./coupGameList";
 
 type GameJson = {
   my: { id: string; hand: number[]; balance: number };
@@ -12,19 +13,16 @@ const { answerAction } = createIoFunction();
 export function addCoupSocketFunction(
   io: socket.Server,
   socket: socket.Socket,
-  gameList: object, //gameList example: {game.id:gameObj}
   session: Session & Partial<SessionData>
 ) {
   if (!session.user || !session.user.id) {
     throw new Error("User not found");
   }
   let myId = session.user.id;
-  if (!session.socketGameMap) {
-    throw new Error("SocketGameMap not found");
-  }
-  let game = gameList[session.socketGameMap[socket.id]];
-  socket.on("askGameInit", () => {
-    console.log(game.getPlayerIndexById(myId));
+  let game: Game;
+
+  socket.on("askGameInit", (arg) => {
+    game = getGameById(arg.game.id);
     socket.join(game.id);
     let gameJson: GameJson = {
       my: {
@@ -45,11 +43,10 @@ export function addCoupSocketFunction(
       }
     }
     socket.emit("ansGameInit", gameJson);
-  });
+    socket.on("gameInitFinished", () => {
+      game.sendGameState();
+    });
 
-  socket.on("gameInitFinished", () => {
-    game.sendGameState();
+    socket.on("answerAction", answerAction(game));
   });
-
-  socket.on("answerAction", answerAction(game));
 }

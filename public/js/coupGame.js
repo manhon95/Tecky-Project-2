@@ -9,6 +9,9 @@ const exchange = document.querySelector("#exchange");
 const steal = document.querySelector("#steal");
 
 const msgBox = document.querySelector("#message-box");
+const url = new URL(location.href);
+const searchParams = new URLSearchParams(url.search);
+const gameId = searchParams.get("game");
 
 const cardPathMap = [
   "/img/ambassador.jpg",
@@ -17,7 +20,7 @@ const cardPathMap = [
   "/img/contessa.jpg",
   "/img/duke.jpg",
 ];
-socket.emit("askGameInit");
+socket.emit("askGameInit", { game: { id: gameId } });
 socket.on("ansGameInit", function (game) {
   init(game);
 });
