@@ -1,1 +1,1 @@
-delete from "user"
+delete from "user"Tables

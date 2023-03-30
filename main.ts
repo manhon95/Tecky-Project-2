@@ -38,7 +38,6 @@ app.use(grant.express({
     callback: "/login/google",
   },
 }))
-
 app.use(userRoutes);
 app.use(createRoomRoutes(io));
 app.use(createPlayerRoutes(io));

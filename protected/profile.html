@@ -51,6 +51,7 @@
     async function main() {
       let id = await getUserId();
       console.log(id);
+      
       let result = await loadProfile(id);
       let userIdData = document.querySelector(".user-id");
       let userNameData = document.querySelector(".user-name");

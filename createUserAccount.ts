@@ -3,8 +3,14 @@ import dotenv from "dotenv";
 import { client } from "./db";
 import "./session-middleware";
 import { hashPassword } from "./hash";
-
+import crypto from "crypto"
+// import sgMail = from "@sendgrid/mail"
 dotenv.config();
+
+
+
+//------------------insert type------- 5:30-------
+
 
 //This function get info from http request and save as use detail
 export async function saveUserDetails(req: Request, res: Response) {
@@ -66,6 +72,22 @@ export async function saveUserDetails(req: Request, res: Response) {
     report["email"] = false;
   }
 
+
+
+
+//-----------------------here insert send email content--------
+
+
+
+
+
+
+
+
+
+//0------------------add isVerified--------------
+
+
   if (checkStatus) {
     let newPassword = await hashPassword(password);
     //save email, userName, password,elo into database
@@ -74,9 +96,7 @@ export async function saveUserDetails(req: Request, res: Response) {
     values ($1,$2,$3,$4,$5)`,
       [email, userName, newPassword, birthday, elo]
     );
-    let id = await client.query(`select id from "user" where user_name=($1)`, [
-      userName,
-    ]);
+    let id = await client.query(`select id from "user" where user_name=($1)`,[userName]);
     report["success"] = "success";
     req.session.user = { id: id.rows[0].id, username: userName };
     req.session.save();

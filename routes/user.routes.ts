@@ -20,13 +20,10 @@ userRoutes.post("/login/password", login);
 
 //Log out function
 userRoutes.post("/login/logout", (req, res)=>{
-  console.log("here")
   if (req.session.user){
-    console.log("save")
 req.session.user.id = null;
 req.session.user.username = "";
 req.session.save()
-console.log(req.session.user)
 res.end()
   }
 });
@@ -35,7 +32,6 @@ res.end()
 userRoutes.get("/login/google", async (req, res, next)=>{
   try{
     let accessToken = req.session?.grant?.response?.access_token
-    let raw = req.session?.grant?.response?.raw;
     const googleRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo',{
       method:"get",
       headers:{
@@ -43,7 +39,6 @@ userRoutes.get("/login/google", async (req, res, next)=>{
         } 
       })
     let googleJson = await googleRes.json()
-    console.log(googleJson)
     let resultDB = await client.query(
       'select id, user_name from "user" where email =($1)', [googleJson.email]
     )
@@ -62,7 +57,6 @@ userRoutes.get("/login/google", async (req, res, next)=>{
   let id = await client.query(
     'select id, user_name from "user" where email =($1)', [googleJson.email]
   )
-  console.log()
 req.session.user = {id: id.rows[0].id, username: googleJson.name}
 req.session.save()
   res.redirect('/user/gameroom')
