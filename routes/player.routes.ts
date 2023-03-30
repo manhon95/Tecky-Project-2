@@ -9,43 +9,13 @@ import {
   togglePlayerReady,
 } from "../utils/players";
 
+type GameParams = {
+  roomName: string;
+  PlayerIdList: string[];
+  io: socketIO.Server;
+};
 export function createPlayerRoutes(io: socketIO.Server) {
   let playerRoutes = Router();
-
-  // handling patch player ready state request
-  playerRoutes.patch("/player/ready", (req, res) => {
-    let allPlayerReady = togglePlayerReady(req, res);
-    // Send players and room info
-    let player = getCurrentPlayer(req.body.id);
-    if (player) {
-      io.to(player.room).emit("room-players", {
-        room: player.room,
-        players: getRoomPlayers(player.room),
-      });
-
-      // count down and force redirect
-      if (allPlayerReady) {
-        // console.log("all ready, game start");
-        let countdown = 3;
-
-        const countdownInterval = setInterval(() => {
-          if (player) {
-            io.to(player.room).emit(
-              "message",
-              formatMessage(botName, `${countdown} second to the game start`)
-            );
-          }
-          countdown--;
-
-          if (countdown < 0) {
-            clearInterval(countdownInterval);
-            // create game function (io, playerIdList)
-            io.emit("redirect-to-game");
-          }
-        }, 1000);
-      }
-    }
-  });
 
   // handling check if player are friends
   playerRoutes.get("/friends/:userId1/:userId2", async (req, res) => {

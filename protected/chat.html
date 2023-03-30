@@ -104,19 +104,7 @@
       let template = document.querySelector("template");
       let readyBtn = document.querySelector(".ready-btn");
       let clientSocketID = "";
-      // create a post request to change the player ready status
-      readyBtn.addEventListener("click", async (e) => {
-        e.preventDefault();
-        const obj = {};
-        obj.id = clientSocketID;
-        const res = await fetch("/player/ready", {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(obj),
-        });
-      });
+
       const socket = io();
 
       // Get username and room from URL
@@ -143,6 +131,21 @@
         // socket on connect get the socketID
         socket.on("connect", () => {
           clientSocketID = socket.id;
+          // create a post request to change the player ready status
+          readyBtn.addEventListener("click", async (e) => {
+            // e.preventDefault();
+            // const obj = {};
+            // obj.id = clientSocketID;
+            console.log("sent emit", clientSocketID);
+            socket.emit("ready", clientSocketID);
+            // const res = await fetch("/player/ready", {
+            //   method: "PATCH",
+            //   headers: {
+            //     "Content-Type": "application/json",
+            //   },
+            //   body: JSON.stringify(obj),
+            // });
+          });
         });
 
         // Join chatroom

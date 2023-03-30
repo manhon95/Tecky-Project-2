@@ -41,13 +41,13 @@ export function getRoomPlayers(room: string) {
   return players.filter((player) => player.room === room);
 }
 
-export function togglePlayerReady(req: Request, res: Response) {
+export function togglePlayerReady(clientSocketID: string) {
   players.map((player) => {
-    if (player.socketId == req.body?.id) {
+    if (player.socketId == clientSocketID) {
       player.ready = !player.ready;
     }
   });
-  let currentRoom = getCurrentPlayer(req.body?.id)?.room;
+  let currentRoom = getCurrentPlayer(clientSocketID)?.room;
   // get the player in the "just ready room" and do the checking
   if (currentRoom) {
     let playerInRoom = getRoomPlayers(currentRoom);

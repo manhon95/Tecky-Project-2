@@ -5,9 +5,11 @@ import {
   getRoomPlayers,
   playerJoin,
   playerLeave,
+  togglePlayerReady,
 } from "./utils/players";
 import { formatMessage } from "./utils/messages";
 import { rooms } from "./routes/room.routes";
+import express from "express";
 
 // counter for socketIO connection
 let onlineCount = 0;
@@ -19,6 +21,8 @@ export function initSocketServer(app: Application, httpServer: any) {
   const io = new SocketIO.Server(httpServer);
   // Alert server upon new connection & increment the counter
   io.on("connection", (socket) => {
+    const req = socket.request as express.Request;
+    console.log(req.session.user?.id);
     // Alert server upon new connection & increment the counter
     onlineCount++;
     io.emit("online-count", onlineCount);
@@ -55,6 +59,57 @@ export function initSocketServer(app: Application, httpServer: any) {
         room: player.room,
         players: getRoomPlayers(player.room),
       });
+    });
+
+    // socketIO version of ready
+    socket.on("ready", (clientSocketID) => {
+      console.log(
+        `userID ${req.session.user?.id} ready, with socketID ${clientSocketID}`
+      );
+      let allPlayerReady = togglePlayerReady(clientSocketID);
+      // Send players and room info
+      let player = getCurrentPlayer(clientSocketID);
+      if (player) {
+        io.to(player.room).emit("room-players", {
+          room: player.room,
+          players: getRoomPlayers(player.room),
+        });
+
+        // count down and force redirect
+        if (allPlayerReady) {
+          // console.log("all ready, game start");
+          let countdown = 3;
+
+          const countdownInterval = setInterval(() => {
+            if (player) {
+              io.to(player.room).emit(
+                "message",
+                formatMessage(botName, `${countdown} second to the game start`)
+              );
+              countdown--;
+
+              if (countdown < 0) {
+                clearInterval(countdownInterval);
+                let players = getRoomPlayers(player.room);
+                let roomName = player.room;
+                let playerIdList: string[] = [];
+                players.map((player) => {
+                  playerIdList.push(player.userId.toString());
+                });
+                // pass arg to victor function here
+                console.log(
+                  "playerIdList:",
+                  playerIdList,
+                  "room-name:",
+                  roomName
+                );
+                // game = new Game("1", roomPlayerList, io);
+                io.emit("redirect-to-game");
+              }
+            }
+          }, 1000);
+        }
+      }
     });
 
     // User leave the room
@@ -103,6 +158,9 @@ export function initSocketServer(app: Application, httpServer: any) {
       }
     });
   });
+
+  /* ---------------------------------- TODO ---------------------------------- */
+  // addCoupSocketFunction(io, socket, game, req.session);
 
   return io;
 }
