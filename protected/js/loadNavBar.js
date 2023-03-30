@@ -6,6 +6,9 @@ navBarHeader.innerHTML = /*html*/ `
 </div>
 <div class="navb-items d-flex gap-3">
   <div class="item">
+    <a href="social.html">Social</a>
+  </div>
+  <div class="item">
     <a href="gameroom.html">Game lobby</a>
   </div>
   <div class="item-button">

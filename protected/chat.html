@@ -14,6 +14,7 @@
       .player {
         display: flex;
         gap: 1rem;
+        position: relative;
       }
       .player-ready-state {
         background-color: white;
@@ -22,6 +23,16 @@
       }
       .player-ready-state.ready {
         color: green;
+      }
+      .player .profile {
+        color: black;
+        background: white;
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform: translate(0, -50%);
+        display: none;
+        z-index: 2;
       }
     </style>
     <title>ChatCord App</title>
@@ -43,7 +54,11 @@
               <li class="player">
                 <span class="player-name">Ivan</span>
                 <div class="player-ready-state">READY</div>
+                <div class="profile">
+                  <div class="friend-status">Not friend</div>
+                </div>
               </li>
+              <button class="add-friend-btn">add</button>
             </template>
           </ul>
         </div>
@@ -70,6 +85,7 @@
       referrerpolicy="no-referrer"
     ></script>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="./js/alert.js"></script>
     <script>
       const chatForm = document.querySelector("#chat-form");
       const chatMessages = document.querySelector(".chat-messages");
@@ -92,62 +108,69 @@
           body: JSON.stringify(obj),
         });
       });
+      const socket = io();
 
-      // emit a leave event when the user refreshed the page
-      window.addEventListener("beforeunload", (event) => {
-        socket.emit("leave-room", rid);
-      });
       // Get username and room from URL
       const { username, room, rid } = Qs.parse(location.search, {
         ignoreQueryPrefix: true,
       });
 
-      const socket = io();
-
-      // socket on connect get the socketID
-      socket.on("connect", () => {
-        clientSocketID = socket.id;
-      });
-
-      // Join chatroom
-      socket.emit("join-room", { username, room, rid });
-
-      // Get room and users
-      socket.on("room-players", ({ room, players }) => {
-        outputRoomName(room);
-        outputPlayers(players);
-      });
-
-      // Message from server
-      socket.on("message", (message) => {
-        outputMessage(message);
-
-        // Scroll down
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      });
-
-      // Message submit
-      chatForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        // Get message text
-        const msg = e.target.elements.msg.value;
-
-        // Emit message to server
-        socket.emit("chatMessage", msg);
-
-        // Clear input
-        e.target.elements.msg.value = "";
-        e.target.elements.msg.focus();
-      });
-      // start the game when all ready
-      socket.on("redirect-to-game", () => {
-        location.href = "game.html";
-      });
       // Leave button decrement room count and direct back to lobby
       leaveBtn.addEventListener("click", () => {
         socket.emit("leave-room", rid);
         location.href = "/user/gameroom.html";
       });
+
+      // emit a leave event when the user refreshed the page
+      window.addEventListener("beforeunload", (event) => {
+        socket.emit("leave-room", rid);
+      });
+      main().catch((e) => console.error(e));
+
+      // Get the userId and send to server
+      async function main() {
+        let currentUserId = await getUserId();
+
+        // socket on connect get the socketID
+        socket.on("connect", () => {
+          clientSocketID = socket.id;
+        });
+
+        // Join chatroom
+        socket.emit("join-room", { username, room, rid, currentUserId });
+
+        // Get room and users
+        socket.on("room-players", async ({ room, players }) => {
+          outputRoomName(room);
+          await outputPlayers(players);
+        });
+
+        // Message from server
+        socket.on("message", (message) => {
+          outputMessage(message);
+
+          // Scroll down
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        });
+
+        // Message submit
+        chatForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          // Get message text
+          const msg = e.target.elements.msg.value;
+
+          // Emit message to server
+          socket.emit("chatMessage", msg);
+
+          // Clear input
+          e.target.elements.msg.value = "";
+          e.target.elements.msg.focus();
+        });
+        // start the game when all ready
+        socket.on("redirect-to-game", () => {
+          location.href = "game.html";
+        });
+      }
 
       // Output message to DOM
 
@@ -167,14 +190,57 @@
       }
 
       // Add users to DOM
-      function outputPlayers(players) {
+      async function outputPlayers(players) {
+        let myId = await getUserId();
         clearAllChildNode(playerList);
         players.map((player) => {
           let playerNode = template.content
             .querySelector(".player")
             .cloneNode(true);
-          playerNode.querySelector(".player-name").textContent =
-            player.username;
+          let playerName = playerNode.querySelector(".player-name");
+          playerName.textContent = player.username;
+          // when hovering a user in a room --> check if they are friend
+          playerName.addEventListener("mouseover", async () => {
+            let profile = playerNode.querySelector(".profile");
+
+            profile.style.display = "block";
+            profile.addEventListener("mouseleave", () => {
+              profile.style.display = "none";
+            });
+            // console.log(`You are hovering ${player.userId}`);
+            let result = await checkFriend(myId, player.userId);
+            if (result) {
+              profile.querySelector(".friend-status").textContent = "friend";
+            } else {
+              profile.querySelector(".friend-status").textContent =
+                "not friend";
+              let button = template.content
+                .querySelector(".add-friend-btn")
+                .cloneNode(true);
+              button.addEventListener("click", async () => {
+                // firing a add friend request
+                let res = await fetch(
+                  `/friend-requests/${myId}/${player.userId}`,
+                  {
+                    method: "POST",
+                  }
+                );
+                let result = await res.json();
+                if (result.success) {
+                  showSuccess({
+                    title: "",
+                    text: `sent friend request to ${player.username}`,
+                  });
+                  return;
+                }
+                showError({ title: "", text: `You cannot add yourself` });
+              });
+              if (!profile.querySelector(".add-friend-btn")) {
+                profile.appendChild(button);
+              }
+            }
+          });
+
           let playerReadyState = playerNode.querySelector(
             ".player-ready-state"
           );
@@ -194,10 +260,22 @@
         // `;
       }
 
+      // check friend function
+      async function checkFriend(myId, someoneId) {
+        let res = await fetch(`/friends/${myId}/${someoneId}`);
+        let result = await res.json();
+        return result.areFriends;
+      }
+
       function clearAllChildNode(parent) {
         while (parent.firstChild) {
           parent.removeChild(parent.firstChild);
         }
+      }
+      async function getUserId() {
+        let res = await fetch("/user-id");
+        let result = await res.json();
+        return result.id;
       }
     </script>
   </body>

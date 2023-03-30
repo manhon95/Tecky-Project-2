@@ -23,10 +23,16 @@ export function initSocketServer(app: Application, httpServer: any) {
     onlineCount++;
     io.emit("online-count", onlineCount);
 
-    socket.on("join-room", ({ username, room, rid }) => {
+    socket.on("join-room", ({ username, room, rid, currentUserId }) => {
       // console.log(socket.id);
-      const player = playerJoin(socket.id, username, room, false);
-      // console.log(`room${rid} has new comer`);
+      const player = playerJoin(
+        socket.id,
+        username,
+        room,
+        false,
+        currentUserId
+      );
+
       rooms[rid].count++;
       io.emit("new-inc", rooms[rid]);
       socket.join(player.room);
@@ -53,9 +59,11 @@ export function initSocketServer(app: Application, httpServer: any) {
 
     // User leave the room
     socket.on("leave-room", (room_id) => {
-      console.log(`${room_id} has people left`);
-      if (rooms[room_id].count !== undefined) rooms[room_id].count--;
-      io.emit("new-inc", rooms[room_id]);
+      // console.log(`${room_id} has people left`);
+      if (rooms[room_id]?.count !== undefined) {
+        rooms[room_id].count--;
+        io.emit("new-inc", rooms[room_id]);
+      }
     });
 
     // Listen for chatMessage

@@ -2,21 +2,23 @@ import { roomCapacity } from "../routes/room.routes";
 import { Request, Response } from "express";
 // this user is for chatroom, not the session stuff from db
 type Player = {
-  id: string;
+  socketId: string;
   username: string;
   room: string;
   ready: boolean;
+  userId: number;
 };
 const players: Player[] = [];
 
 // Join user to chat
 export function playerJoin(
-  id: string,
+  socketId: string,
   username: string,
   room: string,
-  ready: boolean
+  ready: boolean,
+  userId: number
 ) {
-  const player = { id, username, room, ready };
+  const player = { socketId, username, room, ready, userId };
 
   players.push(player);
 
@@ -24,12 +26,12 @@ export function playerJoin(
 }
 
 export function getCurrentPlayer(id: string) {
-  return players.find((player) => player.id === id);
+  return players.find((player) => player.socketId === id);
 }
 
 // User leaves chat
 export function playerLeave(id: string) {
-  const index = players.findIndex((player) => player.id === id);
+  const index = players.findIndex((player) => player.socketId === id);
   if (index === -1) return;
   return players.splice(index, 1)[0];
 }
@@ -41,7 +43,7 @@ export function getRoomPlayers(room: string) {
 
 export function togglePlayerReady(req: Request, res: Response) {
   players.map((player) => {
-    if (player.id == req.body?.id) {
+    if (player.socketId == req.body?.id) {
       player.ready = !player.ready;
     }
   });
@@ -52,7 +54,7 @@ export function togglePlayerReady(req: Request, res: Response) {
     let result = playerInRoom.reduce((acc, curr) => {
       return acc && curr.ready;
     }, true);
-    return result && playerInRoom.length == roomCapacity;
+    return result && playerInRoom.length >= 2;
   }
   return;
 }
