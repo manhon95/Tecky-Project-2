@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Coup Game</title>
-    <link rel="stylesheet" href="/Public/css/index.css" />
+    <link rel="stylesheet" href="/css/index.css" />
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -17,6 +17,7 @@
       integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
       crossorigin="anonymous"
     ></script>
+    <script src="/socket.io/socket.io.js"></script>
   </head>
   <body>
     <div class="container">
@@ -83,186 +84,138 @@
             >
               <div id="players-1-info" class="col-2 border border-dark">
                 <div
-                  id="players-1-card-board"
+                  id="card-board"
                   class="d-flex justify-content-between border border-dark"
                 >
                   <img
-                    id="players-1-card-1"
+                    id="card-1"
                     class="card img-fluid col-5"
-                    src="/Public/img/cardBack.jpg"
+                    src="/img/cardBack.jpg"
                   />
                   <img
-                    id="players-1-card-2"
+                    id="card-2"
                     class="card img-fluid col-5"
-                    src="/Public/img/cardBack.jpg"
+                    src="/img/cardBack.jpg"
                   />
                 </div>
                 <div>
                   <p>Player 1</p>
-                  <p>Balance:0</p>
-                </div>
-              </div>
-              <div id="players-1-info" class="col-2 border border-dark">
-                <div
-                  id="players-1-card-board"
-                  class="d-flex justify-content-between border border-dark"
-                >
-                  <img
-                    id="players-1-card-1"
-                    class="card img-fluid col-5"
-                    src="/Public/img/cardBack.jpg"
-                  />
-                  <img
-                    id="players-1-card-2"
-                    class="card img-fluid col-5"
-                    src="/Public/img/cardBack.jpg"
-                  />
-                </div>
-                <div>
-                  <p>Player 1</p>
-                  <p>Balance:0</p>
-                </div>
-              </div>
-              <div id="players-1-info" class="col-2 border border-dark">
-                <div
-                  id="players-1-card-board"
-                  class="d-flex justify-content-between border border-dark"
-                >
-                  <img
-                    id="players-1-card-1"
-                    class="card img-fluid col-5"
-                    src="/Public/img/cardBack.jpg"
-                  />
-                  <img
-                    id="players-1-card-2"
-                    class="card img-fluid col-5"
-                    src="/Public/img/cardBack.jpg"
-                  />
-                </div>
-                <div>
-                  <p>Player 1</p>
-                  <p>Balance:0</p>
-                </div>
-              </div>
-              <div id="players-1-info" class="col-2 border border-dark">
-                <div
-                  id="players-1-card-board"
-                  class="d-flex justify-content-between border border-dark"
-                >
-                  <img
-                    id="players-1-card-1"
-                    class="card img-fluid col-5"
-                    src="/Public/img/cardBack.jpg"
-                  />
-                  <img
-                    id="players-1-card-2"
-                    class="card img-fluid col-5"
-                    src="/Public/img/cardBack.jpg"
-                  />
-                </div>
-                <div>
-                  <p>Player 1</p>
-                  <p>Balance:0</p>
-                </div>
-              </div>
-              <div id="players-1-info" class="col-2 border border-dark">
-                <div
-                  id="players-1-card-board"
-                  class="d-flex justify-content-between border border-dark"
-                >
-                  <img
-                    id="players-1-card-1"
-                    class="card img-fluid col-5"
-                    src="/Public/img/cardBack.jpg"
-                  />
-                  <img
-                    id="players-1-card-2"
-                    class="card img-fluid col-5"
-                    src="/Public/img/cardBack.jpg"
-                  />
-                </div>
-                <div>
-                  <p>Player 1</p>
-                  <p>Balance:0</p>
-                </div>
-              </div>
-              <div id="players-1-info" class="col-2 border border-dark">
-                <div
-                  id="players-1-card-board"
-                  class="d-flex justify-content-between border border-dark"
-                >
-                  <img
-                    id="players-1-card-1"
-                    class="card img-fluid col-5"
-                    src="/Public/img/cardBack.jpg"
-                  />
-                  <img
-                    id="players-1-card-2"
-                    class="card img-fluid col-5"
-                    src="/Public/img/cardBack.jpg"
-                  />
-                </div>
-                <div>
-                  <p>Player 1</p>
-                  <p>Balance:0</p>
+                  <p>Balance:<span id="balance">0</span></p>
                 </div>
               </div>
             </div>
-            <div
-              id="card-board"
-              class="border- m-4 d-flex justify-content-center"
-            >
-              <img
-                id="card-1"
-                class="card img-fluid col-4 m-4"
-                src="/Public/img/ambassador.jpg"
-              />
-              <img
-                id="card-1"
-                class="card img-fluid col-4 m-4"
-                src="/Public/img/captain.jpg"
-              />
+            <div id="my-info">
+              <div
+                id="card-board"
+                class="border- m-4 d-flex justify-content-center"
+              >
+                <img
+                  id="card-1"
+                  class="card img-fluid col-4 m-4"
+                  src="/img/cardBack.jpg"
+                />
+                <img
+                  id="card-2"
+                  class="card img-fluid col-4 m-4"
+                  src="/img/cardBack.jpg"
+                />
+              </div>
+              <div class="text-center">
+                <p>Balance:<span id="balance">0</span></p>
+              </div>
             </div>
-            <div class="text-center">
-              <p>Balance:0</p>
-            </div>
-            <div id="button-board">
-              <div class="row">
-                <button type="button" class="col-4 btn btn-secondary">
+            <div id="turn-button-board">
+              <div class="row d-flex justify-content-around">
+                <button
+                  id="income"
+                  type="button"
+                  class="col-3 btn btn-secondary"
+                >
                   Income
                 </button>
-                <button type="button" class="col-4 btn btn-secondary">
+                <button
+                  id="foreign-aid"
+                  type="button"
+                  class="col-3 btn btn-secondary"
+                >
                   Foreign Aid
                 </button>
-                <button type="button" class="col-4 btn btn-secondary">
+                <button id="coup" type="button" class="col-3 btn btn-secondary">
                   Coup
                 </button>
               </div>
-              <div class="row">
-                <button type="button" class="col-3 btn btn-secondary">
+              <div class="row d-flex justify-content-around">
+                <button id="tax" type="button" class="col-2 btn btn-secondary">
                   Tax
                 </button>
-                <button type="button" class="col-3 btn btn-secondary">
+                <button
+                  id="assassinate"
+                  type="button"
+                  class="col-2 btn btn-secondary"
+                >
                   Assassinate
                 </button>
-                <button type="button" class="col-3 btn btn-secondary">
+                <button
+                  id="exchange"
+                  type="button"
+                  class="col-2 btn btn-secondary"
+                >
                   Exchange
                 </button>
-                <button type="button" class="col-3 btn btn-secondary">
+                <button
+                  id="steal"
+                  type="button"
+                  class="col-2 btn btn-secondary"
+                >
                   Steal
                 </button>
               </div>
             </div>
+            <div id="challenge-button-board">
+              <div class="row d-flex justify-content-around">
+                <button
+                  id="challenge"
+                  type="button"
+                  class="col-4 btn btn-secondary"
+                >
+                  Challenge
+                </button>
+                <button
+                  id="no-challenge"
+                  type="button"
+                  class="col-4 btn btn-secondary"
+                >
+                  No Challenge
+                </button>
+              </div>
+            </div>
+            <div id="counteraction-button-board">
+              <div class="row d-flex justify-content-around">
+                <button
+                  id="counter"
+                  type="button"
+                  class="col-4 btn btn-secondary"
+                >
+                  Counter
+                </button>
+                <button
+                  id="no-counter"
+                  type="button"
+                  class="col-4 btn btn-secondary"
+                >
+                  No Counter
+                </button>
+              </div>
+            </div>
           </div>
-          <div id="message-box" class="col-3 border border-dark">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vitae
-            dolores consequuntur incidunt sed earum veniam obcaecati fugiat
-            quae, debitis reprehenderit voluptas autem commodi. A, harum atque!
-            Voluptates sequi nemo laborum.
+          <div class="col-3 border border-dark">
+            <h1>message box</h1>
+            <p id="message-box"></p>
           </div>
         </div>
       </main>
       <footer></footer>
+      <script src="/js/coupGame.js"></script>
     </div>
   </body>
 </html>
