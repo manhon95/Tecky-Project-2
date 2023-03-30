@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css
+    "
+    />
+    <link rel="stylesheet" href="css/nav-bar-style.css" />
+    <style>
+      table {
+        margin-top: 1rem;
+      }
+      table,
+      th,
+      td {
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="navbar"></header>
+    <table>
+      <tr>
+        <th>id</th>
+        <th>username</th>
+        <th>birthday</th>
+        <th>elo</th>
+      </tr>
+      <tr>
+        <td class="user-id"></td>
+        <td class="user-name"></td>
+        <td class="user-birthday"></td>
+        <td class="user-elo"></td>
+      </tr>
+    </table>
+
+    <div class="change-name">
+      <span>change your name:</span>
+      <input class="new-name" type="text" />
+      <button class="change-name-btn">submit</button>
+    </div>
+  </body>
+  <script src="./js/loadNavBar.js"></script>
+  <script src="./js/alert.js"></script>
+  <script>
+    async function main() {
+      let id = await getUserId();
+      console.log(id);
+      
+      let result = await loadProfile(id);
+      let userIdData = document.querySelector(".user-id");
+      let userNameData = document.querySelector(".user-name");
+      let userBirthdayData = document.querySelector(".user-birthday");
+      let userEloData = document.querySelector(".user-elo");
+      let changeNameBtn = document.querySelector(".change-name-btn");
+
+      // change name button trigger ajax request to change name
+      changeNameBtn.addEventListener("click", async (e) => {
+        let obj = {};
+        let newName = document.querySelector(".new-name").value;
+        console.log(newName);
+        obj["newName"] = newName;
+        if (newName.length === 0) {
+          showError({ title: "wrong input", text: "cannot be 0 length" });
+          return;
+        }
+        const res = await fetch(`/usernames/${id}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(obj),
+        });
+        const result = await res.json();
+        if (result.success) {
+          showSuccess({
+            title: "success",
+            text: "username updated",
+          });
+          userNameData.textContent = newName;
+          return;
+        }
+        showError({
+          title: "invalid input",
+          text: "username already existed",
+        });
+      });
+
+      userIdData.textContent = result.id;
+      userNameData.textContent = result.user_name;
+      userBirthdayData.textContent = result.birthday;
+      userEloData.textContent = result.elo;
+    }
+    async function loadProfile(id) {
+      const res = await fetch(`/profiles/${id}`);
+      const result = await res.json();
+      return result;
+    }
+    async function getUserId() {
+      let res = await fetch("/user-id");
+      let result = await res.json();
+      return result.id;
+    }
+    main().catch((e) => console.error(e));
+  </script>
+</html>

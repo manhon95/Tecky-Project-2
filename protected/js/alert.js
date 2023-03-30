@@ -7,6 +7,13 @@ function showError({ title, text }) {
     icon: "error",
     title,
     text,
-    footer: "try again later",
+  });
+}
+
+function showSuccess({ title, text }) {
+  Swal.fire({
+    icon: "success",
+    title,
+    text,
   });
 }

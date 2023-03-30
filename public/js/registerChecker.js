@@ -1,6 +1,7 @@
-document
-  .querySelector(".registerForm")
-  .addEventListener("submit", async function (event) {
+
+//---------------------send register form to store in database  --------------------------
+document.querySelector(".registerForm")
+.addEventListener("submit", async function (event) {
     event.preventDefault();
     const form = event.target;
     const formObject = {};
@@ -20,20 +21,21 @@ document
       body: JSON.stringify(formObject),
     });
 
-    const result = await res.json(); // { success: true }
-    if(result.success=="success"){
-      location.href = "/login";
+    const result = await res.json();
+    if (result.success == "success") {
+      location.href = "/user/gameroom";
     }
     for (const key in result) {
       const div = document.querySelectorAll(`.${key}`);
-      if(key=="email"||key=="password"){
-        for(let i of div){
-        if (result[key]) {
-          i.style.border = "solid 5px green";
-        } else {
-          i.style.border = "solid 5px red";
-        }}
-      }else{
+      if (key == "email" || key == "password") {
+        for (let i of div) {
+          if (result[key]) {
+            i.style.border = "solid 5px green";
+          } else {
+            i.style.border = "solid 5px red";
+          }
+        }
+      } else {
         document.querySelector(`.${key}`).textContent = result[key];
       }
     }
@@ -55,4 +57,6 @@ for (let y = 1; y <= 12; y++) {
   createMonth.value = y;
   createMonth.text = y;
   selectMonthDropDown.appendChild(createMonth);
-}
+}document.querySelector(".backArrow").addEventListener("click",()=>{
+  location.href = "/login"
+})

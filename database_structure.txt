@@ -1,0 +1,23 @@
+create table "user"(
+    id serial primary key,
+    user_name varchar(255) not null,
+    email varchar(255) not null,
+    birthday date not null,
+    password varchar(255) not null,
+    elo smallint not null
+);
+
+create table "friend_request" (
+    id serial primary key
+    ,sender_id integer
+    ,FOREIGN KEY (sender_id) REFERENCES "user"(id)
+    ,receiver_id integer
+    ,FOREIGN KEY (receiver_id) REFERENCES "user"(id)
+    ,message TEXT
+    ,accept_time timestamp null
+    ,reject_time timestamp null
+)
+
+alter TABLE "user" ALTER COLUMN PASSWORD DROP NOT NULL;
+alter TABLE "user" ALTER COLUMN birthday DROP NOT NULL;
+alter table "user" add unique (user_name);

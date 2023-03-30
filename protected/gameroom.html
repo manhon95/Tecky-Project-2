@@ -10,7 +10,14 @@
       integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk="
       crossorigin="anonymous"
     />
-    <link rel="stylesheet" href="/css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css
+    "
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/nav-bar-style.css" />
+
     <title>Coup Game Lobby(Protected)</title>
     <style>
       .username {
@@ -25,9 +32,20 @@
         display: flex;
         gap: 15px;
       }
+      .logOutButton{
+        position: absolute;
+        font-size: 20px;
+        right: 30px;
+        top: 130px;
+        z-index: 2;
+        border-radius: 10px;
+        background: none;
+      }
     </style>
   </head>
   <body>
+    <button type="button" class="logOutButton">Log Out</button>
+    <header class="navbar"></header>
     <p>status: <span class="status">connecting...</span></p>
     <p>online users: <span class="online-count"></span></p>
     <div class="join-container">
@@ -63,9 +81,11 @@
             </div>
           </div>
         </template>
+
       </main>
     </div>
-    <script src="/js/alert.js"></script>
+    <script src="./js/loadNavBar.js"></script>
+    <script src="./js/alert.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script>
       let usernameDisplay = document.querySelector(".username");
@@ -85,13 +105,20 @@
           createRoom();
         }
       });
+
+      //Log out function
+document.querySelector(".logOutButton")
+  .addEventListener("click", async function () {
+      const res = await fetch("/login/logout", {
+      method: "post"});
+      location.href = "/login"
+    })
+
       async function loadInfoFromServer() {
         // update the user name when pages refresh
         username = await getUsername();
         usernameDisplay.textContent = username;
-
         roomCapacity = await getRoomCapacity();
-
         loadRoomList();
       }
 
@@ -144,7 +171,7 @@
           return;
         } else {
           // redirect to the chatroom
-          location.href = `/chat.html?username=${username}&room=${newRoomName.value}&rid=${json.maxRoomId}`;
+          location.href = `/user/chat.html?username=${username}&room=${newRoomName.value}&rid=${json.maxRoomId}`;
         }
       }
 
@@ -169,7 +196,7 @@
               showError({ title: "Cannot join room", text: "the room is max" });
             } else {
               joinRoom(room.id);
-              location.href = `/chat.html?username=${username}&room=${room.name}&rid=${room.id}`;
+              location.href = `/user/chat.html?username=${username}&room=${room.name}&rid=${room.id}`;
             }
           });
         roomList.appendChild(roomNode);
