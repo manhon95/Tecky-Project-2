@@ -147,7 +147,7 @@ userRoutes.delete("/users/:idA/friends/:idB", async (req, res) => {
   let userBId = +req.params.idB;
   // console.log(`trying to delete ${userAId}, ${userBId}`);
   let success = await deleteFriendFromDB(userAId, userBId);
-  console.log("trying to delete " + success);
+  // console.log("trying to delete " + success);
   res.json({ success });
 });
 

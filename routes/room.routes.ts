@@ -43,7 +43,6 @@ export function createRoomRoutes(io: socketIO.Server) {
   });
 
   roomRoutes.get("/user/chat.html", hasLogin, (req, res) => {
-    console.log(req.query.username, req.query.room);
     res.sendFile(path.resolve("protected", "chat.html"));
   });
   // showing all room content
