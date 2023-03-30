@@ -63,9 +63,9 @@ export function initSocketServer(app: Application, httpServer: any) {
 
     // socketIO version of ready
     socket.on("ready", (clientSocketID) => {
-      console.log(
-        `userID ${req.session.user?.id} ready, with socketID ${clientSocketID}`
-      );
+      // console.log(
+      //   `userID ${req.session.user?.id} ready, with socketID ${clientSocketID}`
+      // );
       let allPlayerReady = togglePlayerReady(clientSocketID);
       // Send players and room info
       let player = getCurrentPlayer(clientSocketID);
@@ -80,6 +80,7 @@ export function initSocketServer(app: Application, httpServer: any) {
           // console.log("all ready, game start");
           let countdown = 3;
 
+          /* ----------------------------- GAME START PART ---------------------------- */
           const countdownInterval = setInterval(() => {
             if (player) {
               io.to(player.room).emit(
@@ -91,19 +92,19 @@ export function initSocketServer(app: Application, httpServer: any) {
               if (countdown < 0) {
                 clearInterval(countdownInterval);
                 let players = getRoomPlayers(player.room);
-                let roomName = player.room;
-                let playerIdList: string[] = [];
+                let gameId = player.room;
+                let roomPlayerList: string[] = [];
                 players.map((player) => {
-                  playerIdList.push(player.userId.toString());
+                  roomPlayerList.push(player.userId.toString());
                 });
                 // pass arg to victor function here
-                console.log(
-                  "playerIdList:",
-                  playerIdList,
-                  "room-name:",
-                  roomName
-                );
-                // game = new Game("1", roomPlayerList, io);
+                // console.log(
+                //   "playerIdList:",
+                //   playerIdList,
+                //   "room-name:",
+                //   roomName
+                // );
+                // createCoupGame(gameId, roomPlayerList, io);
                 io.emit("redirect-to-game");
               }
             }
@@ -157,10 +158,11 @@ export function initSocketServer(app: Application, httpServer: any) {
         });
       }
     });
-  });
+    console.log(req.session.user?.id);
+    /* ---------------------------------- TODO ---------------------------------- */
 
-  /* ---------------------------------- TODO ---------------------------------- */
-  // addCoupSocketFunction(io, socket, game, req.session);
+    // addCoupSocketFunction(io, socket, req.session);
+  });
 
   return io;
 }
