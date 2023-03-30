@@ -20,26 +20,29 @@ export type User = {
 userRoutes.post("/login/password", login);
 
 //Log out function
-userRoutes.post("/login/logout", (req, res)=>{
-  if (req.session.user){
-req.session.user.id = null;
-req.session.user.username = "";
-req.session.save()
-res.end()
+userRoutes.post("/login/logout", (req, res) => {
+  if (req.session.user) {
+    req.session.user.id = null;
+    req.session.user.username = "";
+    req.session.save();
+    res.end();
   }
 });
 
 //use google to log in
-userRoutes.get("/login/google", async (req, res, next)=>{
-  try{
-    let accessToken = req.session?.grant?.response?.access_token
-    const googleRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo',{
-      method:"get",
-      headers:{
-          "Authorization":`Bearer ${accessToken}`
-        } 
-      })
-    let googleJson = await googleRes.json()
+userRoutes.get("/login/google", async (req, res, next) => {
+  try {
+    let accessToken = req.session?.grant?.response?.access_token;
+    const googleRes = await fetch(
+      "https://www.googleapis.com/oauth2/v2/userinfo",
+      {
+        method: "get",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    let googleJson = await googleRes.json();
     let resultDB = await client.query(
       'select id, user_name from "user" where email =($1)',
       [googleJson.email]
@@ -56,17 +59,19 @@ userRoutes.get("/login/google", async (req, res, next)=>{
       return;
     }
 
-  await client.query(
-    `insert into "user" (user_name, email, elo) values ($1, $2, '1000')`, [googleJson.name, googleJson.email]
-  )
-  let id = await client.query(
-    'select id, user_name from "user" where email =($1)', [googleJson.email]
-  )
-req.session.user = {id: id.rows[0].id, username: googleJson.name}
-req.session.save()
-  res.redirect('/user/gameroom')
-  }catch(error){
-  next(error)
+    await client.query(
+      `insert into "user" (user_name, email, elo) values ($1, $2, '1000')`,
+      [googleJson.name, googleJson.email]
+    );
+    let id = await client.query(
+      'select id, user_name from "user" where email =($1)',
+      [googleJson.email]
+    );
+    req.session.user = { id: id.rows[0].id, username: googleJson.name };
+    req.session.save();
+    res.redirect("/user/gameroom");
+  } catch (error) {
+    next(error);
   }
 });
 
@@ -163,7 +168,7 @@ userRoutes.put("/friend-requests/:id/accept", async (req, res) => {
 
 // user reject the friend request
 userRoutes.put("/friend-requests/:id/reject", async (req, res) => {
-  console.log("received reject!");
+  // console.log("received reject!");
   let requestId = +req.params.id;
 
   await rejectFriendRequest(requestId);
@@ -181,7 +186,7 @@ userRoutes.post(
       return;
     }
     postFriendRequest(senderId, receiverId);
-    console.log(`${senderId} trying to add ${receiverId}`);
+    // console.log(`${senderId} trying to add ${receiverId}`);
     res.json({ success: true });
   }
 );
@@ -263,7 +268,7 @@ OR (sender_id = $2 AND receiver_id = $1)
   );
   // TO-DO
   // if rowCount != 0 that means successful deletion
-  console.log(result.rowCount);
+  // console.log(result.rowCount);
   return result.rowCount !== 0;
 }
 
@@ -276,7 +281,7 @@ WHERE id = $1
 `,
     [id]
   );
-  console.log(result);
+  // console.log(result);
 }
 
 async function rejectFriendRequest(id: number) {
@@ -288,7 +293,7 @@ WHERE id = $1
 `,
     [id]
   );
-  console.log(result);
+  // console.log(result);
 }
 
 async function postFriendRequest(senderId: number, receiverId: number) {

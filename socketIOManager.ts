@@ -39,7 +39,7 @@ export function initSocketServer(app: Application, httpServer: any) {
       // Welcome current player
       socket.emit(
         "message",
-        formatMessage(botName, "Welcome to Coup!, enjoy the game!")
+        formatMessage(botName, `Hello ${username}, enjoy the Coup!`)
       );
 
       // Broadcast when a player connects
@@ -59,7 +59,6 @@ export function initSocketServer(app: Application, httpServer: any) {
 
     // User leave the room
     socket.on("leave-room", (room_id) => {
-      // console.log(`${room_id} has people left`);
       if (rooms[room_id]?.count !== undefined) {
         rooms[room_id].count--;
         io.emit("new-inc", rooms[room_id]);
@@ -87,7 +86,15 @@ export function initSocketServer(app: Application, httpServer: any) {
           "message",
           formatMessage(botName, `${player.username} has left the chat`)
         );
+        let filteredRoom = rooms.filter((room) => {
+          return room.name === player.room;
+        });
+        let roomPlayerLeft = rooms[filteredRoom[0].id];
+        if (roomPlayerLeft?.count !== undefined) {
+          roomPlayerLeft.count--;
 
+          io.emit("new-inc", roomPlayerLeft);
+        }
         // Send players and room info
         io.to(player.room).emit("room-players", {
           room: player.room,

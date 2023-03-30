@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      .player {
+        position: relative;
+      }
+
+      .player-profile {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 1;
+      }
+
+      .player:hover .player-profile {
+        display: block;
+      }
+    </style>
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="player">
+      <span
+        class="player-name"
+        onmouseover="showProfile()"
+        onmouseleave="startHideProfileTimeout()"
+        >Player Name</span
+      >
+      <div
+        class="player-profile"
+        onmouseover="clearHideProfileTimeout()"
+        onmouseleave="startHideProfileTimeout()"
+      >
+        <!-- Profile content here -->
+        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Officiis
+        adipisci, doloribus soluta, similique incidunt ipsa, nam vero cupiditate
+        reiciendis minima consequatur. Iste, blanditiis eius? Esse!
+      </div>
+    </div>
+  </body>
+  <script>
+    let hideProfileTimeout;
+
+    function showProfile() {
+      document.querySelector(".player-profile").style.display = "block";
+    }
+    function hideProfile() {
+      document.querySelector(".player-profile").style.display = "none";
+    }
+    function startHideProfileTimeout() {
+      hideProfileTimeout = setTimeout(() => {
+        document.querySelector(".player-profile").style.display = "none";
+      }, 500);
+    }
+
+    function clearHideProfileTimeout() {
+      clearTimeout(hideProfileTimeout);
+    }
+  </script>
+</html>
