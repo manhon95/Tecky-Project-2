@@ -15,14 +15,12 @@ export function addCoupSocketFunction(
   socket: socket.Socket,
   session: Session & Partial<SessionData>
 ) {
-  if (!session.user || !session.user.id) {
-    throw new Error("User not found");
-  }
-  let myId = session.user.id;
-  let game: Game;
-
   socket.on("askGameInit", (arg) => {
-    game = getGameById(arg.game.id);
+    if (!session.user || !session.user.id) {
+      throw new Error("User not found");
+    }
+    let myId = session.user.id;
+    let game = getGameById(arg.game.id);
     socket.join(game.id);
     let gameJson: GameJson = {
       my: {
