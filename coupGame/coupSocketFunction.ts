@@ -1,4 +1,3 @@
-import "../session-middleWare";
 import { Session, SessionData } from "express-session";
 import socket from "socket.io";
 import { Game, createIoFunction } from "./coupGame";
@@ -13,13 +12,17 @@ const { answerAction } = createIoFunction();
 export function addCoupSocketFunction(
   io: socket.Server,
   socket: socket.Socket,
-  game: Game,
+  gameList: object, //gameList example: {game.id:gameObj}
   session: Session & Partial<SessionData>
 ) {
   if (!session.user || !session.user.id) {
     throw new Error("User not found");
   }
   let myId = session.user.id;
+  if (!session.socketGameMap) {
+    throw new Error("SocketGameMap not found");
+  }
+  let game = gameList[session.socketGameMap[socket.id]];
   socket.on("askGameInit", () => {
     console.log(game.getPlayerIndexById(myId));
     socket.join(game.id);

@@ -20,5 +20,6 @@ declare module "express-session" {
       username: string;
     };
     grant?: GrantSession;
+    socketGameMap: object; //socketGameMap example: {socket.id: game.id}
   }
 }
