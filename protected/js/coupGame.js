@@ -20,18 +20,15 @@ const cardPathMap = [
   "/img/contessa.jpg",
   "/img/duke.jpg",
 ];
-console.log("beforeAskInit");
 socket.emit("askGameInit", { game: { id: gameId } });
-console.log("beforeInit");
 socket.on("ansGameInit", function (game) {
   init(game);
 });
-console.log("afterInit");
-let myId;
+
 function init(game) {
   /* --------------------------------- My Info -------------------------------- */
   const myInfo = document.querySelector("#my-info");
-  myId = game.my.id;
+  let myId = game.my.id;
   myInfo.id = `player-${game.my.id}-info`;
   const myCard1 = document.querySelector(`#player-${game.my.id}-info #card-1`);
   const myCard2 = document.querySelector(`#player-${game.my.id}-info #card-2`);
