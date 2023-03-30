@@ -98,7 +98,7 @@ export async function saveUserDetails(req: Request, res: Response) {
     );
     let id = await client.query(`select id from "user" where user_name=($1)`,[userName]);
     report["success"] = "success";
-    req.session.user = { id: id.rows[0].id, username: userName };
+    req.session.user = { id: id.rows[0].id, username: userName, profilePic: null};
     req.session.save();
     res.json(report);
   } else {

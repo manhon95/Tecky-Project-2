@@ -17,3 +17,13 @@ function clearAllChildNode(parent) {
     parent.removeChild(parent.firstChild);
   }
 }
+
+async function getProfilePic() {
+  const Res = await fetch("/profilePic", {
+  method: "POST",
+});
+  const Result = await Res.json();
+console.log("Result")
+  return Result.profilePic;
+}
+

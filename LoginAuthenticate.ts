@@ -11,6 +11,7 @@ export async function login(req: Request, res: Response) {
   let email: string = req.body.email;
   let users = await getDetail(email);
   let password: string = req.body.password;
+  let profilePic: string = users[0]?.profilepic;
   let status = false;
   let id = users[0]?.id;
   let username = users[0]?.user_name;
@@ -22,9 +23,9 @@ export async function login(req: Request, res: Response) {
   }
 
   //remember me button
-
   if (status) {
-    req.session.user = { id, username };
+    console.log("profilepicfrom loginAuthentic", profilePic)
+    req.session.user = { id, username, profilePic};
     req.session.save();
     res.json({});
   } else {
@@ -35,7 +36,7 @@ export async function login(req: Request, res: Response) {
 
 export async function getDetail(email: string) {
   let userDetails = await client.query(
-    'select id, email, user_name, password from "user" where email=($1)',
+    'select id, email, profilePic user_name, password from "user" where email=($1)',
     [email]
   );
 

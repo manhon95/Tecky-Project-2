@@ -16,8 +16,9 @@ export let sessionMiddleware = session({
 declare module "express-session" {
   interface SessionData {
     user: {
-      id: number|null;
+      id: string;
       username: string;
+      profilePic: string|null
     };
     grant?: GrantSession
   }
