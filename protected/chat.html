@@ -107,6 +107,11 @@
 
       const socket = io();
 
+      readyBtn.addEventListener("click", () => {
+        // console.log("sent emit", clientSocketID);
+        socket.emit("ready");
+      });
+
       // Get username and room from URL
       const { username, room, rid } = Qs.parse(location.search, {
         ignoreQueryPrefix: true,
@@ -127,26 +132,6 @@
       // Get the userId and send to server
       async function main() {
         let currentUserId = await getUserId();
-
-        // socket on connect get the socketID
-        socket.on("connect", () => {
-          clientSocketID = socket.id;
-          // create a post request to change the player ready status
-          readyBtn.addEventListener("click", async (e) => {
-            // e.preventDefault();
-            // const obj = {};
-            // obj.id = clientSocketID;
-            console.log("sent emit", clientSocketID);
-            socket.emit("ready", clientSocketID);
-            // const res = await fetch("/player/ready", {
-            //   method: "PATCH",
-            //   headers: {
-            //     "Content-Type": "application/json",
-            //   },
-            //   body: JSON.stringify(obj),
-            // });
-          });
-        });
 
         // Join chatroom
         socket.emit("join-room", { username, room, rid, currentUserId });
