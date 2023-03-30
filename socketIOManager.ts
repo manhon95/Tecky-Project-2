@@ -10,6 +10,8 @@ import {
 import { formatMessage } from "./utils/messages";
 import { rooms } from "./routes/room.routes";
 import express from "express";
+import { createCoupGame } from "./coupGame/coupGameList";
+import { addCoupSocketFunction } from "./coupGame/coupSocketFunction";
 
 // counter for socketIO connection
 let onlineCount = 0;
@@ -98,13 +100,8 @@ export function initSocketServer(app: Application, httpServer: any) {
                   roomPlayerList.push(player.userId.toString());
                 });
                 // pass arg to victor function here
-                // console.log(
-                //   "playerIdList:",
-                //   playerIdList,
-                //   "room-name:",
-                //   roomName
-                // );
-                // createCoupGame(gameId, roomPlayerList, io);
+
+                createCoupGame(gameId, roomPlayerList, io);
                 io.emit("redirect-to-game");
               }
             }
@@ -158,10 +155,10 @@ export function initSocketServer(app: Application, httpServer: any) {
         });
       }
     });
-    console.log(req.session.user?.id);
+    // console.log(req.session.user?.id);
     /* ---------------------------------- TODO ---------------------------------- */
 
-    // addCoupSocketFunction(io, socket, req.session);
+    addCoupSocketFunction(io, socket, req.session);
   });
 
   return io;

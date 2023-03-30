@@ -12,7 +12,7 @@ export async function login(req: Request, res: Response) {
   let users = await getDetail(email);
   let password: string = req.body.password;
   let status = false;
-  let id = users[0]?.id;
+  let id: string = String(users[0]?.id);
   let username = users[0]?.user_name;
   if (
     users[0]?.email == email &&
@@ -38,6 +38,6 @@ export async function getDetail(email: string) {
     'select id, email, user_name, password from "user" where email=($1)',
     [email]
   );
-
+  // console.log(userDetails.rows);
   return userDetails.rows;
 }

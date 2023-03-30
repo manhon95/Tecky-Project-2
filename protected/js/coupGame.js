@@ -20,11 +20,13 @@ const cardPathMap = [
   "/img/contessa.jpg",
   "/img/duke.jpg",
 ];
+console.log("beforeAskInit");
 socket.emit("askGameInit", { game: { id: gameId } });
+console.log("beforeInit");
 socket.on("ansGameInit", function (game) {
   init(game);
 });
-
+console.log("afterInit");
 let myId;
 function init(game) {
   /* --------------------------------- My Info -------------------------------- */

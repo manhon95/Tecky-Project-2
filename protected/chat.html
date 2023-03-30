@@ -180,7 +180,7 @@
         });
         // start the game when all ready
         socket.on("redirect-to-game", () => {
-          location.href = `game.html?room_id=${room}`;
+          location.href = `coup-game.html?game=${room}`;
         });
       }
 
