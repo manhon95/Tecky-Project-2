@@ -203,7 +203,7 @@ select id, user_name, birthday, elo from "user" where id= $1
   return result.rows[0];
 }
 
-async function getUsernameFromDB(id: number | null) {
+async function getUsernameFromDB(id: string | null) {
   if (id === undefined) return "error, id not exist";
   let result = await client.query(
     /*sql*/ `

@@ -16,9 +16,9 @@ export let sessionMiddleware = session({
 declare module "express-session" {
   interface SessionData {
     user: {
-      id: number|null;
+      id: string | null;
       username: string;
     };
-    grant?: GrantSession
+    grant?: GrantSession;
   }
 }
