@@ -64,13 +64,10 @@ export function initSocketServer(app: Application, httpServer: any) {
     });
 
     // socketIO version of ready
-    socket.on("ready", (clientSocketID) => {
-      // console.log(
-      //   `userID ${req.session.user?.id} ready, with socketID ${clientSocketID}`
-      // );
-      let allPlayerReady = togglePlayerReady(clientSocketID);
+    socket.on("ready", () => {
+      let allPlayerReady = togglePlayerReady(socket.id);
       // Send players and room info
-      let player = getCurrentPlayer(clientSocketID);
+      let player = getCurrentPlayer(socket.id);
       if (player) {
         io.to(player.room).emit("room-players", {
           room: player.room,
