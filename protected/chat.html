@@ -180,7 +180,7 @@
         });
         // start the game when all ready
         socket.on("redirect-to-game", () => {
-          location.href = "game.html";
+          location.href = `game.html?room_id=${room}`;
         });
       }
 
@@ -211,7 +211,24 @@
             .cloneNode(true);
           let playerName = playerNode.querySelector(".player-name");
           playerName.textContent = player.username;
-          // when hovering a user in a room --> check if they are friend
+
+          let playerReadyState = playerNode.querySelector(
+            ".player-ready-state"
+          );
+          playerNode.querySelector(".player-ready-state");
+          if (player.ready) {
+            playerReadyState.textContent = "READY";
+            playerReadyState.classList.add("ready");
+          } else {
+            playerReadyState.textContent = "NOT READY";
+            playerReadyState.classList.remove("ready");
+          }
+
+          if (player.username === username) {
+            playerList.appendChild(playerNode);
+            return;
+          }
+          // when hovering a user in a room --> check if they are friend(apply only on non-current user)
           playerName.addEventListener("mouseover", async () => {
             let profile = playerNode.querySelector(".profile");
 
@@ -253,17 +270,6 @@
             }
           });
 
-          let playerReadyState = playerNode.querySelector(
-            ".player-ready-state"
-          );
-          playerNode.querySelector(".player-ready-state");
-          if (player.ready) {
-            playerReadyState.textContent = "READY";
-            playerReadyState.classList.add("ready");
-          } else {
-            playerReadyState.textContent = "NOT READY";
-            playerReadyState.classList.remove("ready");
-          }
           playerList.appendChild(playerNode);
         });
 
