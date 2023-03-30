@@ -28,7 +28,12 @@ export function createRoomRoutes(io: socketIO.Server) {
       if (rooms.find((room) => room.owner === owner) !== undefined) {
         throw new HttpError(400, "You already own a room");
       }
-
+      if (rooms.find((room) => room.name === roomName)) {
+        throw new HttpError(
+          400,
+          "Room name existed, please try another room name"
+        );
+      }
       let room: Room = { id: maxRoomId, name: roomName, owner, count: 0 };
       rooms.push(room);
       res.json({ maxRoomId });
@@ -37,8 +42,7 @@ export function createRoomRoutes(io: socketIO.Server) {
     }
   });
 
-  roomRoutes.get("/user/chat.html", (req, res) => {
-    console.log(req.query.username, req.query.room);
+  roomRoutes.get("/user/chat.html", hasLogin, (req, res) => {
     res.sendFile(path.resolve("protected", "chat.html"));
   });
   // showing all room content

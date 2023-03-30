@@ -9,7 +9,14 @@
       integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk="
       crossorigin="anonymous"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css
+"
+    />
     <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/nav-bar-style.css" />
+
     <style>
       .player {
         display: flex;
@@ -38,6 +45,7 @@
     <title>ChatCord App</title>
   </head>
   <body>
+    <header class="navbar"></header>
     <div class="chat-container">
       <header class="chat-header">
         <h1><i class="fas fa-smile"></i> Coup Game</h1>
@@ -85,6 +93,7 @@
       referrerpolicy="no-referrer"
     ></script>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="./js/loadNavBar.js"></script>
     <script src="./js/alert.js"></script>
     <script>
       const chatForm = document.querySelector("#chat-form");
@@ -95,20 +104,13 @@
       let template = document.querySelector("template");
       let readyBtn = document.querySelector(".ready-btn");
       let clientSocketID = "";
-      // create a post request to change the player ready status
-      readyBtn.addEventListener("click", async (e) => {
-        e.preventDefault();
-        const obj = {};
-        obj.id = clientSocketID;
-        const res = await fetch("/player/ready", {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(obj),
-        });
-      });
+
       const socket = io();
+
+      readyBtn.addEventListener("click", () => {
+        // console.log("sent emit", clientSocketID);
+        socket.emit("ready");
+      });
 
       // Get username and room from URL
       const { username, room, rid } = Qs.parse(location.search, {
@@ -117,24 +119,19 @@
 
       // Leave button decrement room count and direct back to lobby
       leaveBtn.addEventListener("click", () => {
-        socket.emit("leave-room", rid);
         location.href = "/user/gameroom.html";
       });
 
       // emit a leave event when the user refreshed the page
-      window.addEventListener("beforeunload", (event) => {
+      window.addEventListener("onbeforeunload", (event) => {
         socket.emit("leave-room", rid);
       });
+
       main().catch((e) => console.error(e));
 
       // Get the userId and send to server
       async function main() {
         let currentUserId = await getUserId();
-
-        // socket on connect get the socketID
-        socket.on("connect", () => {
-          clientSocketID = socket.id;
-        });
 
         // Join chatroom
         socket.emit("join-room", { username, room, rid, currentUserId });
@@ -168,7 +165,7 @@
         });
         // start the game when all ready
         socket.on("redirect-to-game", () => {
-          location.href = "game.html";
+          location.href = `coup-game.html?game=${room}`;
         });
       }
 
@@ -199,7 +196,24 @@
             .cloneNode(true);
           let playerName = playerNode.querySelector(".player-name");
           playerName.textContent = player.username;
-          // when hovering a user in a room --> check if they are friend
+
+          let playerReadyState = playerNode.querySelector(
+            ".player-ready-state"
+          );
+          playerNode.querySelector(".player-ready-state");
+          if (player.ready) {
+            playerReadyState.textContent = "READY";
+            playerReadyState.classList.add("ready");
+          } else {
+            playerReadyState.textContent = "NOT READY";
+            playerReadyState.classList.remove("ready");
+          }
+
+          if (player.username === username) {
+            playerList.appendChild(playerNode);
+            return;
+          }
+          // when hovering a user in a room --> check if they are friend(apply only on non-current user)
           playerName.addEventListener("mouseover", async () => {
             let profile = playerNode.querySelector(".profile");
 
@@ -241,17 +255,6 @@
             }
           });
 
-          let playerReadyState = playerNode.querySelector(
-            ".player-ready-state"
-          );
-          playerNode.querySelector(".player-ready-state");
-          if (player.ready) {
-            playerReadyState.textContent = "READY";
-            playerReadyState.classList.add("ready");
-          } else {
-            playerReadyState.textContent = "NOT READY";
-            playerReadyState.classList.remove("ready");
-          }
           playerList.appendChild(playerNode);
         });
 

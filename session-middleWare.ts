@@ -20,6 +20,6 @@ declare module "express-session" {
       username: string;
       profilePic: string|null
     };
-    grant?: GrantSession
+    grant?: GrantSession;
   }
 }

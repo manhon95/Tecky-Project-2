@@ -25,19 +25,28 @@ app.use(express.json());
 
 app.use(sessionMiddleware);
 
-app.use(grant.express({
-  defaults: {
-    origin: 'http://localhost:'+env.port,
-    transport: "session",
-    state: true,
-  },
-  google: {
-    key: env.GOOGLE_CLIENT_ID || "",
-    secret: env.GOOGLE_CLIENT_SECRET || "",
-    scope: ["profile", "email"],
-    callback: "/login/google",
-  },
-}))
+// io middleware, merge express req into io?? ask victor
+io.use((socket, next) => {
+  let req = socket.request as express.Request;
+  let res = req.res as express.Response;
+  sessionMiddleware(req, res, next as express.NextFunction);
+});
+
+app.use(
+  grant.express({
+    defaults: {
+      origin: "http://localhost:" + env.port,
+      transport: "session",
+      state: true,
+    },
+    google: {
+      key: env.GOOGLE_CLIENT_ID || "",
+      secret: env.GOOGLE_CLIENT_SECRET || "",
+      scope: ["profile", "email"],
+      callback: "/login/google",
+    },
+  })
+);
 app.use(userRoutes);
 app.use(createRoomRoutes(io));
 app.use(createPlayerRoutes(io));

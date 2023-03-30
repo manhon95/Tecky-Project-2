@@ -13,7 +13,7 @@ export async function login(req: Request, res: Response) {
   let password: string = req.body.password;
   let profilePic: string = users[0]?.profilepic;
   let status = false;
-  let id = users[0]?.id;
+  let id: string = String(users[0]?.id);
   let username = users[0]?.user_name;
   if (
     users[0]?.email == email &&
@@ -39,6 +39,6 @@ export async function getDetail(email: string) {
     'select id, email, profilePic user_name, password from "user" where email=($1)',
     [email]
   );
-
+  // console.log(userDetails.rows);
   return userDetails.rows;
 }

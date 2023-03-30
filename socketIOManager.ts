@@ -5,9 +5,13 @@ import {
   getRoomPlayers,
   playerJoin,
   playerLeave,
+  togglePlayerReady,
 } from "./utils/players";
 import { formatMessage } from "./utils/messages";
 import { rooms } from "./routes/room.routes";
+import express from "express";
+import { createCoupGame } from "./coupGame/coupGameList";
+import { addCoupSocketFunction } from "./coupGame/coupSocketFunction";
 
 // counter for socketIO connection
 let onlineCount = 0;
@@ -19,6 +23,8 @@ export function initSocketServer(app: Application, httpServer: any) {
   const io = new SocketIO.Server(httpServer);
   // Alert server upon new connection & increment the counter
   io.on("connection", (socket) => {
+    const req = socket.request as express.Request;
+    console.log(req.session.user?.id);
     // Alert server upon new connection & increment the counter
     onlineCount++;
     io.emit("online-count", onlineCount);
@@ -39,7 +45,7 @@ export function initSocketServer(app: Application, httpServer: any) {
       // Welcome current player
       socket.emit(
         "message",
-        formatMessage(botName, "Welcome to Coup!, enjoy the game!")
+        formatMessage(botName, `Hello ${username}, enjoy the Coup!`)
       );
 
       // Broadcast when a player connects
@@ -57,9 +63,52 @@ export function initSocketServer(app: Application, httpServer: any) {
       });
     });
 
+    // socketIO version of ready
+    socket.on("ready", () => {
+      let allPlayerReady = togglePlayerReady(socket.id);
+      // Send players and room info
+      let player = getCurrentPlayer(socket.id);
+      if (player) {
+        io.to(player.room).emit("room-players", {
+          room: player.room,
+          players: getRoomPlayers(player.room),
+        });
+
+        // count down and force redirect
+        if (allPlayerReady) {
+          // console.log("all ready, game start");
+          let countdown = 3;
+
+          /* ----------------------------- GAME START PART ---------------------------- */
+          const countdownInterval = setInterval(() => {
+            if (player) {
+              io.to(player.room).emit(
+                "message",
+                formatMessage(botName, `${countdown} second to the game start`)
+              );
+              countdown--;
+
+              if (countdown < 0) {
+                clearInterval(countdownInterval);
+                let players = getRoomPlayers(player.room);
+                let gameId = player.room;
+                let roomPlayerList: string[] = [];
+                players.map((player) => {
+                  roomPlayerList.push(player.userId.toString());
+                });
+                // pass arg to victor function here
+
+                createCoupGame(gameId, roomPlayerList, io);
+                io.emit("redirect-to-game");
+              }
+            }
+          }, 1000);
+        }
+      }
+    });
+
     // User leave the room
     socket.on("leave-room", (room_id) => {
-      // console.log(`${room_id} has people left`);
       if (rooms[room_id]?.count !== undefined) {
         rooms[room_id].count--;
         io.emit("new-inc", rooms[room_id]);
@@ -87,7 +136,15 @@ export function initSocketServer(app: Application, httpServer: any) {
           "message",
           formatMessage(botName, `${player.username} has left the chat`)
         );
+        let filteredRoom = rooms.filter((room) => {
+          return room.name === player.room;
+        });
+        let roomPlayerLeft = rooms[filteredRoom[0].id];
+        if (roomPlayerLeft?.count !== undefined) {
+          roomPlayerLeft.count--;
 
+          io.emit("new-inc", roomPlayerLeft);
+        }
         // Send players and room info
         io.to(player.room).emit("room-players", {
           room: player.room,
@@ -95,6 +152,10 @@ export function initSocketServer(app: Application, httpServer: any) {
         });
       }
     });
+    // console.log(req.session.user?.id);
+    /* ---------------------------------- TODO ---------------------------------- */
+
+    addCoupSocketFunction(io, socket, req.session);
   });
 
   return io;

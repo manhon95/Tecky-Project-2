@@ -36,16 +36,19 @@ res.json(ProfilePic.rows[0].profilepic)
 }
 })
 //use google to log in
-userRoutes.get("/login/google", async (req, res, next)=>{
-  try{
-    let accessToken = req.session?.grant?.response?.access_token
-    const googleRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo',{
-      method:"get",
-      headers:{
-          "Authorization":`Bearer ${accessToken}`
-        } 
-      })
-    let googleJson = await googleRes.json()
+userRoutes.get("/login/google", async (req, res, next) => {
+  try {
+    let accessToken = req.session?.grant?.response?.access_token;
+    const googleRes = await fetch(
+      "https://www.googleapis.com/oauth2/v2/userinfo",
+      {
+        method: "get",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    let googleJson = await googleRes.json();
     let resultDB = await client.query(
       'select id, user_name, profilePic from "user" where email =($1)',
       [googleJson.email]
@@ -150,7 +153,7 @@ userRoutes.delete("/users/:idA/friends/:idB", async (req, res) => {
   let userBId = +req.params.idB;
   // console.log(`trying to delete ${userAId}, ${userBId}`);
   let success = await deleteFriendFromDB(userAId, userBId);
-  console.log("trying to delete " + success);
+  // console.log("trying to delete " + success);
   res.json({ success });
 });
 
@@ -171,7 +174,7 @@ userRoutes.put("/friend-requests/:id/accept", async (req, res) => {
 
 // user reject the friend request
 userRoutes.put("/friend-requests/:id/reject", async (req, res) => {
-  console.log("received reject!");
+  // console.log("received reject!");
   let requestId = +req.params.id;
 
   await rejectFriendRequest(requestId);
@@ -189,7 +192,7 @@ userRoutes.post(
       return;
     }
     postFriendRequest(senderId, receiverId);
-    console.log(`${senderId} trying to add ${receiverId}`);
+    // console.log(`${senderId} trying to add ${receiverId}`);
     res.json({ success: true });
   }
 );
@@ -271,7 +274,7 @@ OR (sender_id = $2 AND receiver_id = $1)
   );
   // TO-DO
   // if rowCount != 0 that means successful deletion
-  console.log(result.rowCount);
+  // console.log(result.rowCount);
   return result.rowCount !== 0;
 }
 
@@ -284,7 +287,7 @@ WHERE id = $1
 `,
     [id]
   );
-  console.log(result);
+  // console.log(result);
 }
 
 async function rejectFriendRequest(id: number) {
@@ -296,7 +299,7 @@ WHERE id = $1
 `,
     [id]
   );
-  console.log(result);
+  // console.log(result);
 }
 
 async function postFriendRequest(senderId: number, receiverId: number) {
