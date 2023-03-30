@@ -57,8 +57,9 @@ userRoutes.get("/login/google", async (req, res, next) => {
     if (user) {
 
       //if existing user
-      req.session.user = {id: user.id, username: user.user_name || googleJson.name, profilePic: user.profilepic};
+      req.session.user = {id: String(user.id), username: user.user_name || googleJson.name, profilePic: user.profilepic};
       req.session.save();
+      console.log(req.session.user)
       res.redirect("/user/gameroom");
       return;
     }

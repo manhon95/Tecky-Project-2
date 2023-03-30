@@ -24,7 +24,6 @@ export async function login(req: Request, res: Response) {
 
   //remember me button
   if (status) {
-    console.log("profilepicfrom loginAuthentic", profilePic)
     req.session.user = { id, username, profilePic};
     req.session.save();
     res.json({});
