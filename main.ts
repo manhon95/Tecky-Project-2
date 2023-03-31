@@ -7,12 +7,12 @@ import { addMiddleware } from "./middleware";
 import { initSocketServer } from "./socketIO/socketIOManager";
 import { roomRoutes } from "./routes/room.routes";
 import { userRoutes } from "./routes/user.routes";
-import { createPlayerRoutes } from "./routes/player.routes";
+import { playerRoutes } from "./routes/player.routes";
 import { isLoggedIn } from "./guard";
 import grant from "grant";
 import { env } from "./env";
-import { createBadgeRoutes } from "./routes/badges.routes";
-import { createLobbyRoutes } from "./routes/lobby.routes";
+import { badgeRoutes } from "./routes/badges.routes";
+import { lobbyRoutes } from "./routes/lobby.routes";
 import { loginRoutes } from "./routes/login.routes";
 import { registerRoutes } from "./routes/register.routes";
 
@@ -20,7 +20,7 @@ const app = express();
 const server = http.createServer(app);
 
 // Initialize Socket.IO server
-const io = initSocketServer(app, server);
+initSocketServer(server);
 
 addMiddleware(app);
 
@@ -45,9 +45,9 @@ app.use(userRoutes);
 app.use(loginRoutes);
 app.use(registerRoutes);
 app.use(roomRoutes);
-app.use(createPlayerRoutes(io));
-app.use(createBadgeRoutes(io));
-app.use(createLobbyRoutes(io));
+app.use(playerRoutes);
+app.use(badgeRoutes);
+app.use(lobbyRoutes);
 
 app.use((req: Request, res: Response) => {
   res.status(404);

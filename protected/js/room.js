@@ -34,6 +34,7 @@ async function main() {
   myId = result.id;
 
   // Join chatroom
+  console.log(1);
   socket.emit("join-room", { username, room, rid, myId });
 
   // Get room and users

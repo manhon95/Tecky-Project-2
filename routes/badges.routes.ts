@@ -1,21 +1,18 @@
 import { Router } from "express";
 import socketIO from "socket.io";
 import database from "../db";
+import { io } from "../socketIO/socketIOManager";
 
-export function createBadgeRoutes(io: socketIO.Server) {
-  let badgeRoutes = Router();
+export const badgeRoutes = Router();
 
-  // Return badge link when asked
-  badgeRoutes.get("/badges/:userId", async (req, res) => {
-    let userId = +req.params.userId;
-    // console.log(userId);
-    let badges = await getBadgesFromDB(userId);
-    // console.log(badges);
-    res.json({ badges });
-  });
-
-  return badgeRoutes;
-}
+// Return badge link when asked
+badgeRoutes.get("/badges/:userId", async (req, res) => {
+  let userId = +req.params.userId;
+  // console.log(userId);
+  let badges = await getBadgesFromDB(userId);
+  // console.log(badges);
+  res.json({ badges });
+});
 
 async function getBadgesFromDB(userId: number) {
   let result = await database.query(
@@ -30,5 +27,4 @@ async function getBadgesFromDB(userId: number) {
 `,
     [userId]
   );
-  return result.rows;
 }

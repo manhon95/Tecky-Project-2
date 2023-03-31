@@ -95,6 +95,7 @@ function showNewRoom(room) {
   roomNode.dataset.id = room.id;
   roomNode.querySelector(".id").textContent = room.id;
   roomNode.querySelector(".name").textContent = room.name;
+  console.log(room.owner);
   roomNode.querySelector(".owner").textContent = room.owner;
   roomNode.querySelector(".count").textContent = room.count;
   roomNode.querySelector(".capacity").textContent = roomCapacity;

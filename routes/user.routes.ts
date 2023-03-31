@@ -12,7 +12,7 @@ import fs from "fs";
 import { saveUserDetails } from "../register";
 import path from "path";
 
-export let userRoutes = Router();
+export const userRoutes = Router();
 
 export type User = {
   id: string;
