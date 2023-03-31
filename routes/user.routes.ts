@@ -20,21 +20,21 @@ export type User = {
 userRoutes.post("/login/password", login);
 
 //Log out function
-userRoutes.post("/login/logout", (req, res)=>{
-  if (req.session.user){
-req.session.user.id = "";
-req.session.user.username = "";
-req.session.save()
-res.end()
+userRoutes.post("/login/logout", (req, res) => {
+  if (req.session.user) {
+    req.session.user.id = "";
+    req.session.user.username = "";
+    req.session.save();
+    res.end();
   }
 });
 
-userRoutes.get("/profilePic", async (req, res)=>{
-if(req.session.user){
-let ProfilePic = await getProfilePic(req.session.user.id)
-res.json(ProfilePic.rows[0].profilepic)
-}
-})
+userRoutes.get("/profilePic", async (req, res) => {
+  if (req.session.user) {
+    let ProfilePic = await getProfilePic(req.session.user.id);
+    res.json(ProfilePic.rows[0].profilepic);
+  }
+});
 //use google to log in
 userRoutes.get("/login/google", async (req, res, next) => {
   try {
@@ -55,29 +55,41 @@ userRoutes.get("/login/google", async (req, res, next) => {
     );
     let user = resultDB.rows[0];
     if (user) {
-
       //if existing user
-      req.session.user = {id: user.id, username: user.user_name || googleJson.name, profilePic: user.profilepic};
+      req.session.user = {
+        id: user.id,
+        username: user.user_name || googleJson.name,
+        profilePic: user.profilepic,
+      };
       req.session.save();
       res.redirect("/user/gameroom");
       return;
     }
 
     //if user not exist in database, create user
-    
+
     await client.query(
-      `insert into "user" (user_name, email, elo, profilePic) values ($1, $2, '1000', $3)`, [googleJson.name, googleJson.email,googleJson.picture]
-      )
-      let id = await client.query(
-        'select id, user_name from "user" where email =($1)', [googleJson.email]
-        )
-        
-        console.log("profilepic from user.route create user save session", googleJson.picture)
-req.session.user = {id: id.rows[0].id, username: googleJson.name, profilePic: googleJson.picture}
-req.session.save()
-  res.redirect('/user/gameroom')
-  }catch(error){
-  next(error)
+      `insert into "user" (user_name, email, elo, profilePic) values ($1, $2, '1000', $3)`,
+      [googleJson.name, googleJson.email, googleJson.picture]
+    );
+    let id = await client.query(
+      'select id, user_name from "user" where email =($1)',
+      [googleJson.email]
+    );
+
+    console.log(
+      "profilepic from user.route create user save session",
+      googleJson.picture
+    );
+    req.session.user = {
+      id: id.rows[0].id,
+      username: googleJson.name,
+      profilePic: googleJson.picture,
+    };
+    req.session.save();
+    res.redirect("/user/gameroom");
+  } catch (error) {
+    next(error);
   }
 });
 
@@ -110,6 +122,14 @@ userRoutes.get("/profiles/:id", async (req, res) => {
   // change the date format
 
   res.json(result);
+});
+
+// Get user coins
+userRoutes.get("/coins/:userId", async (req, res) => {
+  let userId = +req.params.userId;
+  let coins = await getCoinsFromDB(userId);
+
+  res.json(coins);
 });
 
 // change username
@@ -312,11 +332,22 @@ values ($1, $2, 'default message');
   );
 }
 
-async function getProfilePic(id: string){
+async function getProfilePic(id: string) {
   let result = await client.query(
     /*sql*/ `
 select profilepic from "user" where id = ($1)
-`,[id]
-);
-return result
+`,
+    [id]
+  );
+  return result;
+}
+
+async function getCoinsFromDB(userId: number) {
+  let result = await client.query(
+    /*sql*/ `
+select coins from "user" where id = ($1)
+`,
+    [userId]
+  );
+  return result.rows[0];
 }

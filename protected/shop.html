@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shop</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css
+"
+    />
+    <link rel="stylesheet" href="css/nav-bar-style.css" />
+    <style>
+      th,
+      td {
+        border: 1px solid black;
+        color: black;
+      }
+      thead {
+        display: table-header-group;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="navbar"></header>
+    <div class="info">
+      <span class="username"></span>
+      <div class="coin-display">Your coins<span class="coins"></span></div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>item name</th>
+          <th>image</th>
+          <th>price</th>
+        </tr>
+      </thead>
+      <tbody class="badge-list"></tbody>
+    </table>
+    <template>
+      <tr class="badge">
+        <td class="badge-name"></td>
+        <td>
+          <img src="" class="badge-image" alt="" />
+        </td>
+        <td class="badge-price"></td>
+      </tr>
+    </template>
+  </body>
+  <script src="./js/alert.js"></script>
+  <script src="./js/commonUtils.js"></script>
+  <script src="./js/loadNavBar.js"></script>
+  <script>
+    let username = document.querySelector(".username");
+    let coins = document.querySelector(".coins");
+    let template = document.querySelector("template");
+
+    async function main() {
+      let myId = await getUserId();
+      let myName = await getUsername();
+      let myCoins = await getCoins(myId);
+      let badges = await getUnboughtBadges(myId);
+      showBadges(badges);
+      username.textContent = myName;
+      coins.textContent = myCoins;
+    }
+
+    main().catch((e) => console.error(e));
+
+    async function getUnboughtBadges(id) {
+      let res = await fetch(`/badges/${id}`);
+      let result = await res.json();
+      let badges = result.badges;
+      return badges;
+    }
+    function showBadges(badges) {
+      let badgeList = document.querySelector(".badge-list");
+      // clearAllChildNode(badgeList);
+      let badgeTemplate = template.content.querySelector(".badge");
+
+      badges.map((badge) => {
+        let badgeNode = badgeTemplate.cloneNode(true);
+
+        badgeNode.querySelector(".badge-name").textContent = badge.name;
+        badgeNode.querySelector(".badge-image").src = badge.url;
+        badgeNode.querySelector(".badge-price").textContent = badge.price;
+        badgeList.appendChild(badgeNode);
+      });
+    }
+  </script>
+</html>

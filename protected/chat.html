@@ -85,7 +85,11 @@
         </form>
       </div>
     </div>
-
+    <a
+      href="https://www.freepik.com/free-vector/army-rank-badges-gold-military-insignia-signs_39204058.htm#query=gaming%20badge&position=25&from_view=search&track=ais"
+      >Image by upklyak</a
+    >
+    on Freepik
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.11.1/qs.min.js"
       integrity="sha512-5Zv/hNtOKSkeScnIYOqGjng82gQSHsCoyqq9TgrJLgYa032cUYWH4kF1ayS8Gz1Jfge7e8MaBF6AeEvoQ92v8w=="
@@ -145,11 +149,21 @@
         // Message from server
         socket.on("message", (message) => {
           outputMessage(message);
-
           // Scroll down
           chatMessages.scrollTop = chatMessages.scrollHeight;
         });
 
+        // prompt friend-request when received
+        socket.on("prompt-friend-request", (senderName) => {
+          Swal.fire({
+            position: "top-end",
+            icon: "info",
+            title: `being added by ${senderName}`,
+            text: "Check in the social center",
+            showConfirmButton: false,
+            timer: 1000,
+          });
+        });
         // Message submit
         chatForm.addEventListener("submit", (e) => {
           e.preventDefault();
@@ -209,7 +223,7 @@
             playerReadyState.classList.remove("ready");
           }
 
-          if (player.username === username) {
+          if (player.userId === myId) {
             playerList.appendChild(playerNode);
             return;
           }
@@ -241,9 +255,17 @@
                 );
                 let result = await res.json();
                 if (result.success) {
-                  showSuccess({
-                    title: "",
-                    text: `sent friend request to ${player.username}`,
+                  Swal.fire({
+                    position: "top-end",
+                    icon: "success",
+                    title: `Sent friend request to ${player.username}`,
+                    showConfirmButton: false,
+                    timer: 1000,
+                  });
+                  // update the friend request receiver immediately
+                  socket.emit("add-friend", {
+                    receiverSocketId: player.socketId,
+                    senderName: username,
                   });
                   return;
                 }
