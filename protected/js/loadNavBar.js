@@ -1,4 +1,3 @@
-
 // import {getProfilePic} from "./commonUtils.js"
 // async function getProfilePic() {
 //   const Res = await fetch("/username");
@@ -11,9 +10,9 @@ async function getProfilePic() {
   return Result;
 }
 
-(async ()=>{
+(async () => {
   navBarHeader = document.querySelector(".navbar");
-navBarHeader.innerHTML = /*html*/ `
+  navBarHeader.innerHTML = /*html*/ `
 <div class="container-fluid">
 <div class="navb-logo">
   <a href=""><img src="./assets/coup-logo.jpg" alt="" /></a>
@@ -25,6 +24,9 @@ navBarHeader.innerHTML = /*html*/ `
   <div class="item">
     <a href="gameroom.html">Game lobby</a>
   </div>
+  <div class="item">
+    <a href="shop.html">Shop</a>
+  </div>
   <div class="item-button d-flex">
     <div >
     <img src="${await getProfilePic()}" alt="" class="profileImg"></div>
@@ -33,4 +35,4 @@ navBarHeader.innerHTML = /*html*/ `
 </div>
 </div>
 `;
-})()
+})();
