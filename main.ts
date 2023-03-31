@@ -11,6 +11,7 @@ import { createPlayerRoutes } from "./routes/player.routes";
 import { isLoggedIn } from "./guard";
 import grant from "grant";
 import { env } from "./env";
+import { createBadgeRoutes } from "./routes/badges.routes";
 
 let app = express();
 let server = http.createServer(app);
@@ -50,6 +51,7 @@ app.use(
 app.use(userRoutes);
 app.use(createRoomRoutes(io));
 app.use(createPlayerRoutes(io));
+app.use(createBadgeRoutes(io));
 app.use("/user", isLoggedIn, express.static("protected"));
 
 app.post("/register", (req: Request, res: Response) => {
