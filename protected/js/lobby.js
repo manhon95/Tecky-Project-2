@@ -1,3 +1,38 @@
+async function init() {
+  //put all init in this function
+  //uncomment below if socketIo is used, replace {Page} to the page name
+  const socket = io();
+  socket.emit("askLobbyInit");
+  socketEventInit(socket);
+}
+init();
+
+function socketEventInit(socket) {
+  // on connect update status content
+  socket.on("{lobby}connect", () => {
+    status.textContent = "connected: " + socket.id;
+  });
+
+  // on new online update online counter
+  socket.on("online-count", (data) => {
+    onlineCount.textContent = data;
+  });
+
+  // on new room create show the room
+  socket.on("new-room", (room) => {
+    showNewRoom(room);
+  });
+
+  // on new room inc update the specific room count
+  socket.on("new-inc", (room) => {
+    let roomCount = roomList.querySelector(
+      `.room[data-id="${room.id}"] .count`
+    );
+
+    roomCount.textContent = room.count;
+  });
+}
+
 const usernameDisplay = document.querySelector(".username");
 const status = document.querySelector(".status");
 const onlineCount = document.querySelector(".online-count");
@@ -37,30 +72,6 @@ async function loadInfoFromServer() {
 loadInfoFromServer().catch((e) => console.error(e));
 //debug msg to see if I can room capacity
 
-let socket = io.connect();
-
-// on connect update status content
-socket.on("connect", () => {
-  status.textContent = "connected: " + socket.id;
-});
-
-// on new online update online counter
-socket.on("online-count", (data) => {
-  onlineCount.textContent = data;
-});
-
-// on new room create show the room
-socket.on("new-room", (room) => {
-  showNewRoom(room);
-});
-
-// on new room inc update the specific room count
-socket.on("new-inc", (room) => {
-  let roomCount = roomList.querySelector(`.room[data-id="${room.id}"] .count`);
-
-  roomCount.textContent = room.count;
-});
-
 // trigger function for create room button --> send ajax request
 async function createRoom() {
   let res = await fetch("/rooms", {
@@ -84,11 +95,6 @@ async function createRoom() {
     location.href = `/user/room?username=${username}&room=${newRoomName.value}&rid=${json.maxRoomId}`;
   }
 }
-
-// emit message to update others through SIO when join room
-// function joinRoom(room_id) {
-//   socket.emit("inc-room-count", room_id);
-// }
 
 function showNewRoom(room) {
   let roomNode = roomTemplate.cloneNode(true);
