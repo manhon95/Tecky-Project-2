@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import dotenv from "dotenv";
-import { client } from "./db";
-import "./session-middleware";
+import database from "./db";
+import "./middleware";
 import { hashPassword } from "./hash";
 import crypto from "crypto";
 // import sgMail = from "@sendgrid/mail"
@@ -12,22 +12,22 @@ dotenv.config();
 //This function get info from http request and save as use detail
 export async function saveUserDetails(req: Request, res: Response) {
   let checkStatus = true;
-  let emailFromDB = await client.query(
+  const emailFromDB = await database.query(
     /* sql */ 'select email from "user" where email=($1)',
     [req.body.email]
   );
-  let elo = 1000;
-  let coins = 100;
-  let userName: string = req.body.userName;
+  const elo = 1000;
+  const coins = 100;
+  const userName: string = req.body.userName;
   // let birthday2 = req.body.monthOfBirth + "/" + req.body.yearOfBirth;
-  let birthday = new Date();
+  const birthday = new Date();
   birthday.setFullYear(req.body.yearOfBirth, req.body.monthOfBirth - 1, 1);
   birthday.setHours(0, 0, 0, 0);
-  let email = req.body.email;
-  let password = req.body.password;
-  let confirmPassword = req.body.confirmPassword;
-  let emailFormat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-  let report = {};
+  const email = req.body.email;
+  const password = req.body.password;
+  const confirmPassword = req.body.confirmPassword;
+  const emailFormat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+  const report = {};
 
   //check password and email formate when registering
   if (password.length < 8) {
@@ -75,16 +75,17 @@ export async function saveUserDetails(req: Request, res: Response) {
   //0------------------add isVerified--------------
 
   if (checkStatus) {
-    let newPassword = await hashPassword(password);
+    const newPassword = await hashPassword(password);
     //save email, userName, password,elo into database
-    await client.query(
+    await database.query(
       /* sql */ `insert into "user" (email, user_name, password, birthday, elo,coins) 
     values ($1,$2,$3,$4,$5,$6)`,
       [email, userName, newPassword, birthday, elo, coins]
     );
-    let id = await client.query(`select id from "user" where user_name=($1)`, [
-      userName,
-    ]);
+    const id = await database.query(
+      `select id from "user" where user_name=($1)`,
+      [userName]
+    );
     report["success"] = "success";
     req.session.user = {
       id: id.rows[0].id,
@@ -92,9 +93,8 @@ export async function saveUserDetails(req: Request, res: Response) {
       profilePic: null,
     };
     req.session.save();
-    res.json(report);
   } else {
     res.status(400);
-    res.json(report);
   }
+  res.json(report);
 }

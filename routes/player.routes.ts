@@ -1,8 +1,8 @@
 import { Router } from "express";
 import socketIO from "socket.io";
-import { botName } from "../socketIOManager";
+import { botName } from "../socketIO/socketIOManager";
 import { formatMessage } from "../utils/messages";
-import { client } from "../db";
+import database from "../db";
 import {
   getCurrentPlayer,
   getRoomPlayers,
@@ -22,7 +22,7 @@ export function createPlayerRoutes(io: socketIO.Server) {
     // console.log({ id1: req.params.userId1, id2: req.params.userId2 });
     const userId1 = +req.params.userId1;
     const userId2 = +req.params.userId2;
-    let result = await client.query(
+    let result = await database.query(
       /* sql */ `
   select * from "friend_request"
   where ((sender_id = $1 AND receiver_id = $2) OR (sender_id = $2 AND receiver_id = $1))

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import socketIO from "socket.io";
-import { client } from "../db";
+import database from "../db";
 
 export function createBadgeRoutes(io: socketIO.Server) {
   let badgeRoutes = Router();
@@ -18,7 +18,7 @@ export function createBadgeRoutes(io: socketIO.Server) {
 }
 
 async function getBadgesFromDB(userId: number) {
-  let result = await client.query(
+  let result = await database.query(
     /*sql*/ `
     SELECT name, price, url
     FROM badge

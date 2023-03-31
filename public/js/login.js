@@ -1,22 +1,9 @@
-// async function alert() {
-//   const res = await fetch("/register", {
-//     method: "GET",
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//   });
-
-//   const result = await res.json();
-//   console.log("result");
-//   console.log(result);
-// }
-// alert();
 const rmCheck = document.querySelector(".rememberMe");
 const email = document.querySelector(".email");
 const password = document.querySelector(".password");
 
 if (localStorage.rmCheck && localStorage.rmCheck !== "") {
-  rmCheck.setAttribute("checked", "checked");
+  rmCheck.checked = true;
   email.value = localStorage.email;
   password.value = localStorage.password;
 }
@@ -39,7 +26,7 @@ document
       body: JSON.stringify(formObject),
     });
 
-    const result = await res.json(); // { success: true }
+    const result = await res.json(); // { error: string|undefined }
     if (result.error) {
       document.querySelector(".wrongPasswordMessage").textContent =
         result.error;
@@ -54,6 +41,6 @@ document
         localStorage.removeItem("password");
         localStorage.removeItem("rmCheck");
       }
-      location.href = "/user/gameroom";
+      location.href = "/user/lobby";
     }
   });

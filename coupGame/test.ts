@@ -7,7 +7,7 @@ import path from "path";
 import { Game } from "./coupGame";
 import { addCoupSocketFunction } from "./coupSocketFunction";
 import { createCoupGame, getGameById } from "./coupGameList";
-import "../session-middleWare";
+import "../middleware";
 
 declare module "express-session" {
   interface SessionData {
@@ -39,7 +39,7 @@ io.use((socket, next) => {
 });
 
 app.get("/", (req: Request, res: Response) => {
-  res.sendFile(path.resolve("../Public", "testgameroom.html"));
+  res.sendFile(path.resolve("../Public", "testlobby.html"));
 });
 
 app.get("/coup", (req: Request, res: Response) => {

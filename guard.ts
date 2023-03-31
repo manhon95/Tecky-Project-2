@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { HttpError } from "./utils/express";
-import "./session-middleware";
+import "./middleware";
 
 export function isLoggedIn(req: Request, res: Response, next: NextFunction) {
   // console.log("ok", req.session.user);

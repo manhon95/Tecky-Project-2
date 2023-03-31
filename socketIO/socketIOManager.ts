@@ -6,25 +6,35 @@ import {
   playerJoin,
   playerLeave,
   togglePlayerReady,
-} from "./utils/players";
-import { formatMessage } from "./utils/messages";
-import { rooms } from "./routes/room.routes";
+} from "../utils/players";
+import { formatMessage } from "../utils/messages";
+import { rooms } from "../routes/room.routes";
 import express from "express";
-import { createCoupGame } from "./coupGame/coupGameList";
-import { addCoupSocketFunction } from "./coupGame/coupSocketFunction";
+import { createCoupGame } from "../coupGame/coupGameList";
+import { addCoupSocketFunction } from "../coupGame/coupSocketFunction";
+import { sessionMiddleware } from "../middleware";
+import { env } from "../env";
 
 // counter for socketIO connection
 let onlineCount = 0;
 
 // displaying system message with this name
-export const botName = "Coup Bot";
+export const botName = env.BOT_NAME;
 
 export function initSocketServer(app: Application, httpServer: any) {
   const io = new SocketIO.Server(httpServer);
+
+  // io middleware, merge express req into io
+  io.use((socket, next) => {
+    let req = socket.request as express.Request;
+    let res = req.res as express.Response;
+    sessionMiddleware(req, res, next as express.NextFunction);
+  });
+
   // Alert server upon new connection & increment the counter
   io.on("connection", (socket) => {
     const req = socket.request as express.Request;
-    console.log(req.session.user?.id);
+
     // Alert server upon new connection & increment the counter
     onlineCount++;
     io.emit("online-count", onlineCount);

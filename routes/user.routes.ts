@@ -1,14 +1,16 @@
-import "../session-middleware";
+import "../middleware";
 import { getString, HttpError } from "../utils/express";
-import express, { Request, Router } from "express";
+import express, { Request, Response, Router } from "express";
 import { getSessionUser, hasLogin, isLoggedIn } from "../guard";
-import { login } from "../LoginAuthenticate";
-import { client } from "../db";
+import { login } from "../login";
+import database from "../db";
 import dayjs from "dayjs";
 import { send } from "process";
 import session from "express-session";
 import formidable from "formidable";
 import fs from "fs";
+import { saveUserDetails } from "../register";
+import path from "path";
 
 export let userRoutes = Router();
 
@@ -19,7 +21,11 @@ export type User = {
   elo: number;
 };
 
-userRoutes.post("/login/password", login);
+userRoutes.use("/user", isLoggedIn, express.static("protected"));
+
+userRoutes.post("/register", (req: Request, res: Response) => {
+  saveUserDetails(req, res);
+});
 
 //Log out function
 userRoutes.post("/login/logout", (req, res) => {
@@ -61,64 +67,6 @@ userRoutes.get("/profilePic", async (req, res) => {
   if (req.session.user) {
     let ProfilePic = await getProfilePic(req.session.user.id);
     res.json(ProfilePic.rows[0].profilepic);
-  }
-});
-//use google to log in
-userRoutes.get("/login/google", async (req, res, next) => {
-  try {
-    let accessToken = req.session?.grant?.response?.access_token;
-    const googleRes = await fetch(
-      "https://www.googleapis.com/oauth2/v2/userinfo",
-      {
-        method: "get",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
-    let googleJson = await googleRes.json();
-    let resultDB = await client.query(
-      'select id, user_name, profilePic from "user" where email =($1)',
-      [googleJson.email]
-    );
-    let user = resultDB.rows[0];
-    if (user) {
-      //if existing user
-      req.session.user = {
-        id: user.id,
-        username: user.user_name || googleJson.name,
-        profilePic: user.profilepic,
-      };
-      req.session.save();
-      console.log(req.session.user);
-      res.redirect("/user/gameroom");
-      return;
-    }
-
-    //if user not exist in database, create user
-
-    await client.query(
-      `insert into "user" (user_name, email, elo, profilePic) values ($1, $2, '1000', $3)`,
-      [googleJson.name, googleJson.email, googleJson.picture]
-    );
-    let id = await client.query(
-      'select id, user_name from "user" where email =($1)',
-      [googleJson.email]
-    );
-
-    console.log(
-      "profilepic from user.route create user save session",
-      googleJson.picture
-    );
-    req.session.user = {
-      id: id.rows[0].id,
-      username: googleJson.name,
-      profilePic: googleJson.picture,
-    };
-    req.session.save();
-    res.redirect("/user/gameroom");
-  } catch (error) {
-    next(error);
   }
 });
 
@@ -167,7 +115,7 @@ userRoutes.patch("/usernames/:id", async (req, res) => {
   let id = req.params.id;
   // check duplicate
   // console.log("before check duplicate");
-  let result = await client.query(
+  let result = await database.query(
     /* sql */ `
 select user_name from "user" where user_name = $1
 `,
@@ -176,7 +124,7 @@ select user_name from "user" where user_name = $1
   let row = result.rows[0];
   if (!row) {
     // if no existing same name
-    await client.query(
+    await database.query(
       /*sql*/ `
 update "user" set user_name = $1 where id = ${id}
     `,
@@ -249,7 +197,7 @@ userRoutes.post(
 // are db handling method
 async function getInfoFromDB(id: number | undefined) {
   if (id === undefined) return "error, id not exist";
-  let result = await client.query(
+  let result = await database.query(
     /*sql*/ `
 select id, user_name, birthday, elo from "user" where id= $1
   `,
@@ -260,7 +208,7 @@ select id, user_name, birthday, elo from "user" where id= $1
 
 async function getUsernameFromDB(id: string | null) {
   if (id === undefined) return "error, id not exist";
-  let result = await client.query(
+  let result = await database.query(
     /*sql*/ `
 select user_name from "user" where id= $1
   `,
@@ -270,7 +218,7 @@ select user_name from "user" where id= $1
 }
 
 async function getFriendsFromDB(id: number | undefined) {
-  let result = await client.query(
+  let result = await database.query(
     /*sql*/ `
 SELECT id, user_name, email, elo 
 FROM "user" 
@@ -293,7 +241,7 @@ INNER JOIN (
 }
 
 async function getFriendRequestFromDB(id: number) {
-  let result = await client.query(
+  let result = await database.query(
     /*sql*/ `
 select 
   fr.id,
@@ -313,7 +261,7 @@ WHERE
 }
 
 async function deleteFriendFromDB(userAId: number, userBId: number) {
-  let result = await client.query(
+  let result = await database.query(
     /*sql*/ `
 DELETE FROM friend_request
 WHERE (sender_id = $1 AND receiver_id = $2)
@@ -328,7 +276,7 @@ OR (sender_id = $2 AND receiver_id = $1)
 }
 
 async function acceptFriendRequest(id: number) {
-  let result = await client.query(
+  let result = await database.query(
     /*sql*/ `
 UPDATE friend_request
 SET accept_time = CURRENT_TIMESTAMP
@@ -340,7 +288,7 @@ WHERE id = $1
 }
 
 async function rejectFriendRequest(id: number) {
-  let result = await client.query(
+  let result = await database.query(
     /*sql*/ `
 UPDATE friend_request
 SET reject_time = CURRENT_TIMESTAMP
@@ -352,7 +300,7 @@ WHERE id = $1
 }
 
 async function postFriendRequest(senderId: number, receiverId: number) {
-  let result = await client.query(
+  let result = await database.query(
     /*sql*/ `
 insert into "friend_request" (sender_id, receiver_id, message)
 values ($1, $2, 'default message');
@@ -362,7 +310,7 @@ values ($1, $2, 'default message');
 }
 
 async function getProfilePic(id: string) {
-  let result = await client.query(
+  let result = await database.query(
     /*sql*/ `
 select profilepic from "user" where id = ($1)
 `,
@@ -372,7 +320,7 @@ select profilepic from "user" where id = ($1)
 }
 
 async function getCoinsFromDB(userId: number) {
-  let result = await client.query(
+  let result = await database.query(
     /*sql*/ `
 select coins from "user" where id = ($1)
 `,

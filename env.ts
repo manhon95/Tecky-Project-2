@@ -9,6 +9,7 @@ export let env = {
   GOOGLE_CLIENT_ID: "",
   GOOGLE_CLIENT_SECRET: "",
   port: 8080,
+  BOT_NAME: "",
 };
 
 config();

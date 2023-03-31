@@ -16,7 +16,7 @@ async function getProfilePic() {
     <a href="social.html">Social</a>
   </div>
   <div class="item">
-    <a href="gameroom.html">Game lobby</a>
+    <a href="lobby.html">Game lobby</a>
   </div>
   <div class="item">
     <a href="shop.html">Shop</a>

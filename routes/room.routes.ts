@@ -1,4 +1,4 @@
-import "../session-middleware";
+import "../middleware";
 import { getString, HttpError } from "../utils/express";
 import { Router } from "express";
 import { getSessionUser, hasLogin } from "../guard";
