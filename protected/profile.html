@@ -44,6 +44,23 @@
       <input class="new-name" type="text" />
       <button class="change-name-btn">submit</button>
     </div>
+
+    <form
+      action="/ProfilePic"
+      method="post"
+      enctype="multipart/form-data"
+      onsubmit="submitProfile(event)"
+    >
+      <div class="change-profilePic">
+        <span>upload profile picture:</span>
+        <input class="new-name profilePic" type="file" value="select file" name="profilePic" accept="/image"/>
+        <input
+          class="change-name-btn profilePic"
+          type="submit"
+          value="upload"
+        />
+      </div>
+    </form>
   </body>
   <script src="./js/commonUtils.js"></script>
   <script src="./js/loadNavBar.js"></script>
@@ -51,13 +68,31 @@
   <script>
     async function main() {
       let id = await getUserId();
-      console.log(id);
       let result = await loadProfile(id);
       let userIdData = document.querySelector(".user-id");
       let userNameData = document.querySelector(".user-name");
       let userBirthdayData = document.querySelector(".user-birthday");
       let userEloData = document.querySelector(".user-elo");
       let changeNameBtn = document.querySelector(".change-name-btn");
+      
+      //upload profile picture
+      async function upLoadProfilePicture(event) {
+        event.preventDefault(event);
+        let form = event.target;
+        let formData = new FormData(from);
+        let res = await fetch(`${form.action}/${id}`, {
+          method: 'put',
+          body: formData,
+        });
+        let json = await res.json();
+        console.log("profile.html :", json);
+        if (json.error) {
+          message.textContent = json.error;
+          return;
+        }
+        // image.src = "/profilePicture/" + json.filename;
+        console.log(image)
+      }
 
       // change name button trigger ajax request to change name
       changeNameBtn.addEventListener("click", async (e) => {

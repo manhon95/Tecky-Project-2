@@ -20,7 +20,6 @@ create table "friend_request" (
 
 alter TABLE "user" ALTER COLUMN PASSWORD DROP NOT NULL;
 alter TABLE "user" ALTER COLUMN birthday DROP NOT NULL;
-alter table "user" add unique (user_name);
 ALTER TABLE "user" ADD profilePic text null;
 alter table "user" add column coins integer not null;
 

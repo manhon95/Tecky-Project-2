@@ -7,6 +7,8 @@ import { client } from "../db";
 import dayjs from "dayjs";
 import { send } from "process";
 import session from "express-session";
+import formidable from "formidable";
+import fs from "fs";
 
 export let userRoutes = Router();
 
@@ -28,6 +30,58 @@ userRoutes.post("/login/logout", (req, res) => {
     res.end();
   }
 });
+
+const uploadDir = "profilePicture";
+fs.mkdirSync(uploadDir, { recursive: true });
+const form = formidable({
+  uploadDir,
+  keepExtensions: true,
+  filter: (part) => part.mimetype?.startsWith("image/") || false,
+});
+
+userRoutes.put("/ProfilePic/:id", async (req, res) => {
+  let id = req.params.id;
+  form.parse(req, (err, fields, files) => {
+    if (err) {
+      res.status(507);
+      res.json({ err: "fail to up load image", detail: String(err) });
+      return;
+    }
+    let profilePic = files.profilePic;
+
+    let image = Array.isArray(profilePic) ? profilePic[0] : profilePic;
+    console.log(image.newFilename);
+    res.json(image.newFilename);
+  });
+});
+
+userRoutes.use("/profilePic", express.static(uploadDir));
+
+const uploadDir = "profilePicture";
+fs.mkdirSync(uploadDir, { recursive: true });
+const form = formidable({
+  uploadDir,
+  keepExtensions: true,
+  filter: (part) => part.mimetype?.startsWith("image/") || false,
+});
+
+userRoutes.put("/ProfilePic/:id", async (req, res) => {
+  let id = req.params.id;
+  form.parse(req, (err, fields, files) => {
+    if (err) {
+      res.status(507);
+      res.json({ err: "fail to up load image", detail: String(err) });
+      return;
+    }
+    let profilePic = files.profilePic;
+
+    let image = Array.isArray(profilePic) ? profilePic[0] : profilePic;
+    console.log(image.newFilename);
+    res.json(image.newFilename);
+  });
+});
+
+userRoutes.use("/profilePic", express.static(uploadDir));
 
 userRoutes.get("/profilePic", async (req, res) => {
   if (req.session.user) {
@@ -62,6 +116,7 @@ userRoutes.get("/login/google", async (req, res, next) => {
         profilePic: user.profilepic,
       };
       req.session.save();
+      console.log(req.session.user);
       res.redirect("/user/gameroom");
       return;
     }

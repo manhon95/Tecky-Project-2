@@ -1,9 +1,3 @@
-// import {getProfilePic} from "./commonUtils.js"
-// async function getProfilePic() {
-//   const Res = await fetch("/username");
-//   const Result = await Res.json();
-//   return Result.getProfilePic;
-// }
 async function getProfilePic() {
   const Res = await fetch("/profilePic");
   const Result = await Res.json();
