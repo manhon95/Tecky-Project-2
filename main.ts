@@ -5,14 +5,14 @@ import path from "path";
 import http from "http";
 import { addMiddleware } from "./middleware";
 import { initSocketServer } from "./socketIO/socketIOManager";
-import { createRoomRoutes } from "./routes/room.routes";
+import { roomRoutes } from "./routes/room.routes";
 import { userRoutes } from "./routes/user.routes";
 import { createPlayerRoutes } from "./routes/player.routes";
 import { isLoggedIn } from "./guard";
 import grant from "grant";
 import { env } from "./env";
 import { createBadgeRoutes } from "./routes/badges.routes";
-import { lobbyRoutes } from "./routes/lobby.routes";
+import { createLobbyRoutes } from "./routes/lobby.routes";
 import { loginRoutes } from "./routes/login.routes";
 import { registerRoutes } from "./routes/register.routes";
 
@@ -44,10 +44,10 @@ app.use(
 app.use(userRoutes);
 app.use(loginRoutes);
 app.use(registerRoutes);
-app.use(createRoomRoutes(io));
+app.use(roomRoutes);
 app.use(createPlayerRoutes(io));
 app.use(createBadgeRoutes(io));
-app.use(lobbyRoutes);
+app.use(createLobbyRoutes(io));
 
 app.use((req: Request, res: Response) => {
   res.status(404);

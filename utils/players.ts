@@ -1,4 +1,4 @@
-import { roomCapacity } from "../routes/room.routes";
+import { roomCapacity } from "../routes/lobby.routes";
 import { Request, Response } from "express";
 // this user is for chatroom, not the session stuff from db
 type Player = {

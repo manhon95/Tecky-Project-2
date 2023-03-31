@@ -8,7 +8,7 @@ import {
   togglePlayerReady,
 } from "../utils/players";
 import { formatMessage } from "../utils/messages";
-import { rooms } from "../routes/room.routes";
+import { rooms } from "../routes/lobby.routes";
 import express from "express";
 import { createCoupGame } from "../coupGame/coupGameList";
 import { addCoupSocketFunction } from "../coupGame/coupSocketFunction";
