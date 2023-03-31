@@ -8,7 +8,7 @@ import { initSocketServer } from "./socketIO/socketIOManager";
 import { roomRoutes } from "./routes/room.routes";
 import { userRoutes } from "./routes/user.routes";
 import { playerRoutes } from "./routes/player.routes";
-import { isLoggedIn } from "./guard";
+import { checkLoginToLobby, hasLogin } from "./guard";
 import grant from "grant";
 import { env } from "./env";
 import { badgeRoutes } from "./routes/badges.routes";
@@ -48,6 +48,8 @@ app.use(roomRoutes);
 app.use(playerRoutes);
 app.use(badgeRoutes);
 app.use(lobbyRoutes);
+
+app.use(checkLoginToLobby);
 
 app.use((req: Request, res: Response) => {
   res.status(404);

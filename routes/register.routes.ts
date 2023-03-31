@@ -9,6 +9,4 @@ registerRoutes.get("/register", (req: Request, res: Response) => {
   res.sendFile(path.resolve("public", "register.html"));
 });
 
-registerRoutes.post("/register", (req: Request, res: Response) => {
-  saveUserDetails(req, res);
-});
+registerRoutes.post("/register", saveUserDetails);

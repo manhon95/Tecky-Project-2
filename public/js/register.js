@@ -1,3 +1,6 @@
+async function init() {}
+init();
+
 //to create the drop down options
 const date = new Date();
 const getYear = date.getYear() + 1900;

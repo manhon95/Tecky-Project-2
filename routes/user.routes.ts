@@ -1,7 +1,7 @@
 import "../middleware";
 import { getString, HttpError } from "../utils/express";
 import express, { Request, Response, Router } from "express";
-import { getSessionUser, hasLogin, isLoggedIn } from "../guard";
+import { getSessionUser, hasLogin } from "../guard";
 import { login } from "../login";
 import database from "../db";
 import dayjs from "dayjs";
@@ -21,7 +21,7 @@ export type User = {
   elo: number;
 };
 
-userRoutes.use("/user", isLoggedIn, express.static("protected"));
+userRoutes.use("/user", hasLogin, express.static("protected"));
 
 userRoutes.post("/register", (req: Request, res: Response) => {
   saveUserDetails(req, res);

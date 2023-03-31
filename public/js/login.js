@@ -1,3 +1,8 @@
+async function init() {
+  // TODO: ask victor what to put inside
+}
+init();
+
 const rmCheck = document.querySelector(".rememberMe");
 const email = document.querySelector(".email");
 const password = document.querySelector(".password");
