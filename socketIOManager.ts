@@ -63,6 +63,12 @@ export function initSocketServer(app: Application, httpServer: any) {
       });
     });
 
+    // When player receive a friend request
+    socket.on("add-friend", ({ receiverSocketId, senderName }) => {
+      io.to(receiverSocketId).emit("prompt-friend-request", senderName);
+      // console.log(`${senderName} sent a request to ${receiverSocketId}`);
+    });
+
     // socketIO version of ready
     socket.on("ready", () => {
       let allPlayerReady = togglePlayerReady(socket.id);
