@@ -47,11 +47,11 @@
 
     <form
       action="/ProfilePic"
-      method="post"
+      method="put"
       enctype="multipart/form-data"
-      onsubmit="submitProfile(event)"
+      onsubmit="upLoadProfilePicture(event)"
     >
-      <div class="change-profilePic">
+      <div>
         <span>upload profile picture:</span>
         <input class="new-name profilePic" type="file" value="select file" name="profilePic" accept="/image"/>
         <input
@@ -66,6 +66,8 @@
   <script src="./js/loadNavBar.js"></script>
   <script src="./js/alert.js"></script>
   <script>
+
+
     async function main() {
       let id = await getUserId();
       let result = await loadProfile(id);
@@ -75,25 +77,6 @@
       let userEloData = document.querySelector(".user-elo");
       let changeNameBtn = document.querySelector(".change-name-btn");
       
-      //upload profile picture
-      async function upLoadProfilePicture(event) {
-        event.preventDefault(event);
-        let form = event.target;
-        let formData = new FormData(from);
-        let res = await fetch(`${form.action}/${id}`, {
-          method: 'put',
-          body: formData,
-        });
-        let json = await res.json();
-        console.log("profile.html :", json);
-        if (json.error) {
-          message.textContent = json.error;
-          return;
-        }
-        // image.src = "/profilePicture/" + json.filename;
-        console.log(image)
-      }
-
       // change name button trigger ajax request to change name
       changeNameBtn.addEventListener("click", async (e) => {
         let obj = {};

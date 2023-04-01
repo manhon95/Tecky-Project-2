@@ -37,7 +37,7 @@ userRoutes.post("/login/logout", (req, res) => {
   }
 });
 
-const uploadDir = "profilePicture";
+const uploadDir = "protected/assets/profilePicture";
 fs.mkdirSync(uploadDir, { recursive: true });
 const form = formidable({
   uploadDir,
@@ -45,30 +45,48 @@ const form = formidable({
   filter: (part) => part.mimetype?.startsWith("image/") || false,
 });
 
-userRoutes.put("/ProfilePic/:id", async (req, res) => {
-  let id = req.params.id;
-  form.parse(req, (err, fields, files) => {
+/* ------------------------- upload profile picture ------------------------- */
+userRoutes.put("/ProfilePic", async (req, res) => {
+  let id = req.session.user?.id;
+  form.parse(req, async (err, fields, files) => {
     if (err) {
       res.status(507);
       res.json({ err: "fail to up load image", detail: String(err) });
       return;
     }
     let profilePic = files.profilePic;
-
-    let image = Array.isArray(profilePic) ? profilePic[0] : profilePic;
-    console.log(image.newFilename);
-    res.json(image.newFilename);
+    let newProfilePic = Array.isArray(profilePic) ? profilePic[0] : profilePic;
+    let oldImage = await database.query(
+      'select profilePic from "user" where id = ($1)',
+      [id]
+    );
+    const oldImageName = oldImage.rows[0].profilepic;
+    database.query(
+      /*sql*/ `update "user" set profilepic = '${newProfilePic.newFilename}' where id = ${id}`
+    );
+    if(fs.existsSync(`protected/assets/profilePicture/${oldImageName}`)){
+    fs.unlink(`protected/assets/profilePicture/${oldImageName}`, (err) => {
+      if (err) throw err;
+    });
+  }
+    res.json(newProfilePic.newFilename);
   });
 });
+
+
 
 userRoutes.use("/profilePic", express.static(uploadDir));
 
 userRoutes.get("/profilePic", async (req, res) => {
-  if (req.session.user) {
-    let ProfilePic = await getProfilePic(req.session.user.id);
-    res.json(ProfilePic.rows[0].profilepic);
-  }
-});
+  let id = req.session.user?.id;
+  let oldImage = await database.query(
+    'select profilePic from "user" where id = ($1)',
+    [id]
+  );
+  const oldImageName = oldImage.rows[0].profilepic;
+
+    res.json(oldImageName);
+  });
 
 userRoutes.get("/username", hasLogin, async (req, res) => {
   // console.log("having get role req")

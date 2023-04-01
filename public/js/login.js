@@ -37,7 +37,6 @@ document
         result.error;
     } else {
       if (rmCheck.checked && email.value != "" && password.value != "") {
-        console.log("saved ");
         localStorage.setItem("email", email.value);
         localStorage.setItem("password", password.value);
         localStorage.setItem("rmCheck", rmCheck.checked);

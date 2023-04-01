@@ -6,6 +6,7 @@ import { checkPassword } from "./hash";
 
 dotenv.config();
 
+/* --------------------------- login with password -------------------------- */
 export async function login(req: Request, res: Response) {
   const email: string = req.body.email;
   const password: string = req.body.password;
@@ -32,6 +33,7 @@ export async function login(req: Request, res: Response) {
   }
 }
 
+/* ---------------------------- login with google --------------------------- */
 export async function googleLogin(
   req: Request,
   res: Response,
@@ -62,7 +64,6 @@ export async function googleLogin(
         profilePic: user.profilepic,
       };
       req.session.save();
-      console.log(req.session.user);
       res.redirect("/user/lobby");
       return;
     }
@@ -78,10 +79,6 @@ export async function googleLogin(
       [googleJson.email]
     );
 
-    console.log(
-      "profilepic from user.route create user save session",
-      googleJson.picture
-    );
     req.session.user = {
       id: id.rows[0].id,
       username: googleJson.name,

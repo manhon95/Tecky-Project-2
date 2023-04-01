@@ -1,12 +1,48 @@
 async function getProfilePic() {
   const Res = await fetch("/profilePic");
-  const Result = await Res.json();
-  return Result;
+  let result = await Res.json();
+  profilePic.src = result;
+  // console.log(result)
+}
+
+//upload profile picture
+async function upLoadProfilePicture(event) {
+  event.preventDefault();
+  let form = event.target;
+  let formData = new FormData(form);
+  let res = await fetch(`${form.action}`, {
+    method: "put",
+    body: formData,
+  });
+  let Result = await res.json();
+  console.log("profile.html :", Result);
+  if (Result.error) {
+    message.textContent = Result.error;
+    return;
+  }
+
+  profilePic.src = `./assets/profilePicture/${Result}`;
 }
 
 (async () => {
-  navBarHeader = document.querySelector(".navbar");
-  navBarHeader.innerHTML = /*html*/ `
+  let res = await fetch(`/profilePic`, {
+    method: "get",
+  });
+  let Result = await res.json();
+  // if (json.error) {
+  //   message.textContent = json.error;
+  //   return;
+  // }
+  console.log(Result);
+  if (Result.includes("https")) {
+    profilePic.src = Result;
+    return;
+  }
+  profilePic.src = `./assets/profilePicture/${Result}`;
+})();
+
+navBarHeader = document.querySelector(".navbar");
+navBarHeader.innerHTML = /*html*/ `
 <div class="container-fluid">
 <div class="navb-logo">
   <a href=""><img src="./assets/coup-logo.jpg" alt="" /></a>
@@ -23,10 +59,9 @@ async function getProfilePic() {
   </div>
   <div class="item-button d-flex">
     <div >
-    <img src="${await getProfilePic()}" alt="" class="profileImg"></div>
+    <img id="profilePic" src="" alt="" class="profileImg"></div>
     <a href="./profile.html" type="button">profile</a>
   </div>
 </div>
 </div>
 `;
-})();
