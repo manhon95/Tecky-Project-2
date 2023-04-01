@@ -1,21 +1,11 @@
 import { Server } from "socket.io";
-import { Application } from "express";
-import {
-  getCurrentPlayer,
-  getRoomPlayers,
-  playerJoin,
-  playerLeave,
-  togglePlayerReady,
-} from "../utils/players";
-import { formatMessage } from "../utils/messages";
-import { rooms } from "../lobby";
+
 import express from "express";
-import { createCoupGame } from "../coupGame/coupGameList";
 import { addCoupSocketFunction } from "../coupGame/coupSocketFunction";
 import { sessionMiddleware } from "../middleware";
 import { env } from "../env";
 import { onlineCount } from "../utils/user";
-import { createRoomSocketEvent } from "./room.io";
+import { addRoomSocketInitEvent } from "./room.io";
 
 // counter for socketIO connection
 export let io: Server;
@@ -31,25 +21,25 @@ export function initSocketServer(httpServer: any) {
     let res = req.res as express.Response;
     sessionMiddleware(req, res, next as express.NextFunction);
   });
-
+  let count = onlineCount();
   // Alert server upon new connection & increment the counter
   io.on("connection", (socket) => {
     const req = socket.request as express.Request;
 
     // Alert server upon new connection & increment the counter
-    onlineCount().add();
-    io.emit("online-count", onlineCount().get());
+    count.add();
+    io.emit("online-count", count.get());
 
     // Runs when client disconnects
     socket.on("disconnect", () => {
       // game lobby part
-      onlineCount().deduct();
-      io.emit("online-count", onlineCount().get());
+      count.deduct();
+      io.emit("online-count", count.get());
     });
     // console.log(req.session.user?.id);
     /* ---------------------------------- TODO ---------------------------------- */
 
     addCoupSocketFunction(io, socket, req.session);
   });
-  createRoomSocketEvent(io);
+  addRoomSocketInitEvent(io);
 }

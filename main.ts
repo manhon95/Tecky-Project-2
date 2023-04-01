@@ -15,6 +15,7 @@ import { badgeRoutes } from "./routes/badges.routes";
 import { lobbyRoutes } from "./routes/lobby.routes";
 import { loginRoutes } from "./routes/login.routes";
 import { registerRoutes } from "./routes/register.routes";
+import { commonRoutes } from "./routes/common.routes";
 
 const app = express();
 const server = http.createServer(app);
@@ -40,8 +41,9 @@ app.use(
     },
   })
 );
-
-app.use(userRoutes);
+app.use("/user", hasLogin, express.static("protected"));
+// app.use(userRoutes);
+app.use(commonRoutes);
 app.use(loginRoutes);
 app.use(registerRoutes);
 app.use(roomRoutes);

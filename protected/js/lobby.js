@@ -9,7 +9,7 @@ init();
 
 function socketEventInit(socket) {
   // on connect update status content
-  socket.on("{lobby}connect", () => {
+  socket.on("connect", () => {
     status.textContent = "connected: " + socket.id;
   });
 
@@ -18,7 +18,7 @@ function socketEventInit(socket) {
     onlineCount.textContent = data;
   });
 
-  // on new room create show the room
+  // // on new room create show the room
   socket.on("new-room", (room) => {
     showNewRoom(room);
   });
