@@ -34,7 +34,7 @@ async function upLoadProfilePicture(event) {
   //   return;
   // }
   console.log(Result);
-  if (Result.includes("https")) {
+  if (Result?.includes("https")) {
     profilePic.src = Result;
     return;
   }
@@ -52,7 +52,7 @@ navBarHeader.innerHTML = /*html*/ `
     <a href="social.html">Social</a>
   </div>
   <div class="item">
-    <a href="lobby.html">Game lobby</a>
+    <a href="/user/lobby">Game lobby</a>
   </div>
   <div class="item">
     <a href="shop.html">Shop</a>
@@ -60,7 +60,7 @@ navBarHeader.innerHTML = /*html*/ `
   <div class="item-button d-flex">
     <div >
     <img id="profilePic" src="" alt="" class="profileImg"></div>
-    <a href="./profile.html" type="button">profile</a>
+    <a href="/user/profile" type="button">profile</a>
   </div>
 </div>
 </div>

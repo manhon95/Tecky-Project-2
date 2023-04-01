@@ -1,13 +1,11 @@
 import express, { NextFunction, Request, Response } from "express";
-import { saveUserDetails } from "./register";
+
 import { print } from "listening-on";
-import path from "path";
+
 import http from "http";
 import { addMiddleware } from "./middleware";
 import { initSocketServer } from "./socketIO/socketIOManager";
 import { roomRoutes } from "./routes/room.routes";
-import { userRoutes } from "./routes/user.routes";
-import { playerRoutes } from "./routes/player.routes";
 import { checkLoginToLobby, hasLogin } from "./guard";
 import grant from "grant";
 import { env } from "./env";
@@ -16,6 +14,7 @@ import { lobbyRoutes } from "./routes/lobby.routes";
 import { loginRoutes } from "./routes/login.routes";
 import { registerRoutes } from "./routes/register.routes";
 import { commonRoutes } from "./routes/common.routes";
+import { profileRoutes } from "./routes/profile.routes";
 
 const app = express();
 const server = http.createServer(app);
@@ -30,7 +29,7 @@ app.use(
   grant.express({
     defaults: {
       origin: "http://localhost:" + env.port,
-      transport: "session",
+      transport: "sessqweion",
       state: true,
     },
     google: {
@@ -46,10 +45,10 @@ app.use("/user", hasLogin, express.static("protected"));
 app.use(commonRoutes);
 app.use(loginRoutes);
 app.use(registerRoutes);
-app.use(roomRoutes);
-app.use(playerRoutes);
-app.use(badgeRoutes);
 app.use(lobbyRoutes);
+app.use(profileRoutes);
+app.use(roomRoutes);
+app.use(badgeRoutes);
 
 app.use(checkLoginToLobby);
 

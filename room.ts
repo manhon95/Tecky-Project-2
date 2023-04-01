@@ -1,16 +1,8 @@
 import { Request, Response } from "express";
 import database from "./db";
 import moment from "moment";
-/* -------------------------------- template -------------------------------- */
-//contain all logic function, variable
 
-export function sampleFunction1() {}
-
-export function sampleFunction2() {}
-
-/* ------------------------------ template end ------------------------------ */
-
-/* ----------------------- function for room socketIO ----------------------- */
+/* ----------------------- function for socketIO ----------------------- */
 
 // Room related info are all stored in RAM
 type Player = {

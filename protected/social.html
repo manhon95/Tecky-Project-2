@@ -87,9 +87,10 @@
   <script>
     let template = document.querySelector("template");
     let username = document.querySelector(".username");
+    let myId;
 
     async function main() {
-      currentUserId = await getUserId();
+      myId = await getUserId();
       username.textContent = await getUsername();
 
       showFriends(await loadFriends());
@@ -99,14 +100,14 @@
 
     async function loadFriends() {
       // getting all the friends from server
-      let friendsRes = await fetch(`/users/${currentUserId}/friends`);
+      let friendsRes = await fetch(`/users/${myId}/friends`);
       let friendsResult = await friendsRes.json();
       let friends = friendsResult.friends;
       return friends;
     }
     async function loadRequests() {
       // getting all the friends request from server
-      let friendRequestsRes = await fetch(`/users/${currentUserId}/requests`);
+      let friendRequestsRes = await fetch(`/users/${myId}/requests`);
       let friendRequestsResult = await friendRequestsRes.json();
       let friendRequests = friendRequestsResult.requests;
       return friendRequests;
