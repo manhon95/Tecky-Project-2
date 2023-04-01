@@ -1,1 +1,1 @@
- ALTER TABLE "user" DROP CONSTRAINT user_user_name_key
+delete from "user" where email = 'king2003man@googlemail.com'

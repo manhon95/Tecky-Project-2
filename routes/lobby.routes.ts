@@ -1,10 +1,7 @@
 import { Router } from "express";
 import path from "path";
-import socketIO from "socket.io";
-import { getSessionUser, hasLogin } from "../guard";
-import { getString, HttpError } from "../utils/express";
+import { hasLogin } from "../guard";
 import { rooms, Room, roomCapacity, createRoomAndEmitMsg } from "../lobby";
-import { io } from "../socketIO/socketIOManager";
 
 export const lobbyRoutes = Router();
 
