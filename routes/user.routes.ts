@@ -64,16 +64,14 @@ userRoutes.put("/ProfilePic", async (req, res) => {
     database.query(
       /*sql*/ `update "user" set profilepic = '${newProfilePic.newFilename}' where id = ${id}`
     );
-    if(fs.existsSync(`protected/assets/profilePicture/${oldImageName}`)){
-    fs.unlink(`protected/assets/profilePicture/${oldImageName}`, (err) => {
-      if (err) throw err;
-    });
-  }
+    if (fs.existsSync(`protected/assets/profilePicture/${oldImageName}`)) {
+      fs.unlink(`protected/assets/profilePicture/${oldImageName}`, (err) => {
+        if (err) throw err;
+      });
+    }
     res.json(newProfilePic.newFilename);
   });
 });
-
-
 
 userRoutes.use("/profilePic", express.static(uploadDir));
 
@@ -85,8 +83,8 @@ userRoutes.get("/profilePic", async (req, res) => {
   );
   const oldImageName = oldImage.rows[0].profilepic;
 
-    res.json(oldImageName);
-  });
+  res.json(oldImageName);
+});
 
 userRoutes.get("/username", hasLogin, async (req, res) => {
   // console.log("having get role req")

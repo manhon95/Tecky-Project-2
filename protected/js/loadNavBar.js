@@ -33,7 +33,6 @@ async function upLoadProfilePicture(event) {
   //   message.textContent = json.error;
   //   return;
   // }
-  console.log(Result);
   if (Result.includes("https")) {
     profilePic.src = Result;
     return;

@@ -53,7 +53,13 @@
     >
       <div>
         <span>upload profile picture:</span>
-        <input class="new-name profilePic" type="file" value="select file" name="profilePic" accept="/image"/>
+        <input
+          class="new-name profilePic"
+          type="file"
+          value="select file"
+          name="profilePic"
+          accept="/image"
+        />
         <input
           class="change-name-btn profilePic"
           type="submit"
@@ -66,8 +72,6 @@
   <script src="./js/loadNavBar.js"></script>
   <script src="./js/alert.js"></script>
   <script>
-
-
     async function main() {
       let id = await getUserId();
       let result = await loadProfile(id);
@@ -76,7 +80,7 @@
       let userBirthdayData = document.querySelector(".user-birthday");
       let userEloData = document.querySelector(".user-elo");
       let changeNameBtn = document.querySelector(".change-name-btn");
-      
+
       // change name button trigger ajax request to change name
       changeNameBtn.addEventListener("click", async (e) => {
         let obj = {};

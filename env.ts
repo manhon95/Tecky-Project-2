@@ -10,7 +10,10 @@ export let env = {
   GOOGLE_CLIENT_SECRET: "",
   port: 8080,
   BOT_NAME: "",
+  NODEMAILER_EMAIL:"",
+  NODEMAILER_PW:"",
 };
 
 config();
 populateEnv(env, { mode: "halt" });
+

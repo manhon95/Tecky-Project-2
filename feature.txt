@@ -11,4 +11,3 @@
 3. store match history after the game played
   a. 2-6 player in game, only one winner
 
-  send email by using nodemailer.com

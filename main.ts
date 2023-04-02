@@ -69,7 +69,6 @@ app.use((error: any, req: Request, res: Response, next: NextFunction) => {
   });
 });
 
-const PORT = 8080;
-server.listen(PORT, () => {
-  print(PORT);
+server.listen(env.PORT, () => {
+  print(env.PORT);
 });
