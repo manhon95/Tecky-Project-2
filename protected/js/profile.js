@@ -9,6 +9,7 @@ let myId;
 init();
 
 async function init() {
+  const socket = io();
   myId = await getUserId();
   await loadProfile();
   // change name button trigger ajax request to change name

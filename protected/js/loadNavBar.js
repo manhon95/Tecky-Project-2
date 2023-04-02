@@ -49,7 +49,7 @@ navBarHeader.innerHTML = /*html*/ `
 </div>
 <div class="navb-items d-flex gap-3">
   <div class="item">
-    <a href="social.html">Social</a>
+    <a href="/user/social">Social</a>
   </div>
   <div class="item">
     <a href="/user/lobby">Game lobby</a>

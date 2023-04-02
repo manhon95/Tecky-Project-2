@@ -9,12 +9,13 @@ import { roomRoutes } from "./routes/room.routes";
 import { checkLoginToLobby, hasLogin } from "./guard";
 import grant from "grant";
 import { env } from "./env";
-import { badgeRoutes } from "./routes/badges.routes";
+import { shopRoutes } from "./routes/shop.routes";
 import { lobbyRoutes } from "./routes/lobby.routes";
 import { loginRoutes } from "./routes/login.routes";
 import { registerRoutes } from "./routes/register.routes";
 import { commonRoutes } from "./routes/common.routes";
 import { profileRoutes } from "./routes/profile.routes";
+import { socialRoutes } from "./routes/social.routes";
 
 const app = express();
 const server = http.createServer(app);
@@ -48,7 +49,8 @@ app.use(registerRoutes);
 app.use(lobbyRoutes);
 app.use(profileRoutes);
 app.use(roomRoutes);
-app.use(badgeRoutes);
+app.use(socialRoutes);
+app.use(shopRoutes);
 
 app.use(checkLoginToLobby);
 
