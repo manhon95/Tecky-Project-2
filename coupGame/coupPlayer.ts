@@ -45,12 +45,15 @@ export class Player {
     this.hand.concat(newCards);
   }
 
-  discardHand(chosenCards: number[]): void {
-    this.hand.filter((card) => !chosenCards.includes(card));
+  getFaceUp(): number[] {
+    return this.faceUp;
+  }
+
+  discardHand(chosenCards: number): void {
+    this.hand = this.hand.filter((card) => card != chosenCards);
   }
 
   loseInfluence(chosenCard: number) {
-    console.log(this.hand, " ", chosenCard);
     if (!this.hand.includes(chosenCard)) {
       throw new Error("Invalid cards");
     }

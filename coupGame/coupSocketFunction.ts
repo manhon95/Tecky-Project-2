@@ -5,12 +5,17 @@ import { getGameById } from "./coupGameList";
 import "../session-middleWare";
 
 type GameJson = {
-  my: { id: string; hand: number[]; balance: number };
+  my: { id: string; hand: number[]; faceUp: number[]; balance: number };
   otherPlayerList: { id: string; balance: number }[];
 };
 
-const { answerAction, answerCounteraction, answerChallenge, answerCard } =
-  createIoFunction();
+const {
+  answerAction,
+  answerCounteraction,
+  answerChallenge,
+  answerCard,
+  answerTarget,
+} = createIoFunction();
 
 export function addCoupSocketFunction(
   io: socket.Server,
@@ -29,6 +34,7 @@ export function addCoupSocketFunction(
       my: {
         id: my.userID,
         hand: my.getHand(),
+        faceUp: my.getFaceUp(),
         balance: my.getBalance(),
       },
       otherPlayerList: [],
@@ -52,5 +58,6 @@ export function addCoupSocketFunction(
     socket.on("answerCounteraction", answerCounteraction(game));
     socket.on("answerChallenge", answerChallenge(game));
     socket.on("answerCard", answerCard(game));
+    socket.on("answerTarget", answerTarget(game));
   });
 }
