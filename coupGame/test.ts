@@ -7,7 +7,6 @@ import path from "path";
 import { Game } from "./coupGame";
 import { addCoupSocketFunction } from "./coupSocketFunction";
 import { createCoupGame, getGameById } from "./coupGameList";
-import "../session-middleWare";
 
 declare module "express-session" {
   interface SessionData {
@@ -29,7 +28,8 @@ const sessionMiddleware = session({
   resave: true,
   saveUninitialized: true,
 });
-app.use(express.static("../Public"));
+app.use(express.static("../public"));
+app.use(express.static("../protected"));
 app.use(sessionMiddleware);
 
 io.use((socket, next) => {
@@ -39,16 +39,13 @@ io.use((socket, next) => {
 });
 
 app.get("/", (req: Request, res: Response) => {
-  res.sendFile(path.resolve("../Public", "testgameroom.html"));
+  res.sendFile(path.resolve("../protected", "testgameroom.html"));
 });
 
 app.get("/coup", (req: Request, res: Response) => {
-  try {
-    if (typeof req.query.game == "string") {
-      getGameById(req.query.game);
-    }
-    res.sendFile(path.resolve("../Public", "coup-game.html"));
-  } catch (e) {
+  if (typeof req.query.game == "string" && getGameById(req.query.game)) {
+    res.sendFile(path.resolve("../protected", "coup-game.html"));
+  } else {
     res.redirect("/");
   }
 });

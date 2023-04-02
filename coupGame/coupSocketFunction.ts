@@ -2,13 +2,15 @@ import { Session, SessionData } from "express-session";
 import socket from "socket.io";
 import { Game, createIoFunction } from "./coupGame";
 import { getGameById } from "./coupGameList";
+import "../session-middleWare";
 
 type GameJson = {
   my: { id: string; hand: number[]; balance: number };
   otherPlayerList: { id: string; balance: number }[];
 };
 
-const { answerAction } = createIoFunction();
+const { answerAction, answerCounteraction, answerChallenge, answerCard } =
+  createIoFunction();
 
 export function addCoupSocketFunction(
   io: socket.Server,
@@ -20,13 +22,14 @@ export function addCoupSocketFunction(
       throw new Error("User not found");
     }
     let myId = session.user.id;
-    let game = getGameById(arg.game.id);
+    let game: Game = getGameById(arg.game.id);
+    let my = game.playerList[game.getPlayerIndexById(myId)];
     socket.join(game.id);
     let gameJson: GameJson = {
       my: {
-        id: game.playerList[game.getPlayerIndexById(myId)].userID,
-        hand: game.playerList[game.getPlayerIndexById(myId)].getHand(),
-        balance: game.playerList[game.getPlayerIndexById(myId)].getBalance(),
+        id: my.userID,
+        hand: my.getHand(),
+        balance: my.getBalance(),
       },
       otherPlayerList: [],
     };
@@ -46,5 +49,8 @@ export function addCoupSocketFunction(
     });
 
     socket.on("answerAction", answerAction(game));
+    socket.on("answerCounteraction", answerCounteraction(game));
+    socket.on("answerChallenge", answerChallenge(game));
+    socket.on("answerCard", answerCard(game));
   });
 }

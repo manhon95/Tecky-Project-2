@@ -49,13 +49,15 @@ export class Player {
     this.hand.filter((card) => !chosenCards.includes(card));
   }
 
-  loseInfluence(chosenCards: number[]) {
-    if (!chosenCards.every((card) => this.hand.includes(card))) {
+  loseInfluence(chosenCard: number) {
+    console.log(this.hand, " ", chosenCard);
+    if (!this.hand.includes(chosenCard)) {
       throw new Error("Invalid cards");
     }
-    for (let card of chosenCards) {
-      this.faceUp.concat(this.hand.splice(this.hand.indexOf(card), 1));
-    }
-    return;
+    this.faceUp.concat(this.hand.splice(this.hand.indexOf(chosenCard), 1));
+    this.game.io.emit("loseInfluence", {
+      userID: this.userID,
+      chosenCard: chosenCard.toString(),
+    });
   }
 }
