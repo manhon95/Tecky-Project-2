@@ -3,7 +3,7 @@ import { HttpError } from "./utils/express";
 import "./middleware";
 
 export function hasLogin(req: Request, res: Response, next: NextFunction) {
-  if (req.session.user) {
+  if (req.session.user?.id) {
     next();
   } else {
     res.end("unauthorized");
@@ -16,7 +16,7 @@ export function checkLoginToLobby(
   res: Response,
   next: NextFunction
 ) {
-  if (req.session.user) {
+  if (req.session.user?.id) {
     res.redirect("/user/lobby");
   } else {
     // res.end("unauthorized");

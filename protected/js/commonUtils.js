@@ -4,8 +4,8 @@ async function getUserId() {
   return result.id;
 }
 
-async function getUsername() {
-  const usernameRes = await fetch("/username");
+async function getUsername(id) {
+  const usernameRes = await fetch(`/usernames/${id}`);
   const usernameResult = await usernameRes.json();
 
   return usernameResult.username;

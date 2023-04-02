@@ -51,42 +51,6 @@
   <script src="./js/alert.js"></script>
   <script src="./js/commonUtils.js"></script>
   <script src="./js/loadNavBar.js"></script>
-  <script>
-    let username = document.querySelector(".username");
-    let coins = document.querySelector(".coins");
-    let template = document.querySelector("template");
-
-    async function main() {
-      let myId = await getUserId();
-      let myName = await getUsername();
-      let myCoins = await getCoins(myId);
-      let badges = await getUnboughtBadges(myId);
-      showBadges(badges);
-      username.textContent = myName;
-      coins.textContent = myCoins;
-    }
-
-    main().catch((e) => console.error(e));
-
-    async function getUnboughtBadges(id) {
-      let res = await fetch(`/badges/${id}`);
-      let result = await res.json();
-      let badges = result.badges;
-      return badges;
-    }
-    function showBadges(badges) {
-      let badgeList = document.querySelector(".badge-list");
-      // clearAllChildNode(badgeList);
-      let badgeTemplate = template.content.querySelector(".badge");
-
-      badges.map((badge) => {
-        let badgeNode = badgeTemplate.cloneNode(true);
-
-        badgeNode.querySelector(".badge-name").textContent = badge.name;
-        badgeNode.querySelector(".badge-image").src = badge.url;
-        badgeNode.querySelector(".badge-price").textContent = badge.price;
-        badgeList.appendChild(badgeNode);
-      });
-    }
-  </script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="./js/shop.js"></script>
 </html>

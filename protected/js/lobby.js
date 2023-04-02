@@ -1,15 +1,35 @@
-async function init() {
-  //put all init in this function
-  //uncomment below if socketIo is used, replace {Page} to the page name
-  const socket = io();
-  socket.emit("askLobbyInit");
-  socketEventInit(socket);
-}
+const usernameDisplay = document.querySelector(".username");
+const status = document.querySelector(".status");
+const onlineCount = document.querySelector(".online-count");
+const newRoomName = document.querySelector("#new-room-name");
+const roomList = document.querySelector(".room-list");
+const template = document.querySelector("template");
+const roomTemplate = template.content.querySelector(".room");
+
+// Global variables;
+let roomCapacity = 0;
+const socket = io();
+let myId, myName;
 init();
 
-function socketEventInit(socket) {
+async function init() {
+  // always init socket event first
+  socketEventInit();
+
+  myId = await getUserId();
+  myName = await getUsername(myId);
+  usernameDisplay.textContent = myName;
+  roomCapacity = await getRoomCapacity();
+  loadRoomList();
+
+  socket.emit("askLobbyInit");
+}
+
+function socketEventInit() {
   // on connect update status content
-  socket.on("{lobby}connect", () => {
+  console.log(socket);
+  socket.on("connect", () => {
+    console.log("connected");
     status.textContent = "connected: " + socket.id;
   });
 
@@ -18,7 +38,7 @@ function socketEventInit(socket) {
     onlineCount.textContent = data;
   });
 
-  // on new room create show the room
+  // // on new room create show the room
   socket.on("new-room", (room) => {
     showNewRoom(room);
   });
@@ -33,17 +53,6 @@ function socketEventInit(socket) {
   });
 }
 
-const usernameDisplay = document.querySelector(".username");
-const status = document.querySelector(".status");
-const onlineCount = document.querySelector(".online-count");
-const newRoomName = document.querySelector("#new-room-name");
-const roomList = document.querySelector(".room-list");
-const template = document.querySelector("template");
-const roomTemplate = template.content.querySelector(".room");
-
-// Global variables;
-let username = "";
-let roomCapacity = 0;
 // adding press enter to submit
 newRoomName.addEventListener("keypress", (event) => {
   if (event.key == "Enter") {
@@ -61,15 +70,6 @@ document
     location.href = "/login";
   });
 
-async function loadInfoFromServer() {
-  // update the user name when pages refresh
-  username = await getUsername();
-  usernameDisplay.textContent = username;
-  roomCapacity = await getRoomCapacity();
-  loadRoomList();
-}
-
-loadInfoFromServer().catch((e) => console.error(e));
 //debug msg to see if I can room capacity
 
 // trigger function for create room button --> send ajax request
@@ -92,7 +92,7 @@ async function createRoom() {
     return;
   } else {
     // redirect to the chatroom
-    location.href = `/user/room?username=${username}&room=${newRoomName.value}&rid=${json.maxRoomId}`;
+    location.href = `/user/room?username=${myName}&room=${newRoomName.value}&rid=${json.maxRoomId}`;
   }
 }
 
@@ -101,7 +101,6 @@ function showNewRoom(room) {
   roomNode.dataset.id = room.id;
   roomNode.querySelector(".id").textContent = room.id;
   roomNode.querySelector(".name").textContent = room.name;
-  console.log(room.owner);
   roomNode.querySelector(".owner").textContent = room.owner;
   roomNode.querySelector(".count").textContent = room.count;
   roomNode.querySelector(".capacity").textContent = roomCapacity;
@@ -111,7 +110,7 @@ function showNewRoom(room) {
       showError({ title: "Cannot join room", text: "the room is max" });
     } else {
       // joinRoom(room.id);
-      location.href = `/user/room?username=${username}&room=${room.name}&rid=${room.id}`;
+      location.href = `/user/room?username=${myName}&room=${room.name}&rid=${room.id}`;
     }
   });
   roomList.appendChild(roomNode);
@@ -138,12 +137,4 @@ async function getRoomCapacity() {
     return;
   }
   return json.roomCapacity;
-}
-
-// Update the login username and display in the welcome page
-async function getUsername() {
-  const usernameRes = await fetch("/username");
-  const usernameResult = await usernameRes.json();
-
-  return usernameResult.username;
 }

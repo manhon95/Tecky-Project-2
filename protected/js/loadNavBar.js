@@ -48,10 +48,10 @@ navBarHeader.innerHTML = /*html*/ `
 </div>
 <div class="navb-items d-flex gap-3">
   <div class="item">
-    <a href="social.html">Social</a>
+    <a href="/user/social">Social</a>
   </div>
   <div class="item">
-    <a href="lobby.html">Game lobby</a>
+    <a href="/user/lobby">Game lobby</a>
   </div>
   <div class="item">
     <a href="shop.html">Shop</a>
@@ -59,7 +59,7 @@ navBarHeader.innerHTML = /*html*/ `
   <div class="item-button d-flex">
     <div >
     <img id="profilePic" src="" alt="" class="profileImg"></div>
-    <a href="./profile.html" type="button">profile</a>
+    <a href="/user/profile" type="button">profile</a>
   </div>
 </div>
 </div>

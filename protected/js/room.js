@@ -1,3 +1,4 @@
+// Global variable
 const chatForm = document.querySelector("#chat-form");
 const chatMessages = document.querySelector(".chat-messages");
 const roomName = document.querySelector("#room-name");
@@ -5,42 +6,37 @@ const playerList = document.querySelector("#player-list");
 const leaveBtn = document.querySelector(".leave-btn");
 const template = document.querySelector("template");
 const readyBtn = document.querySelector(".ready-btn");
+const profiles = template.content.querySelectorAll(".profile");
 
 const socket = io();
-let myId;
-
-readyBtn.addEventListener("click", () => {
-  // console.log("sent emit", clientSocketID);
-  socket.emit("ready");
-});
-
-// Get username and room from URL
 const { username, room, rid } = Qs.parse(location.search, {
   ignoreQueryPrefix: true,
 });
+let myId;
 
-// Leave button decrement room count and direct back to lobby
-leaveBtn.addEventListener("click", () => {
-  location.href = "/user/lobby.html";
-});
+init();
 
-main().catch((e) => console.error(e));
-
-// Get the userId and send to server
-async function main() {
+async function init() {
+  //put all init in this function
   //init myId
   const res = await fetch("/user-id");
   const result = await res.json();
   myId = result.id;
 
-  // Join chatroom
-  console.log(1);
-  socket.emit("join-room", { username, room, rid, myId });
+  roomName.innerText = room;
+  //uncomment below if socketIo is used, replace {Page} to the page name
 
+  socket.emit("askRoomInit", { username, room, rid, myId });
+  // Message submit
+
+  htmlInit();
+  socketEventInit();
+}
+
+/* -------------------------- all socketEvent here -------------------------- */
+function socketEventInit() {
   // Get room and users
   socket.on("room-players", async ({ room, players }) => {
-    //TODO check if room is needed here
-    outputRoomName(room);
     await outputPlayers(players);
   });
 
@@ -62,7 +58,92 @@ async function main() {
       timer: 1000,
     });
   });
-  // Message submit
+
+  socket.on("redirect-to-game", () => {
+    location.href = `coup-game.html?game=${room}`;
+  });
+
+  // Add users to DOM when received socketIO event
+  async function outputPlayers(players) {
+    // clear all node
+    while (playerList.firstChild) {
+      playerList.removeChild(playerList.firstChild);
+    }
+    players.map((player) => {
+      const playerNode = template.content
+        .querySelector(".player")
+        .cloneNode(true);
+      // add event listener first
+      playerNode.querySelectorAll(".profile").forEach((profile) => {
+        profile.addEventListener("mouseleave", (e) => {
+          e.target.style.display = "none";
+        });
+      });
+
+      const playerName = playerNode.querySelector(".player-name");
+      playerName.textContent = player.username;
+
+      const playerReadyState = playerNode.querySelector(".player-ready-state");
+
+      if (player.ready) {
+        playerReadyState.textContent = "READY";
+        playerReadyState.classList.add("ready");
+      } else {
+        playerReadyState.textContent = "NOT READY";
+        playerReadyState.classList.remove("ready");
+      }
+
+      if (player.userId !== myId) {
+        const addFriendBtn = playerNode.querySelector(".add-friend-btn");
+        playerName.addEventListener("mouseover", async () => {
+          // console.log(`You are hovering ${player.userId}`);
+          if (await checkFriend(myId, player.userId)) {
+            playerNode.querySelector(".friend-profile").style.display = "block";
+          } else {
+            playerNode.querySelector(".non-friend-profile").style.display =
+              "block";
+          }
+        });
+        addFriendBtn.addEventListener("click", async () => {
+          // firing a add friend request
+          await fetch(`/friend-requests/${myId}/${player.userId}`, {
+            method: "POST",
+          });
+          Swal.fire({
+            position: "top-end",
+            icon: "success",
+            title: `Sent friend request to ${player.username}`,
+            showConfirmButton: false,
+            timer: 1000,
+          });
+          // update the friend request receiver immediately
+          socket.emit("add-friend", {
+            receiverSocketId: player.socketId,
+            senderName: username,
+          });
+        });
+      } else {
+        playerName.style.color = "blue";
+        playerName.style.fontWeight = "bold";
+      }
+      playerList.appendChild(playerNode);
+    });
+  }
+
+  // Output message to DOM
+  function outputMessage(message) {
+    const div = document.createElement("div");
+    div.classList.add("message");
+    div.innerHTML = `<p class="meta">${message.username} <span>${message.time}</span></p>
+        <p class="text">
+         ${message.text}
+        </p>`;
+    document.querySelector(".chat-messages").appendChild(div);
+  }
+}
+
+function htmlInit() {
+  // When player press enter emit the msg and update
   chatForm.addEventListener("submit", (e) => {
     e.preventDefault();
     // Get message text
@@ -75,108 +156,20 @@ async function main() {
     e.target.elements.msg.value = "";
     e.target.elements.msg.focus();
   });
-  // start the game when all ready
-  socket.on("redirect-to-game", () => {
-    location.href = `coup-game.html?game=${room}`;
+
+  // When player press ready emit the msg and update
+  readyBtn.addEventListener("click", () => {
+    // console.log("sent emit", clientSocketID);
+    socket.emit("ready");
+  });
+
+  // Leave button decrement room count and direct back to lobby
+  leaveBtn.addEventListener("click", () => {
+    location.href = "/user/lobby.html";
   });
 }
 
-// Output message to DOM
-
-function outputMessage(message) {
-  const div = document.createElement("div");
-  div.classList.add("message");
-  div.innerHTML = `<p class="meta">${message.username} <span>${message.time}</span></p>
-      <p class="text">
-       ${message.text}
-      </p>`;
-  document.querySelector(".chat-messages").appendChild(div);
-}
-
-// Add room name to DOM
-function outputRoomName(room) {
-  roomName.innerText = room; //TODO check if this function is needed
-}
-
-// Add users to DOM
-async function outputPlayers(players) {
-  // clear all node
-  while (playerList.firstChild) {
-    playerList.removeChild(playerList.firstChild);
-  }
-  players.map((player) => {
-    const playerNode = template.content
-      .querySelector(".player")
-      .cloneNode(true);
-    const playerName = playerNode.querySelector(".player-name");
-    playerName.textContent = player.username;
-    const playerReadyState = playerNode.querySelector(".player-ready-state");
-
-    if (player.ready) {
-      playerReadyState.textContent = "READY";
-      playerReadyState.classList.add("ready");
-    } else {
-      playerReadyState.textContent = "NOT READY";
-      playerReadyState.classList.remove("ready");
-    }
-
-    if (player.userId === myId) {
-      playerList.appendChild(playerNode);
-      return;
-    }
-    // when hovering a user in a room --> check if they are friend(apply only on non-current user)
-    playerName.addEventListener("mouseover", async () => {
-      const profile = playerNode.querySelector(".profile");
-
-      profile.style.display = "block";
-      profile.addEventListener("mouseleave", () => {
-        profile.style.display = "none";
-      });
-      // console.log(`You are hovering ${player.userId}`);
-      if (await checkFriend(myId, player.userId)) {
-        profile.querySelector(".friend-status").textContent = "friend";
-      } else {
-        profile.querySelector(".friend-status").textContent = "not friend";
-        const button = template.content
-          .querySelector(".add-friend-btn")
-          .cloneNode(true);
-        button.addEventListener("click", async () => {
-          // firing a add friend request
-          const res = await fetch(`/friend-requests/${myId}/${player.userId}`, {
-            method: "POST",
-          });
-          const result = await res.json();
-          if (result.success) {
-            Swal.fire({
-              position: "top-end",
-              icon: "success",
-              title: `Sent friend request to ${player.username}`,
-              showConfirmButton: false,
-              timer: 1000,
-            });
-            // update the friend request receiver immediately
-            socket.emit("add-friend", {
-              receiverSocketId: player.socketId,
-              senderName: username,
-            });
-            return;
-          }
-          showError({ title: "", text: `You cannot add yourself` });
-        });
-        if (!profile.querySelector(".add-friend-btn")) {
-          profile.appendChild(button);
-        }
-      }
-    });
-
-    playerList.appendChild(playerNode);
-  });
-
-  //       userList.innerHTML = `
-  //   ${users.map((user) => `<li>${user.username}</li>`).join("")}
-  // `;
-}
-
+/* ------------------------ request related function ------------------------ */
 // check friend function
 async function checkFriend(myId, someoneId) {
   let res = await fetch(`/friends/${myId}/${someoneId}`);

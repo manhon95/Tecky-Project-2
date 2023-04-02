@@ -37,7 +37,7 @@ userRoutes.post("/login/logout", (req, res) => {
   }
 });
 
-const uploadDir = "protected/assets/profilePicture";
+const uploadDir = "profilePicture";
 fs.mkdirSync(uploadDir, { recursive: true });
 const form = formidable({
   uploadDir,
@@ -45,10 +45,9 @@ const form = formidable({
   filter: (part) => part.mimetype?.startsWith("image/") || false,
 });
 
-/* ------------------------- upload profile picture ------------------------- */
-userRoutes.put("/ProfilePic", async (req, res) => {
-  let id = req.session.user?.id;
-  form.parse(req, async (err, fields, files) => {
+userRoutes.put("/ProfilePic/:id", async (req, res) => {
+  let id = req.params.id;
+  form.parse(req, (err, fields, files) => {
     if (err) {
       res.status(507);
       res.json({ err: "fail to up load image", detail: String(err) });
