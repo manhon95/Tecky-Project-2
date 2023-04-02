@@ -8,6 +8,8 @@ import {
 import fs from "fs";
 import formidable from "formidable";
 import { hasLogin } from "../guard";
+import { logOutClearSession } from "../logout";
+import { getProfilePicture } from "../profile";
 
 // This is for routes using in more than one pages(don't know how to classify put them in here first)
 
@@ -31,18 +33,6 @@ commonRoutes.get("/user-id", hasLogin, getSessionUserId);
 commonRoutes.get("/profiles/:id", getProfile);
 
 //Log out function
-commonRoutes.post("/login/logout", (req, res) => {
-  if (req.session.user) {
-    req.session.user.id = "";
-    req.session.user.username = "";
-    req.session.save();
-    res.end();
-  }
-});
+commonRoutes.post("/login/logout", logOutClearSession);
 
-commonRoutes.get("/profilePic", async (req, res) => {
-  if (req.session.user) {
-    let ProfilePic = await getProfilePic(req.session.user.id);
-    res.json(ProfilePic.rows[0].profilepic);
-  }
-});
+commonRoutes.get("/profilePic", getProfilePicture);

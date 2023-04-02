@@ -15,7 +15,6 @@ async function upLoadProfilePicture(event) {
     body: formData,
   });
   let Result = await res.json();
-  console.log("profile.html :", Result);
   if (Result.error) {
     message.textContent = Result.error;
     return;

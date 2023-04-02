@@ -29,13 +29,13 @@ app.use(
   // TODO: move this route to userRoutes
   grant.express({
     defaults: {
-      origin: "http://localhost:" + env.port,
-      transport: "sessqweion",
+      origin: "http://localhost:" + env.PORT,
+      transport: "session",
       state: true,
     },
     google: {
-      key: env.GOOGLE_CLIENT_ID || "",
-      secret: env.GOOGLE_CLIENT_SECRET || "",
+      key: env.GOOGLE_CLIENT_ID,
+      secret: env.GOOGLE_CLIENT_SECRET,
       scope: ["profile", "email"],
       callback: "/login/google",
     },
