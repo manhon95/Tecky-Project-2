@@ -1,7 +1,13 @@
 import express, { Router } from "express";
 import path from "path";
 import { hasLogin } from "../guard";
-import { getProfilePicture, patchUsername, upLoadProfilePicture } from "../profile";
+import {
+  getUserActiveBadge,
+  getUserBadges,
+  patchUserActiveBadge,
+  patchUsername,
+  upLoadProfilePicture,
+} from "../profile";
 
 export const profileRoutes = Router();
 
@@ -16,3 +22,11 @@ profileRoutes.put("/ProfilePic", upLoadProfilePicture);
 
 profileRoutes.use("/profilePic", express.static("/profilePicture"));
 
+profileRoutes.get(`/users/:userId/badges`, getUserBadges);
+
+profileRoutes.get(`/users/:userId/activeBadge`, getUserActiveBadge);
+
+profileRoutes.patch(
+  "/users/:userId/activeBadge/:badgeId",
+  patchUserActiveBadge
+);
