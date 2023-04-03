@@ -7,6 +7,7 @@ import path from "path";
 import { Game } from "./coupGame";
 import { addCoupSocketFunction } from "./coupSocketFunction";
 import { createCoupGame, getGameById } from "./coupGameList";
+import "../middleware";
 
 declare module "express-session" {
   interface SessionData {

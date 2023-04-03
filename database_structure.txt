@@ -20,4 +20,42 @@ create table "friend_request" (
 
 alter TABLE "user" ALTER COLUMN PASSWORD DROP NOT NULL;
 alter TABLE "user" ALTER COLUMN birthday DROP NOT NULL;
-alter table "user" add unique (user_name);
+ALTER TABLE "user" ADD profilePic text null;
+alter table "user" add column coins integer not null;
+
+create table "user_badge"(
+    id serial primary key
+    ,owner_id integer
+    ,badge_id integer
+);
+
+create table "badge" (
+    id serial primary key
+    name varchar(32) not null
+    ,url varchar(60) not null
+    ,price smallint not null
+);
+
+# ------------------ TODO: change it to reading excel file ----------------- #
+insert into badge (name, url, price)
+values ('lv1_badge', './assets/badge/lv1_badge.png', 10);
+insert into badge (name, url, price)
+values ('lv2_badge', './assets/badge/lv2_badge.png', 20);
+insert into badge (name, url, price)
+values ('lv3_badge', './assets/badge/lv3_badge.png', 130);
+# ------------------------------------ end ----------------------------------- #
+
+alter table "user_badge"
+add constraint user_badge_owner_id_fkey
+FOREIGN KEY (owner_id) REFERENCES "user"(id);
+
+alter table "user_badge"
+add constraint user_badge_id_fkey
+FOREIGN KEY (badge_id) REFERENCES "badge"(id);
+
+alter table "user" add active_badge_id integer null;
+alter table "user"
+add constraint user_active_badge_id_fkey
+FOREIGN KEY (active_badge_id) REFERENCES "user_badge"(id);
+
+

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>social.html</title>
+    <title>social</title>
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css
@@ -84,137 +84,6 @@
   <script src="./js/loadNavBar.js"></script>
   <script src="./js/alert.js"></script>
   <script src="./js/commonUtils.js"></script>
-  <script>
-    let template = document.querySelector("template");
-    let username = document.querySelector(".username");
-
-    async function main() {
-      currentUserId = await getUserId();
-      username.textContent = await getUsername();
-
-      showFriends(await loadFriends());
-
-      showFriendRequest(await loadRequests());
-    }
-
-    async function loadFriends() {
-      // getting all the friends from server
-      let friendsRes = await fetch(`/users/${currentUserId}/friends`);
-      let friendsResult = await friendsRes.json();
-      let friends = friendsResult.friends;
-      return friends;
-    }
-    async function loadRequests() {
-      // getting all the friends request from server
-      let friendRequestsRes = await fetch(`/users/${currentUserId}/requests`);
-      let friendRequestsResult = await friendRequestsRes.json();
-      let friendRequests = friendRequestsResult.requests;
-      return friendRequests;
-    }
-    // listing out all the friends
-    function showFriends(friends) {
-      let friendList = document.querySelector(".friend-list");
-      clearAllChildNode(friendList);
-      // console.log(friendList.children);
-      let friendTemplate = template.content.querySelector(".friend-record");
-      // console.log(friends);
-      friends.map((friend) => {
-        let friendNode = friendTemplate.cloneNode(true);
-        friendNode.querySelector(".friend-id").textContent = friend.id;
-        friendNode.querySelector(".friend-name").textContent = friend.user_name;
-        friendNode.querySelector(".friend-email").textContent = friend.email;
-        friendNode.querySelector(".friend-elo").textContent = friend.elo;
-        friendNode
-          .querySelector(".unfriend-btn")
-          .addEventListener("click", async (e) => {
-            Swal.fire({
-              title: `Are you sure you want to unfriend ${friend.user_name}?`,
-              showDenyButton: true,
-              showCancelButton: false,
-              confirmButtonText: "Yes",
-              denyButtonText: `No`,
-            }).then(async (result) => {
-              /* Read more about isConfirmed, isDenied below */
-              if (result.isConfirmed) {
-                let userId = await getUserId();
-                let res = await fetch(`/users/${userId}/friends/${friend.id}`, {
-                  method: "DELETE",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                });
-                let result = await res.json();
-
-                if (result.success) {
-                  showFriends(await loadFriends());
-                  Swal.fire(`unfriended ${friend.user_name}!`);
-                } else {
-                  showError({
-                    title: "unknown bug",
-                    text: "database have no record to delete",
-                  });
-                }
-              } else if (result.isDenied) {
-                Swal.fire("Cancelled");
-              }
-            });
-          });
-
-        friendList.appendChild(friendNode);
-      });
-    }
-
-    // listing all the friend request
-    function showFriendRequest(friendRequests) {
-      let friendRequestList = document.querySelector(".friend-request-list");
-
-      clearAllChildNode(friendRequestList);
-      // console.log(template.content);
-      let friendRequestTemplate = template.content.querySelector(
-        ".friend-request-record"
-      );
-      friendRequests.map((request) => {
-        let requestNode = friendRequestTemplate.cloneNode(true);
-        requestNode.querySelector(".request-id").textContent = request.id;
-        requestNode.querySelector(".sender-name").textContent =
-          request.sender_name;
-        requestNode.querySelector(".message").textContent = request.message;
-        requestNode
-          .querySelector(".accept-btn")
-          .addEventListener("click", async () => {
-            let res = await fetch(`/friend-requests/${request.id}/accept`, {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-              },
-            });
-            let result = await res.json();
-            showFriends(await loadFriends());
-            showFriendRequest(await loadRequests());
-            showSuccess({
-              title: "Success",
-              text: `You have added ${request.sender_name} as friend!`,
-            });
-          });
-        requestNode
-          .querySelector(".reject-btn")
-          .addEventListener("click", async () => {
-            let res = await fetch(`/friend-requests/${request.id}/reject`, {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-              },
-            });
-            showFriends(await loadFriends());
-            showFriendRequest(await loadRequests());
-            showSuccess({
-              title: "Success",
-              text: `You have rejected ${request.sender_name}'s friend request!`,
-            });
-          });
-        friendRequestList.appendChild(requestNode);
-      });
-    }
-    main().catch((e) => console.error(e));
-  </script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="./js/social.js"></script>
 </html>

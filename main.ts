@@ -1,68 +1,58 @@
 import express, { NextFunction, Request, Response } from "express";
-import { saveUserDetails } from "./createUserAccount";
+
 import { print } from "listening-on";
-import path from "path";
+
 import http from "http";
-import { sessionMiddleware } from "./session-middleware";
-import { initSocketServer } from "./socketIOManager";
-import { createRoomRoutes } from "./routes/room.routes";
-import { userRoutes } from "./routes/user.routes";
-import { createPlayerRoutes } from "./routes/player.routes";
-import { isLoggedIn } from "./guard";
+import { addMiddleware } from "./middleware";
+import { initSocketServer } from "./socketIO/socketIOManager";
+import { roomRoutes } from "./routes/room.routes";
+import { checkLoginToLobby, hasLogin } from "./guard";
 import grant from "grant";
 import { env } from "./env";
+import { shopRoutes } from "./routes/shop.routes";
+import { lobbyRoutes } from "./routes/lobby.routes";
+import { loginRoutes } from "./routes/login.routes";
+import { registerRoutes } from "./routes/register.routes";
+import { commonRoutes } from "./routes/common.routes";
+import { profileRoutes } from "./routes/profile.routes";
+import { socialRoutes } from "./routes/social.routes";
 
-let app = express();
-let server = http.createServer(app);
+const app = express();
+const server = http.createServer(app);
 
 // Initialize Socket.IO server
-let io = initSocketServer(app, server);
+initSocketServer(server);
 
-app.use(express.static("public"));
-
-app.use(express.urlencoded());
-app.use(express.json());
-
-app.use(sessionMiddleware);
-
-// io middleware, merge express req into io?? ask victor
-io.use((socket, next) => {
-  let req = socket.request as express.Request;
-  let res = req.res as express.Response;
-  sessionMiddleware(req, res, next as express.NextFunction);
-});
+addMiddleware(app);
 
 app.use(
+  // TODO: move this route to userRoutes
   grant.express({
     defaults: {
-      origin: "http://localhost:" + env.port,
+      origin: "http://localhost:" + env.PORT,
       transport: "session",
       state: true,
     },
     google: {
-      key: env.GOOGLE_CLIENT_ID || "",
-      secret: env.GOOGLE_CLIENT_SECRET || "",
+      key: env.GOOGLE_CLIENT_ID,
+      secret: env.GOOGLE_CLIENT_SECRET,
       scope: ["profile", "email"],
       callback: "/login/google",
     },
   })
 );
-app.use(userRoutes);
-app.use(createRoomRoutes(io));
-app.use(createPlayerRoutes(io));
-app.use("/user", isLoggedIn, express.static("protected"));
+app.use("/user", hasLogin, express.static("protected"));
+// app.use(userRoutes);
+app.use(commonRoutes);
+app.use(loginRoutes);
+app.use(registerRoutes);
+app.use(lobbyRoutes);
+app.use(profileRoutes);
+app.use(roomRoutes);
+app.use(socialRoutes);
+app.use(shopRoutes);
 
-app.post("/register", (req: Request, res: Response) => {
-  saveUserDetails(req, res);
-});
-
-app.get("/login", (req: Request, res: Response) => {
-  res.sendFile(path.resolve("public", "login-page.html"));
-});
-
-app.get("/user/gameroom", (req: Request, res: Response) => {
-  res.sendFile(path.resolve("protected", "gameroom.html"));
-});
+app.use(checkLoginToLobby);
 
 app.use((req: Request, res: Response) => {
   res.status(404);
@@ -82,7 +72,6 @@ app.use((error: any, req: Request, res: Response, next: NextFunction) => {
   });
 });
 
-const PORT = 8080;
-server.listen(PORT, () => {
-  print(PORT);
+server.listen(env.PORT, () => {
+  print(env.PORT);
 });

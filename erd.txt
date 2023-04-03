@@ -9,6 +9,7 @@ email varchar(255)
 birthday date
 elo smallint
 coins integer
+profilepic text
 active_badge_id integer NULL FK >0- user_badge.id
 
 
@@ -33,6 +34,7 @@ reject_time timestamp NULL
 badge
 -----
 id integer PK
+name varchar(32)
 url varchar(60)
 price smallint
 

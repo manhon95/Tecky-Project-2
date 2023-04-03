@@ -20,6 +20,9 @@
       td {
         border: 1px solid black;
       }
+      .badge-name {
+        color: black;
+      }
     </style>
   </head>
   <body>
@@ -44,68 +47,52 @@
       <input class="new-name" type="text" />
       <button class="change-name-btn">submit</button>
     </div>
+
+    <form
+      action="/ProfilePic"
+      method="put"
+      enctype="multipart/form-data"
+      onsubmit="upLoadProfilePicture(event)"
+    >
+      <div>
+        <span>upload profile picture:</span>
+        <input
+          class="new-name profilePic"
+          type="file"
+          value="select file"
+          name="profilePic"
+          accept="/image"
+        />
+        <input
+          class="change-name-btn profilePic"
+          type="submit"
+          value="upload"
+        />
+      </div>
+    </form>
+
+    <div>Your Badge:</div>
+    <div class="badge-list">
+      <template>
+        <div class="badge">
+          <div class="badge-name"></div>
+          <div>
+            <img src="" class="badge-icon" alt="" />
+          </div>
+          <button class="set-active-btn">set active</button>
+        </div>
+      </template>
+    </div>
+    <div>Your active badge</div>
+    <div class="active-badge-container">
+      <div class="active-badge-name"></div>
+      <img src="" class="active-badge-icon"></img>
+      <button class="unload-btn">unload</button>
+    </div>
   </body>
+  <script src="./js/commonUtils.js"></script>
   <script src="./js/loadNavBar.js"></script>
   <script src="./js/alert.js"></script>
-  <script>
-    async function main() {
-      let id = await getUserId();
-      console.log(id);
-      
-      let result = await loadProfile(id);
-      let userIdData = document.querySelector(".user-id");
-      let userNameData = document.querySelector(".user-name");
-      let userBirthdayData = document.querySelector(".user-birthday");
-      let userEloData = document.querySelector(".user-elo");
-      let changeNameBtn = document.querySelector(".change-name-btn");
-
-      // change name button trigger ajax request to change name
-      changeNameBtn.addEventListener("click", async (e) => {
-        let obj = {};
-        let newName = document.querySelector(".new-name").value;
-        console.log(newName);
-        obj["newName"] = newName;
-        if (newName.length === 0) {
-          showError({ title: "wrong input", text: "cannot be 0 length" });
-          return;
-        }
-        const res = await fetch(`/usernames/${id}`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(obj),
-        });
-        const result = await res.json();
-        if (result.success) {
-          showSuccess({
-            title: "success",
-            text: "username updated",
-          });
-          userNameData.textContent = newName;
-          return;
-        }
-        showError({
-          title: "invalid input",
-          text: "username already existed",
-        });
-      });
-
-      userIdData.textContent = result.id;
-      userNameData.textContent = result.user_name;
-      userBirthdayData.textContent = result.birthday;
-      userEloData.textContent = result.elo;
-    }
-    async function loadProfile(id) {
-      const res = await fetch(`/profiles/${id}`);
-      const result = await res.json();
-      return result;
-    }
-    async function getUserId() {
-      let res = await fetch("/user-id");
-      let result = await res.json();
-      return result.id;
-    }
-    main().catch((e) => console.error(e));
-  </script>
-</html>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="./js/profile.js"></script>
+  </html>

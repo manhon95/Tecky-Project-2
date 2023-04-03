@@ -70,3 +70,7 @@ header .item-button a {
 header .item-button a:hover {
   background-color: #64d6f4;
 }
+.profileImg{
+    width: 70px;
+    height: 50px;
+}

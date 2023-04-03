@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css"
+      integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk="
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css
+"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/nav-bar-style.css" />
+
+    <style>
+      .player {
+        display: flex;
+        gap: 1rem;
+        position: relative;
+      }
+      .player-ready-state {
+        background-color: white;
+        border: 1px solid black;
+        color: red;
+      }
+      .player-ready-state.ready {
+        color: green;
+      }
+      .player .profile {
+        color: black;
+        background: white;
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform: translate(0, -50%);
+        display: none;
+        z-index: 2;
+      }
+      .player-badge {
+        width: 30px;
+        height: 30px;
+      }
+    </style>
+    <title>ChatCord App</title>
+  </head>
+  <body>
+    <header class="navbar"></header>
+    <div class="chat-container">
+      <header class="chat-header">
+        <h1><i class="fas fa-smile"></i> Coup Game</h1>
+        <button class="ready-btn">toggle ready state</button>
+        <button class="btn leave-btn">Leave Room</button>
+      </header>
+      <main class="chat-main">
+        <div class="chat-sidebar">
+          <h3><i class="fas fa-comments"></i> Room Name:</h3>
+          <h2 id="room-name"></h2>
+          <h3><i class="fas fa-users"></i> Players</h3>
+          <ul id="player-list">
+            <template>
+              <li class="player">
+                <img
+                  src="./assets/badge/noob.png"
+                  alt=""
+                  class="player-badge"
+                />
+                <span class="player-name">Ivan</span>
+                <div class="player-ready-state">READY</div>
+                <div class="friend-profile profile">
+                  <div class="friend-status">friend</div>
+                </div>
+                <div class="non-friend-profile profile">
+                  <div class="friend-status">not friend</div>
+                  <button class="add-friend-btn">add</button>
+                </div>
+              </li>
+            </template>
+          </ul>
+        </div>
+        <div class="chat-messages"></div>
+      </main>
+      <div class="chat-form-container">
+        <form id="chat-form">
+          <input
+            id="msg"
+            type="text"
+            placeholder="Enter Message"
+            required
+            autocomplete="off"
+          />
+          <button class="btn"><i class="fas fa-paper-plane"></i> Send</button>
+        </form>
+      </div>
+    </div>
+    <a
+      href="https://www.freepik.com/free-vector/army-rank-badges-gold-military-insignia-signs_39204058.htm#query=gaming%20badge&position=25&from_view=search&track=ais"
+      >Image by upklyak</a
+    >
+    on Freepik
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.11.1/qs.min.js"
+      integrity="sha512-5Zv/hNtOKSkeScnIYOqGjng82gQSHsCoyqq9TgrJLgYa032cUYWH4kF1ayS8Gz1Jfge7e8MaBF6AeEvoQ92v8w=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="./js/loadNavBar.js"></script>
+    <script src="./js/alert.js"></script>
+    <script src="./js/room.js"></script>
+  </body>
+</html>

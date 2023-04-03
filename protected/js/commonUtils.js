@@ -4,8 +4,8 @@ async function getUserId() {
   return result.id;
 }
 
-async function getUsername() {
-  const usernameRes = await fetch("/username");
+async function getUsername(id) {
+  const usernameRes = await fetch(`/usernames/${id}`);
   const usernameResult = await usernameRes.json();
 
   return usernameResult.username;
@@ -16,4 +16,21 @@ function clearAllChildNode(parent) {
     console.log("cleared ", parent.firstChild);
     parent.removeChild(parent.firstChild);
   }
+}
+
+async function getProfilePic() {
+  const Res = await fetch("/profilePic", {
+    method: "POST",
+  });
+  const Result = await Res.json();
+  console.log("Result");
+  return Result.profilePic;
+}
+
+async function getCoins(userId) {
+  let res = await fetch(`/coins/${userId}`);
+  let result = await res.json();
+  let coins = result.coins;
+
+  return coins;
 }

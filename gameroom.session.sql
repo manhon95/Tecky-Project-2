@@ -1,1 +1,1 @@
-delete from "user"Tables
+delete from "user" where email = 'a@gmail.com'
