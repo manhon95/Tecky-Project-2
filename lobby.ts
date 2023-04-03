@@ -2,14 +2,8 @@ import { getSessionUser } from "./guard";
 import { getString, HttpError } from "./utils/express";
 import { Request, Response } from "express";
 import { io } from "./socketIO/socketIOManager";
+import { Room, rooms } from "./utils/roomInfo";
 
-export type Room = {
-  id: number;
-  name: string;
-  owner: string;
-  count: number;
-};
-export let rooms: Room[] = [];
 export const roomCapacity = 4;
 let maxRoomId = rooms.reduce((id, item) => Math.max(id, item.id), 0);
 

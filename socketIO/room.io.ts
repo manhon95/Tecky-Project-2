@@ -1,7 +1,7 @@
 import socket from "socket.io";
 import express from "express";
 import { botName } from "./socketIOManager";
-import { rooms } from "../lobby";
+import { rooms } from "../utils/roomInfo";
 import {
   formatMessage,
   playerJoin,

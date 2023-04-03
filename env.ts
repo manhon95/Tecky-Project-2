@@ -9,10 +9,9 @@ export let env = {
   GOOGLE_CLIENT_ID: "",
   GOOGLE_CLIENT_SECRET: "",
   BOT_NAME: "",
-  NODEMAILER_EMAIL:"",
-  NODEMAILER_PW:"",
+  NODEMAILER_EMAIL: "",
+  NODEMAILER_PW: "",
 };
 
 config();
 populateEnv(env, { mode: "halt" });
-

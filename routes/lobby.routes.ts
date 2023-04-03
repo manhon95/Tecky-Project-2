@@ -1,8 +1,8 @@
 import { Router } from "express";
 import path from "path";
 import { hasLogin } from "../guard";
-import { rooms, Room, roomCapacity, createRoomAndEmitMsg } from "../lobby";
-
+import { roomCapacity, createRoomAndEmitMsg } from "../lobby";
+import { rooms, Room } from "../utils/roomInfo";
 export const lobbyRoutes = Router();
 
 lobbyRoutes.get("/user/lobby", hasLogin, (req, res) => {
