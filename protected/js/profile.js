@@ -53,3 +53,21 @@ async function getUserId() {
   let result = await res.json();
   return result.id;
 }
+
+//upload profile picture
+async function upLoadProfilePicture(event) {
+  event.preventDefault();
+  let form = event.target;
+  let formData = new FormData(form);
+  let res = await fetch(`${form.action}`, {
+    method: "put",
+    body: formData,
+  });
+  let Result = await res.json();
+  if (Result.error) {
+    message.textContent = Result.error;
+    return;
+  }
+
+  profilePic.src = `./assets/profilePicture/${Result}`;
+}
