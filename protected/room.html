@@ -41,6 +41,10 @@
         display: none;
         z-index: 2;
       }
+      .player-badge {
+        width: 30px;
+        height: 30px;
+      }
     </style>
     <title>ChatCord App</title>
   </head>
@@ -60,6 +64,11 @@
           <ul id="player-list">
             <template>
               <li class="player">
+                <img
+                  src="./assets/badge/noob.png"
+                  alt=""
+                  class="player-badge"
+                />
                 <span class="player-name">Ivan</span>
                 <div class="player-ready-state">READY</div>
                 <div class="friend-profile profile">
