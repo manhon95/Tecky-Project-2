@@ -62,6 +62,7 @@ io.on("connection", (socket) => {
   req.session.user = {
     id: req.sessionID.slice(0, 4),
     username: req.sessionID.slice(5, 8),
+    profilePic: null,
   };
   req.session.save();
   if (req.session.user.id == null) {

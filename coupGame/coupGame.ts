@@ -5,37 +5,27 @@ export function createIoFunction() {
   return {
     answerAction: function (game: Game) {
       return (arg: gameArgument) => {
-        console.log(game.getState());
         game.transition(arg);
-        console.log(game.getState());
       };
     },
     answerCounteraction: function (game: Game) {
       return (arg: gameArgument) => {
-        console.log(game.getState());
         game.transition(arg);
-        console.log(game.getState());
       };
     },
     answerChallenge: function (game: Game) {
       return (arg: gameArgument) => {
-        console.log(game.getState());
         game.transition(arg);
-        console.log(game.getState());
       };
     },
     answerCard: function (game: Game) {
       return (arg: gameArgument) => {
-        console.log(game.getState());
         game.transition(arg);
-        console.log(game.getState());
       };
     },
     answerTarget: function (game: Game) {
       return (arg: gameArgument) => {
-        console.log(game.getState());
         game.transition(arg);
-        console.log(game.getState());
       };
     },
   };
