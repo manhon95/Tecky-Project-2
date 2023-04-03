@@ -187,11 +187,13 @@ function init(game) {
   });
 
   socket.on("addBalance", function (arg) {
-    myBalance.textContent = arg.balance;
+    document.querySelector(`#player-${arg.userID} #balance`).textContent =
+      arg.balance;
   });
 
   socket.on("lowerBalance", function (arg) {
-    myBalance.textContent = arg.balance;
+    document.querySelector(`#player-${arg.userID} #balance`).textContent =
+      arg.balance;
   });
 
   socket.on("askForAction", function (arg) {
