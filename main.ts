@@ -16,6 +16,7 @@ import { registerRoutes } from "./routes/register.routes";
 import { commonRoutes } from "./routes/common.routes";
 import { profileRoutes } from "./routes/profile.routes";
 import { socialRoutes } from "./routes/social.routes";
+import { verifyRoutes } from "./routes/verify.routes";
 
 const app = express();
 const server = http.createServer(app);
@@ -51,6 +52,7 @@ app.use(profileRoutes);
 app.use(roomRoutes);
 app.use(socialRoutes);
 app.use(shopRoutes);
+app.use(verifyRoutes)
 
 app.use(checkLoginToLobby);
 

@@ -9,6 +9,7 @@ declare module "express-session" {
       username: string;
       profilePic: string | null;
     };
+    verificationCode: String
     grant?: GrantSession;
   }
 }
