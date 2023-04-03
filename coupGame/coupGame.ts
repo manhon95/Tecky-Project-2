@@ -77,7 +77,7 @@ export class Game {
   private readonly startingHandSize = 2;
   //create randomize deck
   private deck: number[] = this.shuffle([
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
   ]);
   private gameState = "askForAction";
   private action: Action | undefined = undefined;
@@ -275,7 +275,6 @@ class Income implements Action {
   }
 
   getState(): string {
-    console.log(this.actionState);
     return this.actionState;
   }
 
@@ -345,7 +344,7 @@ class ForeignAid implements Action {
             this.currentPlayerIndex++;
             if (
               this.currentPlayerIndex ===
-              this.callingGame.inGamePlayerList.length - 1
+              this.callingGame.inGamePlayerList.length
             ) {
               this.actionState = "effect";
               this.transition();
@@ -507,7 +506,7 @@ class Tax implements Action {
             this.currentPlayerIndex++;
             if (
               this.currentPlayerIndex ===
-              this.callingGame.inGamePlayerList.length - 1
+              this.callingGame.inGamePlayerList.length
             ) {
               this.actionState = "effect";
               this.transition();
@@ -619,7 +618,7 @@ class Assassinate implements Action {
             this.currentPlayerIndex++;
             if (
               this.currentPlayerIndex ===
-              this.callingGame.inGamePlayerList.length - 1
+              this.callingGame.inGamePlayerList.length
             ) {
               this.callingGame.inGamePlayerList[
                 this.activePlayerIndex
@@ -683,7 +682,7 @@ class Assassinate implements Action {
             this.currentPlayerIndex++;
             if (
               this.currentPlayerIndex ===
-                this.callingGame.inGamePlayerList.length - 1 &&
+                this.callingGame.inGamePlayerList.length &&
               this.targetIndex
             ) {
               this.callingGame.io.emit("askCard", {
@@ -798,7 +797,7 @@ class Exchange implements Action {
             this.currentPlayerIndex++;
             if (
               this.currentPlayerIndex ===
-              this.callingGame.inGamePlayerList.length - 1
+              this.callingGame.inGamePlayerList.length
             ) {
               this.actionState = "effect";
               this.transition();
@@ -952,7 +951,7 @@ class Steal implements Action {
             this.currentPlayerIndex++;
             if (
               this.currentPlayerIndex ===
-              this.callingGame.inGamePlayerList.length - 1
+              this.callingGame.inGamePlayerList.length
             ) {
               this.currentPlayerIndex = -1;
               this.actionState = "askForCounterAction";
@@ -1007,7 +1006,7 @@ class Steal implements Action {
             this.currentPlayerIndex++;
             if (
               this.currentPlayerIndex ===
-              this.callingGame.inGamePlayerList.length - 1
+              this.callingGame.inGamePlayerList.length
             ) {
               this.actionState = "effect";
               this.transition();
@@ -1120,7 +1119,7 @@ class Counteraction implements Action {
             this.currentPlayerIndex++;
             if (
               this.currentPlayerIndex ===
-              this.callingGame.inGamePlayerList.length - 1
+              this.callingGame.inGamePlayerList.length
             ) {
               this.callingAction.setActionValid(false);
               this.counteractionState = "finish";
@@ -1200,9 +1199,6 @@ class Challenge {
   }
 
   transition(arg?: gameArgument): void {
-    if (arg) {
-      console.log(arg);
-    }
     switch (this.challengeState) {
       case "targetLoseInfluence": {
         if (arg && arg.chosenCard) {
