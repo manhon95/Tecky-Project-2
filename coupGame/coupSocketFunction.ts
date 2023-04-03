@@ -6,7 +6,7 @@ import "../session-middleWare";
 
 type GameJson = {
   my: { id: string; hand: number[]; faceUp: number[]; balance: number };
-  otherPlayerList: { id: string; balance: number }[];
+  otherPlayerList: { id: string; balance: number; status: string }[];
 };
 
 const {
@@ -28,7 +28,10 @@ export function addCoupSocketFunction(
     }
     let myId = session.user.id;
     let game: Game = getGameById(arg.game.id);
-    let my = game.playerList[game.getPlayerIndexById(myId)];
+    let my = game.playerList.find((player) => player.userID === myId);
+    if (!my) {
+      throw new Error("player not found");
+    }
     socket.join(game.id);
     let gameJson: GameJson = {
       my: {
@@ -45,6 +48,7 @@ export function addCoupSocketFunction(
         gameJson.otherPlayerList[i] = {
           id: player.userID,
           balance: player.getBalance(),
+          status: player.getStatus(),
         };
         i++;
       }

@@ -7,9 +7,11 @@ const tax = document.querySelector("#tax");
 const assassinate = document.querySelector("#assassinate");
 const exchange = document.querySelector("#exchange");
 const steal = document.querySelector("#steal");
-
+const playersInfoBoard = document.querySelector("#players-info-board");
+const playerNode = document.querySelector("#players-1");
 const msgBox = document.querySelector("#message-box");
 const myCardBoard = document.querySelector("#my #card-board");
+const myBalance = document.querySelector(`#my #balance`);
 const CardNode = document.querySelector(`#my .card`);
 const url = new URL(location.href);
 const searchParams = new URLSearchParams(url.search);
@@ -61,7 +63,7 @@ function init(game) {
     }
     //myCardBoard.textContent = ''
     for (let card of cardList) {
-      let newCardNode = CardNode.cloneNode(true);
+      const newCardNode = CardNode.cloneNode(true);
       myCardBoard.appendChild(newCardNode);
       newCardNode.src = cardPathMap[Math.floor(parseInt(card) / 3)];
       newCardNode.className = nodeClass;
@@ -81,7 +83,7 @@ function init(game) {
       });
     }
     for (let card of faceUpList) {
-      let newCardNode = CardNode.cloneNode(true);
+      const newCardNode = CardNode.cloneNode(true);
       myCardBoard.appendChild(newCardNode);
       newCardNode.src = cardPathMap[Math.floor(parseInt(card) / 3)];
       newCardNode.className = nodeClass;
@@ -90,32 +92,47 @@ function init(game) {
       changeCardStyle(newCardNode);
     }
   }
-  /* ------------------------------ Player 2 Info ----------------------------- */
-  let playersInfo = document.querySelector("#players-1");
-  playersInfo.id = `player-${game.otherPlayerList[0].id}`;
-  playersInfo.setAttribute("user-id", `${game.otherPlayerList[0].id}`);
-  document.querySelector(
-    `#player-${game.otherPlayerList[0].id} #balance`
-  ).textContent = game.otherPlayerList[0].balance;
-  document.querySelector(
-    `#player-${game.otherPlayerList[0].id} #name`
-  ).textContent = game.otherPlayerList[0].id;
+
   /* ---------------------------- Other Player Info --------------------------- */
-  for (let i = 1; i < game.otherPlayerList.length; i++) {
-    playersInfo = playersInfo.cloneNode(true);
-    playersInfo.id = `player-${game.otherPlayerList[i].id}`;
-    playersInfo.setAttribute("user-id", `${game.otherPlayerList[i].id}`);
-    document.getElementById("players-info-board").appendChild(playersInfo);
-    document.querySelector(
-      `#player-${game.otherPlayerList[i].id} #balance`
-    ).textContent = game.otherPlayerList[i].balance;
-    document.querySelector(
-      `#player-${game.otherPlayerList[i].id} #name`
-    ).textContent = game.otherPlayerList[i].id;
+
+  loadPlayers(game.otherPlayerList);
+
+  function loadPlayers(playerList) {
+    while (playersInfoBoard.firstChild) {
+      playersInfoBoard.removeChild(playersInfoBoard.lastChild);
+    }
+    for (let player of playerList) {
+      const newPlayerNode = playerNode.cloneNode(true);
+      playersInfoBoard.appendChild(newPlayerNode);
+      newPlayerNode.id = `player-${player.id}`;
+      newPlayerNode.setAttribute("user-id", `${player.id}`);
+      newPlayerNode.setAttribute("status", `${player.status}`);
+      document.querySelector(`#player-${player.id} #balance`).textContent =
+        player.balance;
+      document.querySelector(`#player-${player.id} #name`).textContent =
+        player.id;
+      if (player.status == "inGame") {
+        newPlayerNode.addEventListener("click", (event) => {
+          if (
+            chooseTargets &&
+            event.currentTarget.getAttribute("status") == "inGame"
+          ) {
+            socket.emit("answerTarget", {
+              targetId: event.currentTarget.getAttribute("user-id"),
+            });
+            chooseTargets = false;
+            document.querySelectorAll(`.other`).forEach((player) => {
+              changePlayerStyle(player);
+            });
+          }
+        });
+      }
+      changePlayerStyle(newPlayerNode);
+    }
   }
 
   function changePlayerStyle(playerNode) {
-    if (playerNode.getAttribute("location") != "outOfGame") {
+    if (playerNode.getAttribute("status") != "outGame") {
       if (chooseTargets) {
         playerNode.style.border = "4px solid DodgerBlue";
       } else {
@@ -126,22 +143,6 @@ function init(game) {
     }
   }
 
-  const otherPlayer = document.querySelectorAll(".other");
-  otherPlayer.forEach((player) => {
-    player.addEventListener("click", (event) => {
-      if (chooseTargets) {
-        socket.emit("answerTarget", {
-          targetId: event.currentTarget.getAttribute("user-id"),
-        });
-        chooseTargets = false;
-        otherPlayer.forEach((player) => {
-          changePlayerStyle(player);
-        });
-      }
-    });
-    player.setAttribute("location", `in-game`);
-    changePlayerStyle(player);
-  });
   /* ------------------------------- Button Init ------------------------------ */
   const actionButton = document.querySelectorAll("#turn-button-board .btn");
   actionButton.forEach((button) => {
@@ -186,15 +187,24 @@ function init(game) {
   });
 
   socket.on("addBalance", function (arg) {
-    const myBalance = document.querySelector(`#player-${arg.userID} #balance`);
-    msgBox.innerHTML += `User ${arg.userID} balance add ${arg.amount}<br>`;
+    myBalance.textContent = arg.balance;
+  });
+
+  socket.on("lowerBalance", function (arg) {
     myBalance.textContent = arg.balance;
   });
 
   socket.on("askForAction", function (arg) {
+    console.log("incoming");
     actionButton.forEach((button) => {
       button.disabled = !(arg.userID == myId);
     });
+  });
+
+  socket.on("outGame", function (arg) {
+    let node = document.querySelector(`#player-${arg.userID}`);
+    node.setAttribute("status", "outGame");
+    changePlayerStyle(node);
   });
 
   socket.on("askForCounterAction", function (arg) {
@@ -223,7 +233,7 @@ function init(game) {
 
   socket.on("askTarget", function (arg) {
     chooseTargets = arg.userID == myId;
-    otherPlayer.forEach((player) => {
+    document.querySelectorAll(`.other`).forEach((player) => {
       changePlayerStyle(player);
     });
   });
@@ -245,6 +255,13 @@ function init(game) {
         remainHand.src = cardPathMap[Math.floor(parseInt(arg.chosenCard) / 3)];
       }
     }
+  });
+
+  socket.on("message", function (arg) {
+    msgBox.innerHTML += arg;
+  });
+  socket.on("finish", function (arg) {
+    msgBox.innerHTML += `User ${arg.userID} Win<br>`;
   });
 
   /* ------------------------------- finish init ------------------------------ */

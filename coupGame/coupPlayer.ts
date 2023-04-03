@@ -3,6 +3,7 @@ import { Game } from "./coupGame";
 
 export class Player {
   private faceUp: number[] = [];
+  private status: string = "inGame";
   private sockets: Socket | undefined = undefined;
   constructor(
     public readonly userID: string,
@@ -22,6 +23,10 @@ export class Player {
       balance: this.balance,
       amount: amount,
     });
+    this.game.io.emit(
+      "message",
+      `User ${this.userID} balance add ${amount}<br>`
+    );
   }
 
   lowerBalance(amount: number) {
@@ -31,6 +36,14 @@ export class Player {
       balance: this.balance,
       amount: amount,
     });
+    this.game.io.emit(
+      "message",
+      `User ${this.userID} balance lower ${amount}<br>`
+    );
+  }
+
+  getStatus(): string {
+    return this.status;
   }
 
   getBalance(): number {
@@ -74,5 +87,12 @@ export class Player {
       userID: this.userID,
       chosenCard: chosenCard.toString(),
     });
+    if (this.getHand().length == 0) {
+      this.status = "outGame";
+      this.game.io.emit("outGame", {
+        userID: this.userID,
+      });
+      this.game.io.emit("message", `User ${this.userID} Out Game!<br>`);
+    }
   }
 }
