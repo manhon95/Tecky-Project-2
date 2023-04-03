@@ -65,7 +65,7 @@ function init(game) {
     for (let card of cardList) {
       const newCardNode = CardNode.cloneNode(true);
       myCardBoard.appendChild(newCardNode);
-      newCardNode.src = cardPathMap[Math.floor((parseInt(card) - 1 - 1) / 3)];
+      newCardNode.src = cardPathMap[Math.floor((parseInt(card) - 1) / 3)];
       newCardNode.className = nodeClass;
       newCardNode.setAttribute("cardNo", `${card}`);
       newCardNode.setAttribute("location", `hand`);

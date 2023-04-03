@@ -919,6 +919,7 @@ class Steal implements Action {
             }!<br>`
           );
           this.actionState = "askForChallenge";
+          this.transition();
         } else {
           this.callingGame.io.emit("askTarget", {
             userID:
