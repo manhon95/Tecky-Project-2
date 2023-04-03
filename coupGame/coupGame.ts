@@ -497,6 +497,7 @@ class Tax implements Action {
             this.currentPlayerIndex,
             this.activePlayerIndex
           );
+          this.challenge.transition();
         } else if (
           this.currentPlayerIndex !==
           this.callingGame.inGamePlayerList.length - 1
@@ -609,6 +610,7 @@ class Assassinate implements Action {
             this.currentPlayerIndex,
             this.activePlayerIndex
           );
+          this.challenge.transition();
         } else if (
           this.currentPlayerIndex !==
           this.callingGame.inGamePlayerList.length - 1
@@ -673,6 +675,7 @@ class Assassinate implements Action {
             this,
             this.currentPlayerIndex
           );
+          this.counteraction.transition();
         } else if (
           this.currentPlayerIndex !==
           this.callingGame.inGamePlayerList.length - 1
@@ -788,6 +791,7 @@ class Exchange implements Action {
             this.currentPlayerIndex,
             this.activePlayerIndex
           );
+          this.challenge.transition();
         } else if (
           this.currentPlayerIndex !==
           this.callingGame.inGamePlayerList.length - 1
@@ -943,6 +947,7 @@ class Steal implements Action {
             this.currentPlayerIndex,
             this.activePlayerIndex
           );
+          this.challenge.transition();
         } else if (
           this.currentPlayerIndex !==
           this.callingGame.inGamePlayerList.length - 1
@@ -998,6 +1003,7 @@ class Steal implements Action {
             this,
             this.currentPlayerIndex
           );
+          this.counteraction.transition();
         } else if (
           this.currentPlayerIndex !==
           this.callingGame.inGamePlayerList.length - 1
