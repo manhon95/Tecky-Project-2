@@ -2,7 +2,7 @@ import { Session, SessionData } from "express-session";
 import socket from "socket.io";
 import { Game, createIoFunction } from "./coupGame";
 import { getGameById } from "./coupGameList";
-import "../session-middleWare";
+import "../middleware";
 
 type GameJson = {
   my: { id: string; hand: number[]; faceUp: number[]; balance: number };
