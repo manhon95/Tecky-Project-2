@@ -30,6 +30,7 @@
     "jsonfile": "^6.1.0",
     "listening-on": "^2.0.9",
     "moment": "^2.29.4",
+    "nodejs-nodemailer-outlook": "^1.2.4",
     "nodemailer": "^6.9.1",
     "pg": "^8.10.0",
     "populate-env": "^2.0.0",

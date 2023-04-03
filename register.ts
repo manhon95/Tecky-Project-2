@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 import database from "./db";
 import "./middleware";
 import { hashPassword } from "./hash";
-import crypto from "crypto";
 import nodemailer from "nodemailer";
 import { env } from "./env";
 dotenv.config();
@@ -71,28 +70,28 @@ export async function saveUserDetails(req: Request, res: Response) {
 
   //-----------------------here insert send email content--------
   // create reusable transporter object using the default SMTP transport
-  // let transporter = nodemailer.createTransport({
-  //   service: "gmail",
-  //   auth: {
-  //     user: env.NODEMAILER_EMAIL, // generated ethereal user
-  //     pass: env.NODEMAILER_PW, // generated ethereal password
-  //   },
-  // });
+  let transporter = nodemailer.createTransport({
+    service: "outlook",
+    auth: {
+      user: `${env.NODEMAILER_EMAIL}`, // generated ethereal user
+      pass:`${env.NODEMAILER_PW}`, // generated ethereal password
+    },
+  });
 
-  // // send mail with defined transport object
-  // let info = await transporter.sendMail({
-  //   from: '"Fred Foo 👻" <foo@example.com>', // sender address
-  //   to: "bar@example.com, baz@example.com", // list of receivers
-  //   subject: "Hello ✔", // Subject line
-  //   text: "Hello world?", // plain text body
-  //   html: "<b>Hello world?</b>", // html body
-  // });
+  // send mail with defined transport object
+  let info = await transporter.sendMail({
+    from: `${env.NODEMAILER_EMAIL}`, // sender address
+    to: `${email}`, // list of receivers
+    subject: "verification ", // Subject line
+    text: "Hello world?", // plain text body
+    html: "<b>Hello world?</b>", // html body
+  });
 
-  // console.log("Message sent: %s", info.messageId);
-  // // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+  console.log("Message sent: %s", info.messageId);
+  // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
 
-  // // Preview only available when sending through an Ethereal account
-  // console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+  // Preview only available when sending through an Ethereal account
+  console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
 //This function get info from http request and save as use detail
 
   //0------------------add isVerified--------------
