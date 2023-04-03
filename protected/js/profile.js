@@ -4,9 +4,11 @@ const userBirthday = document.querySelector(".user-birthday");
 const userElo = document.querySelector(".user-elo");
 const changeNameBtn = document.querySelector(".change-name-btn");
 const badgeList = document.querySelector(".badge-list");
+
+const activeBadgeContainer = document.querySelector(".active-badge");
 const activeBadgeName = document.querySelector(".active-badge-name");
 const activeBadgeIcon = document.querySelector(".active-badge-icon");
-
+const unloadBtn = document.querySelector(".unload-btn");
 const template = document.querySelector("template");
 let myId;
 
@@ -41,8 +43,16 @@ async function init() {
       text: "username updated",
     });
     await loadProfile();
-    await loadProfileNamePic()
+    await loadProfileNamePic();
     return;
+  });
+
+  unloadBtn.addEventListener("click", async () => {
+    await fetch(`/users/${myId}/activeBadge/${-1}`, {
+      method: "PATCH",
+    });
+    showSuccess({ title: "!!!", text: "you have unloaded the badge!" });
+    await loadActiveBadge();
   });
 }
 
@@ -111,10 +121,12 @@ async function loadUserBadges() {
 async function loadActiveBadge() {
   let res = await fetch(`/users/${myId}/activeBadge`);
   let activeBadge = await res.json();
-  console.log(activeBadge);
   if (activeBadge.length == 0) {
     activeBadgeName.innerHTML = "<h1>no active badge yet</h1>";
+    unloadBtn.style.display = "none";
+    activeBadgeIcon.src = "";
   } else {
+    unloadBtn.style.display = "inline-block";
     activeBadgeName.textContent = activeBadge[0].name;
     activeBadgeIcon.src = activeBadge[0].url;
   }

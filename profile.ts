@@ -23,6 +23,12 @@ export async function patchUserActiveBadge(req: Request, res: Response) {
   await updateActiveBadgeInDB(+req.params.userId, +req.params.badgeId);
   res.json({});
 }
+export async function deleteUserActiveBadge(req: Request, res: Response) {
+  console.log("trying to delete");
+  // delete = set null
+  // await updateActiveBadgeInDB(+req.params.userId, null);
+  res.json({});
+}
 /* ----------------------- function for Database query ---------------------- */
 async function updateUsernameInDB(id: number, newName: string) {
   let result = await database.query(
@@ -136,13 +142,13 @@ WHERE b.id  =
   return [];
 }
 
-async function updateActiveBadgeInDB(userId: number, badgeId: number) {
+async function updateActiveBadgeInDB(userId: number, badgeId: number | null) {
   let result = await database.query(
     /* sql */ `
 UPDATE "user"
 SET active_badge_id  = $2
 WHERE id = $1
   `,
-    [userId, badgeId]
+    [userId, badgeId == -1 ? null : badgeId]
   );
 }
