@@ -11,6 +11,7 @@ import {
   getCurrentPlayer,
 } from "../room";
 import { createCoupGame } from "../coupGame/coupGameList";
+import { updateMatchRecord } from "../matchRecord";
 
 export function addRoomSocketInitEvent(io: socket.Server) {
   io.on("connection", (socket) => {
@@ -85,6 +86,14 @@ function addRoomSocketEvent(socket: socket.Socket, io: socket.Server) {
               // pass arg to victor function here
 
               createCoupGame(gameId, roomPlayerList, io);
+              /* -------------------------------- fake part ------------------------------- */
+              // create fake winner --> create match record --> create user_match
+              // const winnerIdx = Math.floor(
+              //   Math.random() * roomPlayerList.length
+              // );
+              // const winnerId = +roomPlayerList[winnerIdx];
+              // updateMatchRecord(roomPlayerList, gameId, winnerId);
+              /* ------------------------------ fake part end ----------------------------- */
               io.emit("redirect-to-game");
             }
           }

@@ -49,8 +49,8 @@ export async function googleLogin(
           Authorization: `Bearer ${accessToken}`,
         },
       }
-      );
-      let googleJson = await googleRes.json();
+    );
+    let googleJson = await googleRes.json();
     let resultDB = await database.query(
       'select id, user_name, profilePic from "user" where email =($1)',
       [googleJson.email]
@@ -59,7 +59,7 @@ export async function googleLogin(
     if (user) {
       //if existing user
       req.session.user = {
-        id: user.id,
+        id: String(user.id),
         username: user.user_name || googleJson.name,
         profilePic: user.profilepic,
       };
@@ -77,7 +77,7 @@ export async function googleLogin(
       'select id, user_name from "user" where email =($1)',
       [googleJson.email]
     );
-      req.session.user = {
+    req.session.user = {
       id: id.rows[0].id,
       username: googleJson.name,
       profilePic: googleJson.picture,

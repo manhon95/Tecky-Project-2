@@ -27,68 +27,80 @@
   </head>
   <body>
     <header class="navbar"></header>
-    <table>
-      <tr>
-        <th>id</th>
-        <th>username</th>
-        <th>birthday</th>
-        <th>elo</th>
-      </tr>
-      <tr>
-        <td class="user-id"></td>
-        <td class="user-name"></td>
-        <td class="user-birthday"></td>
-        <td class="user-elo"></td>
-      </tr>
-    </table>
-
-    <div class="change-name">
-      <span>change your name:</span>
-      <input class="new-name" type="text" />
-      <button class="change-name-btn">submit</button>
-    </div>
-
-    <form
-      action="/ProfilePic"
-      method="put"
-      enctype="multipart/form-data"
-      onsubmit="upLoadProfilePicture(event)"
-    >
-      <div>
-        <span>upload profile picture:</span>
-        <input
-          class="new-name profilePic"
-          type="file"
-          value="select file"
-          name="profilePic"
-          accept="/image"
-        />
-        <input
-          class="change-name-btn profilePic"
-          type="submit"
-          value="upload"
-        />
-      </div>
-    </form>
-
-    <div>Your Badge:</div>
-    <div class="badge-list">
-      <template>
-        <div class="badge">
-          <div class="badge-name"></div>
-          <div>
-            <img src="" class="badge-icon" alt="" />
-          </div>
-          <button class="set-active-btn">set active</button>
+    <div class="row">
+      <div class="col-6">
+        <table>
+          <tr>
+            <th>id</th>
+            <th>username</th>
+            <th>birthday</th>
+            <th>elo</th>
+          </tr>
+          <tr>
+            <td class="user-id"></td>
+            <td class="user-name"></td>
+            <td class="user-birthday"></td>
+            <td class="user-elo"></td>
+          </tr>
+        </table>
+    
+        <div class="change-name">
+          <span>change your name:</span>
+          <input class="new-name" type="text" />
+          <button class="change-name-btn">submit</button>
         </div>
-      </template>
+    
+        <form
+          action="/ProfilePic"
+          method="put"
+          enctype="multipart/form-data"
+          onsubmit="upLoadProfilePicture(event)"
+        >
+          <div>
+            <span>upload profile picture:</span>
+            <input
+              class="new-name profilePic"
+              type="file"
+              value="select file"
+              name="profilePic"
+              accept="/image"
+            />
+            <input
+              class="change-name-btn profilePic"
+              type="submit"
+              value="upload"
+            />
+          </div>
+        </form>
+    
+        <div>Your Badge:</div>
+        <div class="badge-list">
+
+        </div>
+        <div>Your active badge</div>
+        <div class="active-badge-container">
+          <div class="active-badge-name"></div>
+          <img src="" class="active-badge-icon"></img>
+          <button class="unload-btn">unload</button>
+        </div>
+      </div>
+      <div class="col-6 match-history">
+        <h1>Match History</h1>
+        <ul class="match-history-list">
+          
+        </ul>
+      </div>
     </div>
-    <div>Your active badge</div>
-    <div class="active-badge-container">
-      <div class="active-badge-name"></div>
-      <img src="" class="active-badge-icon"></img>
-      <button class="unload-btn">unload</button>
-    </div>
+    <template>
+      <div class="badge">
+        <div class="badge-name"></div>
+        <div>
+          <img src="" class="badge-icon" alt="" />
+        </div>
+        <button class="set-active-btn">set active</button>
+      </div>
+      <li class="match-history"></li>
+    </template>
   </body>
   <script src="./js/commonUtils.js"></script>
   <script src="./js/loadNavBar.js"></script>
