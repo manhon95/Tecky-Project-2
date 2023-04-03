@@ -2,15 +2,14 @@ const username = document.querySelector(".username");
 const coins = document.querySelector(".coins");
 const template = document.querySelector("template");
 
+let myId;
+
 async function init() {
   const socket = io();
-  let myId = await getUserId();
-  let myName = await getUsername(myId);
-  let myCoins = await getCoins(myId);
-  let badges = await getUnboughtBadges(myId);
-  showBadges(badges);
-  username.textContent = myName;
-  coins.textContent = myCoins;
+  myId = await getUserId();
+  username.textContent = await getUsername(myId);
+  showBadges(await getUnboughtBadges(myId));
+  coins.textContent = await getCoins(myId);
 }
 
 init();
@@ -22,23 +21,46 @@ async function getUnboughtBadges(id) {
   return badges;
 }
 function showBadges(badges) {
-  let badgeList = document.querySelector(".badge-list");
+  const badgeList = document.querySelector(".badge-list");
+  clearAllChildNode(badgeList);
   // clearAllChildNode(badgeList);
-  let badgeTemplate = template.content.querySelector(".badge");
+  const badgeTemplate = template.content.querySelector(".badge");
 
   badges.map((badge) => {
-    let badgeNode = badgeTemplate.cloneNode(true);
+    const badgeNode = badgeTemplate.cloneNode(true);
 
     badgeNode.querySelector(".badge-name").textContent = badge.name;
     badgeNode.querySelector(".badge-image").src = badge.url;
-    badgeNode.querySelector(".badge-price").textContent = badge.price;
+    badgeNode.querySelector(".badge-price").textContent = `$${badge.price}`;
+    badgeNode.querySelector(".buy-btn").addEventListener("click", async () => {
+      console.log("tries to post");
+      let res = await fetch(`/users/${myId}/badges/${badge.id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      let result = await res.json();
+      console.log(result);
+      if (result.error) {
+        showError({ title: "Can't Purchase", text: result.error });
+        return;
+      }
+      showSuccess({
+        title: "Finish buy",
+        text: `You have purchased ${badge.name}`,
+      });
+      // update again coins and list;
+      showBadges(await getUnboughtBadges(myId));
+      coins.textContent = await getCoins(myId);
+    });
     badgeList.appendChild(badgeNode);
   });
 }
 async function getCoins(userId) {
   let res = await fetch(`/coins/${userId}`);
   let result = await res.json();
-  let coins = result.coins;
+  let coins = result;
 
   return coins;
 }
