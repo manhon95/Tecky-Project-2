@@ -38,11 +38,11 @@ create table "badge" (
 
 # ------------------ TODO: change it to reading excel file ----------------- #
 insert into badge (name, url, price)
-values ('lv1_badge', '/assets/badge/lv1_badge.png', 10);
+values ('lv1_badge', './assets/badge/lv1_badge.png', 10);
 insert into badge (name, url, price)
-values ('lv2_badge', '/assets/badge/lv2_badge.png', 20);
+values ('lv2_badge', './assets/badge/lv2_badge.png', 20);
 insert into badge (name, url, price)
-values ('lv3_badge', '/assets/badge/lv3_badge.png', 130);
+values ('lv3_badge', './assets/badge/lv3_badge.png', 130);
 # ------------------------------------ end ----------------------------------- #
 
 alter table "user_badge"
