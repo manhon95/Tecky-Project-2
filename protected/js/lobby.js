@@ -27,9 +27,7 @@ async function init() {
 
 function socketEventInit() {
   // on connect update status content
-  console.log(socket);
   socket.on("connect", () => {
-    console.log("connected");
     status.textContent = "connected: " + socket.id;
   });
 

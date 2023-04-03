@@ -15,7 +15,6 @@ async function upLoadProfilePicture(event) {
     body: formData,
   });
   let Result = await res.json();
-  console.log("profile.html :", Result);
   if (Result.error) {
     message.textContent = Result.error;
     return;
@@ -33,8 +32,7 @@ async function upLoadProfilePicture(event) {
   //   message.textContent = json.error;
   //   return;
   // }
-  console.log(Result);
-  if (Result?.includes("https")) {
+  if (Result.includes("https")) {
     profilePic.src = Result;
     return;
   }

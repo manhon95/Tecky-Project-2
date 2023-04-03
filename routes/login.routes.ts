@@ -1,8 +1,7 @@
-import "../middleware";
-import { Request, Response, Router } from "express";
+import express, { Request, Response, Router } from "express";
 import { googleLogin, login } from "../login";
-import database from "../db";
 import path from "path";
+import { hasLogin } from "../guard";
 
 export const loginRoutes = Router();
 
@@ -14,3 +13,6 @@ loginRoutes.post("/login/password", login);
 
 //use google to log in
 loginRoutes.get("/login/google", googleLogin);
+
+loginRoutes.use("/user", hasLogin, express.static("protected"));
+

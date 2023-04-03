@@ -49,8 +49,8 @@ export async function googleLogin(
           Authorization: `Bearer ${accessToken}`,
         },
       }
-    );
-    let googleJson = await googleRes.json();
+      );
+      let googleJson = await googleRes.json();
     let resultDB = await database.query(
       'select id, user_name, profilePic from "user" where email =($1)',
       [googleJson.email]
@@ -69,7 +69,6 @@ export async function googleLogin(
     }
 
     //if user not exist in database, create user
-
     await database.query(
       `insert into "user" (user_name, email, elo, profilePic, coins) values ($1, $2, '1000', $3, 100)`,
       [googleJson.name, googleJson.email, googleJson.picture]
@@ -78,8 +77,7 @@ export async function googleLogin(
       'select id, user_name from "user" where email =($1)',
       [googleJson.email]
     );
-
-    req.session.user = {
+      req.session.user = {
       id: id.rows[0].id,
       username: googleJson.name,
       profilePic: googleJson.picture,
