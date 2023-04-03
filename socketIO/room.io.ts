@@ -88,13 +88,13 @@ function addRoomSocketEvent(socket: socket.Socket, io: socket.Server) {
               createCoupGame(gameId, roomPlayerList, io);
               /* -------------------------------- fake part ------------------------------- */
               // create fake winner --> create match record --> create user_match
-              const winnerIdx = Math.floor(
-                Math.random() * roomPlayerList.length
-              );
-              const winnerId = +roomPlayerList[winnerIdx];
-              updateMatchRecord(roomPlayerList, gameId, winnerId);
+              // const winnerIdx = Math.floor(
+              //   Math.random() * roomPlayerList.length
+              // );
+              // const winnerId = +roomPlayerList[winnerIdx];
+              // updateMatchRecord(roomPlayerList, gameId, winnerId);
               /* ------------------------------ fake part end ----------------------------- */
-              // io.emit("redirect-to-game");
+              io.emit("redirect-to-game");
             }
           }
         }, 1000);
