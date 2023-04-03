@@ -74,6 +74,6 @@ create table "user_match" (
     ,player_id integer
     ,FOREIGN KEY (player_id) REFERENCES "user"(id)
     ,match_id integer
-    ,FOREIGN KEY (player_id) REFERENCES "match"(id)
+    ,FOREIGN KEY (match_id) REFERENCES "match"(id)
 );
 
