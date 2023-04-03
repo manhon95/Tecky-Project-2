@@ -3,6 +3,7 @@ import { Game } from "./coupGame";
 
 export class Player {
   private faceUp: number[] = [];
+  private status: string = "inGame";
   private sockets: Socket | undefined = undefined;
   constructor(
     public readonly userID: string,
@@ -22,6 +23,10 @@ export class Player {
       balance: this.balance,
       amount: amount,
     });
+    this.game.io.emit(
+      "message",
+      `User ${this.userID} balance add ${amount}<br>`
+    );
   }
 
   lowerBalance(amount: number) {
@@ -31,6 +36,14 @@ export class Player {
       balance: this.balance,
       amount: amount,
     });
+    this.game.io.emit(
+      "message",
+      `User ${this.userID} balance lower ${amount}<br>`
+    );
+  }
+
+  getStatus(): string {
+    return this.status;
   }
 
   getBalance(): number {
@@ -42,20 +55,44 @@ export class Player {
   }
 
   addHand(newCards: number[]): void {
-    this.hand.concat(newCards);
+    this.hand = this.hand.concat(newCards);
+    this.game.io.emit("updateCard", {
+      userID: this.userID,
+      hand: this.getHand(),
+      faceUp: this.getFaceUp(),
+    });
   }
 
-  discardHand(chosenCards: number[]): void {
-    this.hand.filter((card) => !chosenCards.includes(card));
+  getFaceUp(): number[] {
+    return this.faceUp;
   }
 
-  loseInfluence(chosenCards: number[]) {
-    if (!chosenCards.every((card) => this.hand.includes(card))) {
+  discardHand(chosenCards: number): void {
+    this.hand = this.hand.filter((card) => card != chosenCards);
+    this.game.io.emit("updateCard", {
+      userID: this.userID,
+      hand: this.getHand(),
+      faceUp: this.getFaceUp(),
+    });
+  }
+
+  loseInfluence(chosenCard: number) {
+    if (!this.hand.includes(chosenCard)) {
       throw new Error("Invalid cards");
     }
-    for (let card of chosenCards) {
-      this.faceUp.concat(this.hand.splice(this.hand.indexOf(card), 1));
+    this.faceUp = this.faceUp.concat(
+      this.hand.splice(this.hand.indexOf(chosenCard), 1)
+    );
+    this.game.io.emit("loseInfluence", {
+      userID: this.userID,
+      chosenCard: chosenCard.toString(),
+    });
+    if (this.getHand().length == 0) {
+      this.status = "outGame";
+      this.game.io.emit("outGame", {
+        userID: this.userID,
+      });
+      this.game.io.emit("message", `User ${this.userID} Out Game!<br>`);
     }
-    return;
   }
 }

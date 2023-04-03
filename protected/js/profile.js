@@ -3,7 +3,13 @@ const userId = document.querySelector(".user-id");
 const userBirthday = document.querySelector(".user-birthday");
 const userElo = document.querySelector(".user-elo");
 const changeNameBtn = document.querySelector(".change-name-btn");
+const badgeList = document.querySelector(".badge-list");
 
+const activeBadgeContainer = document.querySelector(".active-badge");
+const activeBadgeName = document.querySelector(".active-badge-name");
+const activeBadgeIcon = document.querySelector(".active-badge-icon");
+const unloadBtn = document.querySelector(".unload-btn");
+const template = document.querySelector("template");
 let myId;
 
 init();
@@ -12,6 +18,8 @@ async function init() {
   const socket = io();
   myId = await getUserId();
   await loadProfile();
+  await loadUserBadges();
+  await loadActiveBadge();
   // change name button trigger ajax request to change name
   changeNameBtn.addEventListener("click", async () => {
     let obj = {};
@@ -35,8 +43,16 @@ async function init() {
       text: "username updated",
     });
     await loadProfile();
-    await loadProfileNamePic()
+    await loadProfileNamePic();
     return;
+  });
+
+  unloadBtn.addEventListener("click", async () => {
+    await fetch(`/users/${myId}/activeBadge/${-1}`, {
+      method: "PATCH",
+    });
+    showSuccess({ title: "!!!", text: "you have unloaded the badge!" });
+    await loadActiveBadge();
   });
 }
 
@@ -71,4 +87,54 @@ async function upLoadProfilePicture(event) {
   }
 
   profilePic.src = `./assets/profilePicture/${Result}`;
+}
+
+async function loadUserBadges() {
+  console.log("load user badge");
+  let res = await fetch(`/users/${myId}/badges`);
+  let userBadge = await res.json();
+  if (userBadge.length == 0) {
+    badgeList.innerHTML = "<h1>no item sad</h1>";
+  }
+  userBadge.forEach((badge) => {
+    const badgeNode = template.content.querySelector(".badge").cloneNode(true);
+    badgeNode
+      .querySelector(".set-active-btn")
+      .addEventListener("click", async () => {
+        console.log({ myId, badgeId: badge.id });
+        await fetch(`/users/${myId}/activeBadge/${badge.id}`, {
+          method: "PATCH",
+        });
+        showSuccess({
+          title: "success",
+          text: "active batch updated",
+        });
+        await loadActiveBadge();
+      });
+    // console.log(badge);
+    badgeNode.querySelector(".badge-name").textContent = badge.name;
+    badgeNode.querySelector(".badge-icon").src = badge.url;
+    badgeList.appendChild(badgeNode);
+  });
+}
+
+async function loadActiveBadge() {
+  let res = await fetch(`/users/${myId}/activeBadge`);
+  let activeBadge = await res.json();
+  if (activeBadge.length == 0) {
+    activeBadgeName.innerHTML = "<h1>no active badge yet</h1>";
+    unloadBtn.style.display = "none";
+    activeBadgeIcon.src = "";
+  } else {
+    unloadBtn.style.display = "inline-block";
+    activeBadgeName.textContent = activeBadge[0].name;
+    activeBadgeIcon.src = activeBadge[0].url;
+  }
+
+  // const badgeNode = template.content.querySelector(".badge").cloneNode(true);
+
+  // // console.log(badge);
+  // badgeNode.querySelector(".badge-name").textContent = badge.name;
+  // badgeNode.querySelector(".badge-icon").src = badge.url;
+  // badgeList.appendChild(badgeNode);
 }

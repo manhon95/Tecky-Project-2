@@ -69,7 +69,7 @@ function socketEventInit() {
     while (playerList.firstChild) {
       playerList.removeChild(playerList.firstChild);
     }
-    players.map((player) => {
+    players.map(async (player) => {
       const playerNode = template.content
         .querySelector(".player")
         .cloneNode(true);
@@ -79,7 +79,10 @@ function socketEventInit() {
           e.target.style.display = "none";
         });
       });
-
+      let activeBadge = await loadActiveBadgeUrl(player.userId);
+      if (activeBadge) {
+        playerNode.querySelector(".player-badge").src = activeBadge;
+      }
       const playerName = playerNode.querySelector(".player-name");
       playerName.textContent = player.username;
 
@@ -175,4 +178,14 @@ async function checkFriend(myId, someoneId) {
   let res = await fetch(`/friends/${myId}/${someoneId}`);
   let result = await res.json();
   return result.areFriends;
+}
+
+async function loadActiveBadgeUrl(userId) {
+  let res = await fetch(`/users/${userId}/activeBadge`);
+  let activeBadge = await res.json();
+
+  if (activeBadge.length == 0) {
+    return false;
+  }
+  return activeBadge[0].url;
 }

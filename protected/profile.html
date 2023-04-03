@@ -20,6 +20,9 @@
       td {
         border: 1px solid black;
       }
+      .badge-name {
+        color: black;
+      }
     </style>
   </head>
   <body>
@@ -67,6 +70,25 @@
         />
       </div>
     </form>
+
+    <div>Your Badge:</div>
+    <div class="badge-list">
+      <template>
+        <div class="badge">
+          <div class="badge-name"></div>
+          <div>
+            <img src="" class="badge-icon" alt="" />
+          </div>
+          <button class="set-active-btn">set active</button>
+        </div>
+      </template>
+    </div>
+    <div>Your active badge</div>
+    <div class="active-badge-container">
+      <div class="active-badge-name"></div>
+      <img src="" class="active-badge-icon"></img>
+      <button class="unload-btn">unload</button>
+    </div>
   </body>
   <script src="./js/commonUtils.js"></script>
   <script src="./js/loadNavBar.js"></script>
