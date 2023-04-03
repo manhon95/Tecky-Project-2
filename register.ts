@@ -71,29 +71,29 @@ export async function saveUserDetails(req: Request, res: Response) {
 
   //-----------------------here insert send email content--------
   // create reusable transporter object using the default SMTP transport
-//   let transporter = nodemailer.createTransport({
-//     service: "gmail",
-//     auth: {
-//       user: env.NODEMAILER_EMAIL, // generated ethereal user
-//       pass: env.NODEMAILER_PW, // generated ethereal password
-//     },
-//   });
+  // let transporter = nodemailer.createTransport({
+  //   service: "gmail",
+  //   auth: {
+  //     user: env.NODEMAILER_EMAIL, // generated ethereal user
+  //     pass: env.NODEMAILER_PW, // generated ethereal password
+  //   },
+  // });
 
-//   // send mail with defined transport object
-//   let info = await transporter.sendMail({
-//     from: '"Fred Foo 👻" <foo@example.com>', // sender address
-//     to: "bar@example.com, baz@example.com", // list of receivers
-//     subject: "Hello ✔", // Subject line
-//     text: "Hello world?", // plain text body
-//     html: "<b>Hello world?</b>", // html body
-//   });
+  // // send mail with defined transport object
+  // let info = await transporter.sendMail({
+  //   from: '"Fred Foo 👻" <foo@example.com>', // sender address
+  //   to: "bar@example.com, baz@example.com", // list of receivers
+  //   subject: "Hello ✔", // Subject line
+  //   text: "Hello world?", // plain text body
+  //   html: "<b>Hello world?</b>", // html body
+  // });
 
-//   console.log("Message sent: %s", info.messageId);
-//   // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+  // console.log("Message sent: %s", info.messageId);
+  // // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
 
-//   // Preview only available when sending through an Ethereal account
-//   console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-// //This function get info from http request and save as use detail
+  // // Preview only available when sending through an Ethereal account
+  // console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+//This function get info from http request and save as use detail
 
   //0------------------add isVerified--------------
 
@@ -101,10 +101,10 @@ export async function saveUserDetails(req: Request, res: Response) {
     const newPassword = await hashPassword(password);
     //save email, userName, password,elo into database
     await database.query(
-      /* sql */ `insert into "user" (email, user_name, password, birthday, elo,coins) 
-    values ($1,$2,$3,$4,$5,$6)`,
+      /* sql */ `insert into "user" (email, user_name, password, birthday, elo, coins, profilepic) 
+      values ($1,$2,$3,$4,$5,$6,'default_profilePic.jpg')`,
       [email, userName, newPassword, birthday, elo, coins]
-    );
+      );
     const id = await database.query(
       `select id from "user" where user_name=($1)`,
       [userName]

@@ -1,1 +1,1 @@
-alter table "user" add column coins integer not null;
+delete from "user" where email = 'a@gmail.com'

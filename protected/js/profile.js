@@ -35,6 +35,7 @@ async function init() {
       text: "username updated",
     });
     await loadProfile();
+    await loadProfileNamePic()
     return;
   });
 }

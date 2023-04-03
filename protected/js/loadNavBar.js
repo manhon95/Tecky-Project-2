@@ -1,25 +1,13 @@
-async function getProfilePic() {
-  const Res = await fetch("/profilePic");
-  let result = await Res.json();
-  profilePic.src = result;
-  // console.log(result)
-}
-
-(async () => {
+async function loadProfileNamePic(){
   let res = await fetch(`/profilePic`, {
     method: "get",
   });
   let Result = await res.json();
-  // if (json.error) {
-  //   message.textContent = json.error;
-  //   return;
-  // }
-  if (Result.includes("https")) {
-    profilePic.src = Result;
-    return;
-  }
-  profilePic.src = `./assets/profilePicture/${Result}`;
-})();
+console.log(Result.oldImageName)
+  profileName.textContent = Result.userName;
+  profilePic.src = Result.oldImageName.includes("https")? Result.oldImageName : `./assets/profilePicture/${Result.oldImageName}`
+};
+loadProfileNamePic()
 
 navBarHeader = document.querySelector(".navbar");
 navBarHeader.innerHTML = /*html*/ `
@@ -40,7 +28,7 @@ navBarHeader.innerHTML = /*html*/ `
   <div class="item-button d-flex">
     <div >
     <img id="profilePic" src="" alt="" class="profileImg"></div>
-    <a href="/user/profile" type="button">profile</a>
+    <a id="profileName" href="/user/profile" type="button"></a>
   </div>
 </div>
 </div>
