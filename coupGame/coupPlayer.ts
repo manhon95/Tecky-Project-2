@@ -42,7 +42,12 @@ export class Player {
   }
 
   addHand(newCards: number[]): void {
-    this.hand.concat(newCards);
+    this.hand = this.hand.concat(newCards);
+    this.game.io.emit("updateCard", {
+      userID: this.userID,
+      hand: this.getHand(),
+      faceUp: this.getFaceUp(),
+    });
   }
 
   getFaceUp(): number[] {
@@ -51,13 +56,20 @@ export class Player {
 
   discardHand(chosenCards: number): void {
     this.hand = this.hand.filter((card) => card != chosenCards);
+    this.game.io.emit("updateCard", {
+      userID: this.userID,
+      hand: this.getHand(),
+      faceUp: this.getFaceUp(),
+    });
   }
 
   loseInfluence(chosenCard: number) {
     if (!this.hand.includes(chosenCard)) {
       throw new Error("Invalid cards");
     }
-    this.faceUp.concat(this.hand.splice(this.hand.indexOf(chosenCard), 1));
+    this.faceUp = this.faceUp.concat(
+      this.hand.splice(this.hand.indexOf(chosenCard), 1)
+    );
     this.game.io.emit("loseInfluence", {
       userID: this.userID,
       chosenCard: chosenCard.toString(),

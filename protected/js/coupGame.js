@@ -52,6 +52,10 @@ function init(game) {
   myBalance.textContent = game.my.balance;
 
   function loadCards(cardList, faceUpList) {
+    let nodeClass =
+      cardList.length + faceUpList.length > 2
+        ? "card img-fluid col-2"
+        : "card img-fluid col-5";
     while (myCardBoard.firstChild) {
       myCardBoard.removeChild(myCardBoard.lastChild);
     }
@@ -60,6 +64,7 @@ function init(game) {
       let newCardNode = CardNode.cloneNode(true);
       myCardBoard.appendChild(newCardNode);
       newCardNode.src = cardPathMap[Math.floor(parseInt(card) / 3)];
+      newCardNode.className = nodeClass;
       newCardNode.setAttribute("cardNo", `${card}`);
       newCardNode.setAttribute("location", `hand`);
       changeCardStyle(newCardNode);
@@ -79,6 +84,7 @@ function init(game) {
       let newCardNode = CardNode.cloneNode(true);
       myCardBoard.appendChild(newCardNode);
       newCardNode.src = cardPathMap[Math.floor(parseInt(card) / 3)];
+      newCardNode.className = nodeClass;
       newCardNode.setAttribute("cardNo", `${card}`);
       newCardNode.setAttribute("location", `face-up`);
       changeCardStyle(newCardNode);
@@ -91,6 +97,9 @@ function init(game) {
   document.querySelector(
     `#player-${game.otherPlayerList[0].id} #balance`
   ).textContent = game.otherPlayerList[0].balance;
+  document.querySelector(
+    `#player-${game.otherPlayerList[0].id} #name`
+  ).textContent = game.otherPlayerList[0].id;
   /* ---------------------------- Other Player Info --------------------------- */
   for (let i = 1; i < game.otherPlayerList.length; i++) {
     playersInfo = playersInfo.cloneNode(true);
@@ -100,6 +109,9 @@ function init(game) {
     document.querySelector(
       `#player-${game.otherPlayerList[i].id} #balance`
     ).textContent = game.otherPlayerList[i].balance;
+    document.querySelector(
+      `#player-${game.otherPlayerList[i].id} #name`
+    ).textContent = game.otherPlayerList[i].id;
   }
 
   function changePlayerStyle(playerNode) {
@@ -199,6 +211,12 @@ function init(game) {
   socket.on("askCard", function (arg) {
     if (arg.userID == myId) {
       chooseCards = true;
+      loadCards(arg.hand, arg.faceUp);
+    }
+  });
+
+  socket.on("updateCard", function (arg) {
+    if (arg.userID == myId) {
       loadCards(arg.hand, arg.faceUp);
     }
   });

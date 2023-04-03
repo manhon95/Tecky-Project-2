@@ -467,10 +467,9 @@ class Tax implements Action {
               break;
             }
           }
-          this.callingGame.io.emit(
-            "askForChallenge",
-            this.callingGame.playerList[this.currentPlayerIndex].userID
-          );
+          this.callingGame.io.emit("askForChallenge", {
+            userID: this.callingGame.playerList[this.currentPlayerIndex].userID,
+          });
         } else {
           this.actionState = "effect";
           this.transition();
@@ -568,10 +567,9 @@ class Assassinate implements Action {
               break;
             }
           }
-          this.callingGame.io.emit(
-            "askForChallenge",
-            this.callingGame.playerList[this.currentPlayerIndex].userID
-          );
+          this.callingGame.io.emit("askForChallenge", {
+            userID: this.callingGame.playerList[this.currentPlayerIndex].userID,
+          });
         } else {
           this.callingGame.playerList[this.activePlayerIndex].lowerBalance(3);
           this.currentPlayerIndex = -1;
@@ -624,10 +622,9 @@ class Assassinate implements Action {
               break;
             }
           }
-          this.callingGame.io.emit(
-            "askForCounterAction",
-            this.callingGame.playerList[this.currentPlayerIndex].userID
-          );
+          this.callingGame.io.emit("askForCounterAction", {
+            userID: this.callingGame.playerList[this.currentPlayerIndex].userID,
+          });
         } else if (this.targetIndex) {
           this.callingGame.io.emit("askCard", {
             userID: this.callingGame.playerList[this.targetIndex].userID,
@@ -720,10 +717,9 @@ class Exchange implements Action {
               break;
             }
           }
-          this.callingGame.io.emit(
-            "askForChallenge",
-            this.callingGame.playerList[this.currentPlayerIndex].userID
-          );
+          this.callingGame.io.emit("askForChallenge", {
+            userID: this.callingGame.playerList[this.currentPlayerIndex].userID,
+          });
         } else {
           this.actionState = "effect";
           this.transition();
@@ -852,10 +848,9 @@ class Steal implements Action {
               break;
             }
           }
-          this.callingGame.io.emit(
-            "askForChallenge",
-            this.callingGame.playerList[this.currentPlayerIndex].userID
-          );
+          this.callingGame.io.emit("askForChallenge", {
+            userID: this.callingGame.playerList[this.currentPlayerIndex].userID,
+          });
         } else {
           this.currentPlayerIndex = -1;
           this.actionState = "askForCounterAction";
@@ -900,10 +895,9 @@ class Steal implements Action {
               break;
             }
           }
-          this.callingGame.io.emit(
-            "askForCounterAction",
-            this.callingGame.playerList[this.currentPlayerIndex].userID
-          );
+          this.callingGame.io.emit("askForCounterAction", {
+            userID: this.callingGame.playerList[this.currentPlayerIndex].userID,
+          });
         } else {
           this.actionState = "effect";
           this.transition();
