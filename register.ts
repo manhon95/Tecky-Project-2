@@ -93,7 +93,7 @@ export async function saveUserDetails(req: Request, res: Response) {
 
   // // Preview only available when sending through an Ethereal account
   // console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-  //This function get info from http request and save as use detail
+//This function get info from http request and save as use detail
 
   //0------------------add isVerified--------------
 
@@ -101,10 +101,10 @@ export async function saveUserDetails(req: Request, res: Response) {
     const newPassword = await hashPassword(password);
     //save email, userName, password,elo into database
     await database.query(
-      /* sql */ `insert into "user" (email, user_name, password, birthday, elo,coins) 
-    values ($1,$2,$3,$4,$5,$6)`,
+      /* sql */ `insert into "user" (email, user_name, password, birthday, elo, coins, profilepic) 
+      values ($1,$2,$3,$4,$5,$6,'default_profilePic.jpg')`,
       [email, userName, newPassword, birthday, elo, coins]
-    );
+      );
     const id = await database.query(
       `select id from "user" where user_name=($1)`,
       [userName]

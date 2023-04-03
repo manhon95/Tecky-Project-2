@@ -85,13 +85,14 @@ export async function upLoadProfilePicture(req: Request, res: Response) {
 
 export async function getProfilePicture(req: Request, res: Response) {
   let id = req.session.user?.id;
+  const userInfo = {};
   let oldImage = await database.query(
-    'select profilePic from "user" where id = ($1)',
+    'select profilePic, user_name from "user" where id = ($1)',
     [id]
   );
-  const oldImageName = oldImage.rows[0].profilepic;
-
-  res.json(oldImageName);
+  userInfo["oldImageName"] = oldImage.rows[0].profilepic;
+  userInfo["userName"] = oldImage.rows[0].user_name;
+  res.json(userInfo);
 }
 
 async function readUserBadgesFromDB(userId: number) {
