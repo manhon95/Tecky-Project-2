@@ -1,5 +1,6 @@
 import { Player } from "./coupPlayer";
 import { Server } from "socket.io";
+import { updateWinner } from "../utils/matchDb";
 
 export function createIoFunction() {
   return {
@@ -71,6 +72,12 @@ type gameArgument = {
   chosenCard: number;
   chosenAction: string;
 };
+
+type GameSave = {
+  id: string;
+  playerList: { id: string; hand: number[]; balance: number };
+};
+
 /* ---------------------------------- Game ---------------------------------- */
 export class Game {
   private readonly startingBalance = 2;
@@ -87,6 +94,7 @@ export class Game {
   public readonly io: any; //TODO any to specific type
 
   constructor(
+    public readonly name: string,
     public readonly id: string,
     public readonly playerIdList: string[],
     io: Server
@@ -227,7 +235,11 @@ export class Game {
         if (this.action?.getState() == "finish") {
           if (this.checkVictory()) {
             this.gameState = "finish";
-            this.io.emit("finish", { userID: this.inGamePlayerList[0].userID });
+            this.io.emit("finish", {
+              userID: this.inGamePlayerList[0].userID,
+              gameName: this.name,
+            });
+            updateWinner(this.id, this.inGamePlayerList[0].userID);
           } else {
             if (this.activePlayerIndex >= this.inGamePlayerList.length - 1) {
               this.activePlayerIndex = 0;

@@ -69,10 +69,10 @@ async function init() {
 async function loadProfile() {
   const res = await fetch(`/profiles/${myId}`);
   const result = await res.json();
-  userId.textContent = result.id;
-  userName.textContent = result.user_name;
-  userBirthday.textContent = result.birthday;
-  userElo.textContent = result.elo;
+  userId.textContent = result.profile.id;
+  userName.textContent = result.profile.user_name;
+  userBirthday.textContent = result.profile.birthday;
+  userElo.textContent = result.profile.elo;
   return result;
 }
 async function getUserId() {
@@ -183,7 +183,7 @@ async function loadMatchHistory() {
 
 async function loadMatchHistory() {
   // match_date ---- match_name ---- participant ---  winner
-  console.log("trying to ask history");
+  // console.log("trying to ask history");
   let res = await fetch(`/matchHistory/${myId}`);
   let obj = await res.json();
   console.log(template.content);
@@ -202,7 +202,6 @@ async function loadMatchHistory() {
 
       matchHistoryList.appendChild(historyNode);
     });
-    return;
   } else {
     winRate.textContent = "N/A";
   }

@@ -82,7 +82,7 @@ export async function googleLogin(
       [googleJson.email]
     );
     req.session.user = {
-      id: id.rows[0].id,
+      id: String(id.rows[0].id),
       username: googleJson.name,
       profilePic: googleJson.picture,
     };

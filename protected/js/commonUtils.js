@@ -26,11 +26,3 @@ async function getProfilePic() {
   console.log("Result");
   return Result.profilePic;
 }
-
-async function getCoins(userId) {
-  let res = await fetch(`/coins/${userId}`);
-  let result = await res.json();
-  let coins = result.coins;
-
-  return coins;
-}

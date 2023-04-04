@@ -54,10 +54,16 @@ add constraint user_badge_id_fkey
 FOREIGN KEY (badge_id) REFERENCES "badge"(id);
 
 alter table "user" add active_badge_id integer null;
+
 alter table "user"
 add constraint user_active_badge_id_fkey
 FOREIGN KEY (active_badge_id) REFERENCES "user_badge"(id);
 
+alter table "user" drop constraint user_active_badge_id_fkey;
+
+alter table "user"
+add constraint user_active_badge_id_fkey
+FOREIGN KEY (active_badge_id) REFERENCES "badge"(id);
 
 create table "match" (
     id serial primary key

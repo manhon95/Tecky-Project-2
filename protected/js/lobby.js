@@ -90,7 +90,10 @@ async function createRoom() {
     return;
   } else {
     // redirect to the chatroom
-    location.href = `/user/room?username=${myName}&room=${newRoomName.value}&rid=${json.maxRoomId}`;
+    /* ------------------------------- old version ------------------------------ */
+    // location.href = `/user/room?username=${myName}&room=${newRoomName.value}&rid=${json.maxRoomId}`;
+    /* ------------------------------- new version ------------------------------ */
+    location.href = `/user/room?room=${newRoomName.value}`;
   }
 }
 
@@ -108,7 +111,7 @@ function showNewRoom(room) {
       showError({ title: "Cannot join room", text: "the room is max" });
     } else {
       // joinRoom(room.id);
-      location.href = `/user/room?username=${myName}&room=${room.name}&rid=${room.id}`;
+      location.href = `/user/room?room=${room.name}`;
     }
   });
   roomList.appendChild(roomNode);

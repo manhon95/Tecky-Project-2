@@ -35,12 +35,13 @@ export async function getSessionUserId(req: Request, res: Response) {
 
 export async function getProfile(req: Request, res: Response) {
   const userId = +req.params.id;
-  let result = await readProfileFromDB(userId);
-  result.birthday = dayjs(result.birthday).format("DD/MM/YYYY");
+  let profile = await readProfileFromDB(userId);
+  let profilePic = await getProfilePic(req.params.id);
+  profile.birthday = dayjs(profile.birthday).format("DD/MM/YYYY");
   // console.log(result);
   // change the date format
-
-  res.json(result);
+  let profilePicUrl = profilePic.rows[0].profilepic;
+  res.json({ profile, profilePicUrl });
 }
 
 /* ---------------------------- database function --------------------------- */

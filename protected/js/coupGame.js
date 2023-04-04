@@ -263,6 +263,7 @@ function init(game) {
   });
   socket.on("finish", function (arg) {
     msgBox.innerHTML += `User ${arg.userID} Win<br>`;
+    location.href = `/user/room?room=${arg.gameName}`;
   });
 
   /* ------------------------------- finish init ------------------------------ */

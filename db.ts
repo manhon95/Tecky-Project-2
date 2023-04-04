@@ -13,3 +13,15 @@ client.connect().catch((err) => {
 });
 
 export default client;
+
+export async function begin() {
+  await client.query("BEGIN;");
+}
+
+export async function commit() {
+  await client.query("COMMIT;");
+}
+
+export async function rollback() {
+  await client.query("ROLLBACK");
+}
