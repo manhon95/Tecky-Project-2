@@ -111,7 +111,7 @@ function showNewRoom(room) {
       showError({ title: "Cannot join room", text: "the room is max" });
     } else {
       // joinRoom(room.id);
-      location.href = `/user/room?username=${myName}&room=${room.name}&rid=${room.id}`;
+      location.href = `/user/room?room=${newRoomName.value}`;
     }
   });
   roomList.appendChild(roomNode);

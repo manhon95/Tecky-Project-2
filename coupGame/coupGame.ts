@@ -72,6 +72,12 @@ type gameArgument = {
   chosenCard: number;
   chosenAction: string;
 };
+
+type GameSave = {
+  id: string;
+  playerList: { id: string; hand: number[]; balance: number };
+};
+
 /* ---------------------------------- Game ---------------------------------- */
 export class Game {
   private readonly startingBalance = 2;
@@ -229,7 +235,10 @@ export class Game {
         if (this.action?.getState() == "finish") {
           if (this.checkVictory()) {
             this.gameState = "finish";
-            this.io.emit("finish", { userID: this.inGamePlayerList[0].userID });
+            this.io.emit("finish", {
+              userID: this.inGamePlayerList[0].userID,
+              gameName: this.name,
+            });
             updateWinner(this.id, this.inGamePlayerList[0].userID);
           } else {
             if (this.activePlayerIndex >= this.inGamePlayerList.length - 1) {
