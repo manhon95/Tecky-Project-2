@@ -23,7 +23,7 @@ for (let y = 1; y <= 12; y++) {
 document
   .querySelector(".registerForm")
   .addEventListener("submit", async function (event) {
-    document.querySelector("#submit").disabled = true
+    document.querySelector("#submit").disabled = true;
 
     event.preventDefault();
     const form = event.target;
@@ -45,10 +45,10 @@ document
     });
     const result = await res.json();
     if (result.success == "success") {
-      console.log("here")
+      console.log("here");
       location.href = "/verify";
-    }else{
-      document.querySelector("#submit").disabled = false
+    } else {
+      document.querySelector("#submit").disabled = false;
     }
 
     for (const key in result) {

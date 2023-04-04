@@ -20,7 +20,6 @@ const server = http.createServer(app);
 const io = new socket.Server(server);
 
 /* -------------------------------- init game ------------------------------- */
-let game: Game;
 
 let roomPlayerList: string[] = [];
 
@@ -51,11 +50,6 @@ app.get("/coup", (req: Request, res: Response) => {
   }
 });
 
-type GameJson = {
-  my: { id: string; hand: number[]; balance: number };
-  otherPlayerList: { id: string; balance: number }[];
-};
-
 io.on("connection", (socket) => {
   const req = socket.request as express.Request;
   // setup user id
@@ -82,9 +76,10 @@ io.on("connection", (socket) => {
     io.emit("playerIn", { roomPlayerList: roomPlayerList });
   });
   socket.on("gameStart", () => {
+    let gameName = "1";
     let gameId = "1";
     /* -------------------------------- important ------------------------------- */
-    createCoupGame(gameId, roomPlayerList, io);
+    createCoupGame(gameName, gameId, roomPlayerList, io);
     /* ----------------------------------- end ---------------------------------- */
     //game.playerList[0].setSocket(socket);
     io.emit("gameCreated", { game: { id: gameId } });

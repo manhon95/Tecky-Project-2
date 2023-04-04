@@ -55,7 +55,7 @@ export function addCoupSocketFunction(
     }
     socket.emit("ansGameInit", gameJson);
     socket.on("gameInitFinished", () => {
-      game.sendGameState();
+      game.sendState();
     });
 
     socket.on("answerAction", answerAction(game));
