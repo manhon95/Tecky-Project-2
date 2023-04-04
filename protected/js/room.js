@@ -9,10 +9,10 @@ const readyBtn = document.querySelector(".ready-btn");
 const profiles = template.content.querySelectorAll(".profile");
 
 const socket = io();
-const { username, room, rid } = Qs.parse(location.search, {
+const { room } = Qs.parse(location.search, {
   ignoreQueryPrefix: true,
 });
-let myId;
+let myId, username;
 
 init();
 
@@ -22,11 +22,12 @@ async function init() {
   const res = await fetch("/user-id");
   const result = await res.json();
   myId = result.id;
-
+  username = await getUsername(myId);
+  console.log(room, username);
   roomName.innerText = room;
   //uncomment below if socketIo is used, replace {Page} to the page name
 
-  socket.emit("askRoomInit", { username, room, rid, myId });
+  socket.emit("askRoomInit", { username, room, myId });
   // Message submit
 
   htmlInit();
@@ -59,8 +60,8 @@ function socketEventInit() {
     });
   });
 
-  socket.on("redirect-to-game", () => {
-    location.href = `coup-game.html?game=${room}`;
+  socket.on("redirect-to-game", (gameId) => {
+    location.href = `coup-game.html?game=${gameId}`;
   });
 
   // Add users to DOM when received socketIO event

@@ -17,7 +17,9 @@ import { begin, commit, rollback } from "../db";
 export function addRoomSocketInitEvent(io: socket.Server) {
   io.on("connection", (socket) => {
     const req = socket.request as express.Request;
-    socket.on("askRoomInit", ({ username, room, rid, myId }) => {
+    socket.on("askRoomInit", ({ username, room, myId }) => {
+      let rid = rooms.findIndex((rmName) => rmName.name == room);
+
       const player = playerJoin(socket.id, username, room, false, myId);
 
       rooms[rid].count++;
@@ -85,16 +87,17 @@ function addRoomSocketEvent(socket: socket.Socket, io: socket.Server) {
                 roomPlayerList.push(player.userId.toString());
               });
               // pass arg to victor function here
+              console.log(roomPlayerList);
               begin();
               try {
                 const gameId = await createGameInDB(gameName, roomPlayerList);
-                createCoupGame(gameId, roomPlayerList, io);
+                createCoupGame(gameName, gameId, roomPlayerList, io);
+                io.emit("redirect-to-game", gameId);
               } catch (err) {
                 rollback();
                 throw err;
               }
               commit();
-              io.emit("redirect-to-game");
             }
           }
         }, 1000);

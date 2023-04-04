@@ -90,7 +90,10 @@ async function createRoom() {
     return;
   } else {
     // redirect to the chatroom
-    location.href = `/user/room?username=${myName}&room=${newRoomName.value}&rid=${json.maxRoomId}`;
+    /* ------------------------------- old version ------------------------------ */
+    // location.href = `/user/room?username=${myName}&room=${newRoomName.value}&rid=${json.maxRoomId}`;
+    /* ------------------------------- new version ------------------------------ */
+    location.href = `/user/room?room=${newRoomName.value}`;
   }
 }
 

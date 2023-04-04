@@ -88,6 +88,7 @@ export class Game {
   public readonly io: any; //TODO any to specific type
 
   constructor(
+    public readonly name: string,
     public readonly id: string,
     public readonly playerIdList: string[],
     io: Server

@@ -24,7 +24,7 @@ values ($1, $2)
 }
 
 export async function updateWinner(gameId: string, winnerId: string) {
-  await database.query("UPDATE 'match' SET winner_id = $1 WHERE id = $2;", [
+  await database.query(`UPDATE "match" SET winner_id = $1 WHERE id = $2;`, [
     winnerId,
     gameId,
   ]);
