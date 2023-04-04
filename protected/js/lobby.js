@@ -43,11 +43,15 @@ function socketEventInit() {
 
   // on new room inc update the specific room count
   socket.on("new-inc", (room) => {
-    let roomCount = roomList.querySelector(
-      `.room[data-id="${room.id}"] .count`
-    );
-
-    roomCount.textContent = room.count;
+    const roomElem = roomList.querySelector(`.room[data-id="${room.id}"`);
+    const roomCount = roomElem.querySelector(".count");
+    roomElem.querySelector(".game-status").textContent = room.playing
+      ? "PLAYING"
+      : "WAITING";
+    roomElem.querySelector(".join-room").disabled = room.playing;
+    if (!room.playing) {
+      roomCount.textContent = room.count;
+    }
   });
 }
 
@@ -105,13 +109,14 @@ function showNewRoom(room) {
   roomNode.querySelector(".owner").textContent = room.owner;
   roomNode.querySelector(".count").textContent = room.count;
   roomNode.querySelector(".capacity").textContent = roomCapacity;
+  roomNode.querySelector(".game-status").textContent = "WAITING";
   roomNode.querySelector(".join-room").addEventListener("click", async (e) => {
     let currentCount = +roomNode.querySelector(".count").textContent;
     if (currentCount + 1 > roomCapacity) {
       showError({ title: "Cannot join room", text: "the room is max" });
     } else {
       // joinRoom(room.id);
-      location.href = `/user/room?room=${newRoomName.value}`;
+      location.href = `/user/room?room=${room.name}`;
     }
   });
   roomList.appendChild(roomNode);

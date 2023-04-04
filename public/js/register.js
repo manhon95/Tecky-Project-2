@@ -45,7 +45,6 @@ document
     });
     const result = await res.json();
     if (result.success == "success") {
-      console.log("here");
       location.href = "/verify";
     } else {
       document.querySelector("#submit").disabled = false;

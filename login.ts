@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
 import "./middleware";
 import database from "./db";
-import { checkPassword } from "./hash";
+import { checkPassword } from "./utils/hash";
 
 dotenv.config();
 

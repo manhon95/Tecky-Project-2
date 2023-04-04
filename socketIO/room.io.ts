@@ -19,7 +19,10 @@ export function addRoomSocketInitEvent(io: socket.Server) {
     const req = socket.request as express.Request;
     socket.on("askRoomInit", ({ username, room, myId }) => {
       let rid = rooms.findIndex((rmName) => rmName.name == room);
-
+      // if room.playing == true, set it back to false(people returning to lobby)
+      if (rooms[rid].playing) {
+        rooms[rid].playing = false;
+      }
       const player = playerJoin(socket.id, username, room, false, myId);
 
       rooms[rid].count++;
@@ -77,6 +80,7 @@ function addRoomSocketEvent(socket: socket.Socket, io: socket.Server) {
               formatMessage(botName, `${countdown} second to the game start`)
             );
             countdown--;
+            // get room by room name
 
             if (countdown < 0) {
               clearInterval(countdownInterval);
@@ -92,6 +96,13 @@ function addRoomSocketEvent(socket: socket.Socket, io: socket.Server) {
               try {
                 const gameId = await createGameInDB(gameName, roomPlayerList);
                 createCoupGame(gameName, gameId, roomPlayerList, io);
+                if (player) {
+                  let playerRoom = player.room;
+                  let roomIdx = rooms.findIndex(
+                    (room) => room.name == playerRoom
+                  );
+                  rooms[roomIdx].playing = true;
+                }
                 io.emit("redirect-to-game", gameId);
               } catch (err) {
                 rollback();
