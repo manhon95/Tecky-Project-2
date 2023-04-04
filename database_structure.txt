@@ -77,3 +77,4 @@ create table "user_match" (
     ,FOREIGN KEY (match_id) REFERENCES "match"(id)
 );
 
+alter table "user" add column email_verify boolean not null 
