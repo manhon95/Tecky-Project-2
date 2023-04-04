@@ -14,7 +14,9 @@ const gameWon = document.querySelector(".game-won");
 const winRate = document.querySelector(".win-rate");
 const template = document.querySelector("template");
 const changePassword = document.querySelector("#changePassword");
-const changePasswordSubmitGroup = document.querySelector("#changePasswordSubmitGroup");
+const changePasswordSubmitGroup = document.querySelector(
+  "#changePasswordSubmitGroup"
+);
 
 let myId;
 
@@ -178,25 +180,24 @@ async function loadMatchHistory() {
   // clone node
 }
 
-changePassword.addEventListener("click", ()=>{
-  changePasswordSubmitGroup.classList.toggle("hidden")
-  changePassword.classList.add("hidden")
-})
+changePassword.addEventListener("click", () => {
+  changePasswordSubmitGroup.classList.toggle("hidden");
+  changePassword.classList.add("hidden");
+});
 
 changePasswordSubmitGroup.addEventListener("submit", async function (event) {
-    document.querySelector("#submit").disabled = true
-    event.preventDefault();
-    const form = event.target;
-    
-    const res = await fetch("/changePasswordVerify", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({code: form.changePasswordCode.value}),
-    });
+  document.querySelector("#submit").disabled = true;
+  event.preventDefault();
+  const form = event.target;
 
-})
+  const res = await fetch("/changePasswordVerify", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ code: form.changePasswordCode.value }),
+  });
+});
 async function loadMatchHistory() {
   // match_date ---- match_name ---- participant ---  winner
   console.log("trying to ask history");
@@ -218,7 +219,6 @@ async function loadMatchHistory() {
 
       matchHistoryList.appendChild(historyNode);
     });
-    return;
   } else {
     winRate.textContent = "N/A";
   }
@@ -228,22 +228,21 @@ async function loadMatchHistory() {
   // clone node
 }
 
-changePassword.addEventListener("click", ()=>{
-  changePasswordSubmitGroup.classList.toggle("hidden")
-  changePassword.classList.add("hidden")
-})
+changePassword.addEventListener("click", () => {
+  changePasswordSubmitGroup.classList.toggle("hidden");
+  changePassword.classList.add("hidden");
+});
 
 changePasswordSubmitGroup.addEventListener("submit", async function (event) {
-    document.querySelector("#submit").disabled = true
-    event.preventDefault();
-    const form = event.target;
-    
-    const res = await fetch("/changePasswordVerify", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({code: form.changePasswordCode.value}),
-    });
+  document.querySelector("#submit").disabled = true;
+  event.preventDefault();
+  const form = event.target;
 
-})
+  const res = await fetch("/changePasswordVerify", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ code: form.changePasswordCode.value }),
+  });
+});
