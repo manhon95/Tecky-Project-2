@@ -1,1 +1,0 @@
-delete from "user" where email = 'a@gmail.com'

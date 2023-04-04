@@ -23,6 +23,8 @@ for (let y = 1; y <= 12; y++) {
 document
   .querySelector(".registerForm")
   .addEventListener("submit", async function (event) {
+    document.querySelector("#submit").disabled = true
+
     event.preventDefault();
     const form = event.target;
     const formObject = {};
@@ -41,11 +43,14 @@ document
       },
       body: JSON.stringify(formObject),
     });
-
     const result = await res.json();
     if (result.success == "success") {
-      location.href = "/user/lobby";
+      console.log("here")
+      location.href = "/verify";
+    }else{
+      document.querySelector("#submit").disabled = false
     }
+
     for (const key in result) {
       if (key == "email" || key == "password") {
         document.querySelectorAll(`.${key}`).forEach((i) => {

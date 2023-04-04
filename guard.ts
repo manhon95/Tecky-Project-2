@@ -1,9 +1,16 @@
 import { NextFunction, Request, Response } from "express";
 import { HttpError } from "./utils/express";
 import "./middleware";
+import database from "./db";
 
-export function hasLogin(req: Request, res: Response, next: NextFunction) {
-  if (req.session.user?.id) {
+
+export async function hasLogin(req: Request, res: Response, next: NextFunction) {
+  const verify = await database.query(
+    `select email_verify from "user" where id =($1)`,
+    [req.session.user?.id]
+  );
+console.log("session check: ",verify.rows[0].email_verify)
+  if (req.session.user?.id&&verify.rows[0].email_verify) {
     next();
   } else {
     res.end("unauthorized");

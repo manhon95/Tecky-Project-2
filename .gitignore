@@ -5,3 +5,4 @@ package-lock.json
 *.sql
 protected/assets/profilePicture
 sampleData/
+sql_commands
