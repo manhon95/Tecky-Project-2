@@ -10,6 +10,9 @@ const activeBadgeName = document.querySelector(".active-badge-name");
 const activeBadgeIcon = document.querySelector(".active-badge-icon");
 const unloadBtn = document.querySelector(".unload-btn");
 const template = document.querySelector("template");
+const changePassword = document.querySelector("#changePassword");
+const changePasswordSubmitGroup = document.querySelector("#changePasswordSubmitGroup");
+
 let myId;
 
 init();
@@ -138,3 +141,23 @@ async function loadActiveBadge() {
   // badgeNode.querySelector(".badge-icon").src = badge.url;
   // badgeList.appendChild(badgeNode);
 }
+
+changePassword.addEventListener("click", ()=>{
+  changePasswordSubmitGroup.classList.toggle("hidden")
+  changePassword.classList.add("hidden")
+})
+
+changePasswordSubmitGroup.addEventListener("submit", async function (event) {
+    document.querySelector("#submit").disabled = true
+    event.preventDefault();
+    const form = event.target;
+    
+    const res = await fetch("/changePasswordVerify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({code: form.changePasswordCode.value}),
+    });
+
+})

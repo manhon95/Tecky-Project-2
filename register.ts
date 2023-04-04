@@ -7,7 +7,6 @@ import nodemailer from "nodemailer";
 import { env } from "./env";
 dotenv.config();
 
-//------------------insert type------- 5:30-------
 export async function saveUserDetails(req: Request, res: Response) {
   let checkStatus = true;
   const emailFromDB = await database.query(
@@ -101,6 +100,7 @@ export async function saveUserDetails(req: Request, res: Response) {
       [userName]
     );
     report["success"] = "success";
+    console.log(verificationCode)
     req.session.verificationCode = verificationCode
     req.session.user = {
       id: id.rows[0].id,

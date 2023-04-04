@@ -16,8 +16,7 @@ export async function login(req: Request, res: Response) {
   );
 
   const users = result.rows[0];
-
-  if (users !== undefined && (await checkPassword(password, users.password) && users.email_verify==true)) {
+  if (users !== undefined && users.password!==null &&(await checkPassword(password, users.password) && users.email_verify==true)) {
     //password match
     req.session.user = {
       id: String(users.id),
@@ -40,6 +39,7 @@ export async function googleLogin(
   next: NextFunction
 ) {
   try {
+
     let accessToken = req.session?.grant?.response?.access_token;
     const googleRes = await fetch(
       "https://www.googleapis.com/oauth2/v2/userinfo",
@@ -70,7 +70,7 @@ export async function googleLogin(
 
     //if user not exist in database, create user
     await database.query(
-      `insert into "user" (user_name, email, elo, profilePic, coins) values ($1, $2, '1000', $3, 100)`,
+      `insert into "user" (user_name, email, elo, profilePic, coins,  email_verify) values ($1, $2, '1000', $3, 100, true)`,
       [googleJson.name, googleJson.email, googleJson.picture]
     );
     let id = await database.query(
@@ -84,6 +84,7 @@ export async function googleLogin(
     };
     req.session.save();
     res.redirect("/user/lobby");
+
   } catch (error) {
     next(error);
   }

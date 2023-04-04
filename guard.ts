@@ -9,7 +9,6 @@ export async function hasLogin(req: Request, res: Response, next: NextFunction) 
     `select email_verify from "user" where id =($1)`,
     [req.session.user?.id]
   );
-console.log("session check: ",verify.rows[0].email_verify)
   if (req.session.user?.id&&verify.rows[0].email_verify) {
     next();
   } else {
@@ -17,7 +16,6 @@ console.log("session check: ",verify.rows[0].email_verify)
     // next()
   }
 }
-
 export function checkLoginToLobby(
   req: Request,
   res: Response,

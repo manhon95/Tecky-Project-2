@@ -23,6 +23,15 @@
       .badge-name {
         color: black;
       }
+    
+
+.hidden{
+  display:none !important;
+}
+.show{
+  display:block;
+}
+
     </style>
   </head>
   <body>
@@ -82,6 +91,14 @@
           <div class="active-badge-name"></div>
           <img src="" class="active-badge-icon"></img>
           <button class="unload-btn">unload</button>
+        </div>
+        <div>
+          <button id="changePassword" >change password</button>
+          <form id="changePasswordSubmitGroup" class="d-inline-block hidden">
+            <p  >we have send to a one time password to your email, please input the code below</p>
+          <input id="changePasswordCode" type="text" name="changePasswordCode" >
+          <input id="changePasswordSubmit" type="submit" >
+          </form>
         </div>
       </div>
       <div class="col-6 match-history">
