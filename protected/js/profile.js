@@ -4,11 +4,14 @@ const userBirthday = document.querySelector(".user-birthday");
 const userElo = document.querySelector(".user-elo");
 const changeNameBtn = document.querySelector(".change-name-btn");
 const badgeList = document.querySelector(".badge-list");
-
+const matchHistoryList = document.querySelector(".match-history-list");
 const activeBadgeContainer = document.querySelector(".active-badge");
 const activeBadgeName = document.querySelector(".active-badge-name");
 const activeBadgeIcon = document.querySelector(".active-badge-icon");
 const unloadBtn = document.querySelector(".unload-btn");
+const gamePlayed = document.querySelector(".game-played");
+const gameWon = document.querySelector(".game-won");
+const winRate = document.querySelector(".win-rate");
 const template = document.querySelector("template");
 let myId;
 
@@ -20,6 +23,7 @@ async function init() {
   await loadProfile();
   await loadUserBadges();
   await loadActiveBadge();
+  await loadMatchHistory();
   // change name button trigger ajax request to change name
   changeNameBtn.addEventListener("click", async () => {
     let obj = {};
@@ -101,7 +105,7 @@ async function loadUserBadges() {
     badgeNode
       .querySelector(".set-active-btn")
       .addEventListener("click", async () => {
-        console.log({ myId, badgeId: badge.id });
+        // console.log({ myId, badgeId: badge.id });
         await fetch(`/users/${myId}/activeBadge/${badge.id}`, {
           method: "PATCH",
         });
@@ -121,6 +125,7 @@ async function loadUserBadges() {
 async function loadActiveBadge() {
   let res = await fetch(`/users/${myId}/activeBadge`);
   let activeBadge = await res.json();
+  console.log(activeBadge);
   if (activeBadge.length == 0) {
     activeBadgeName.innerHTML = "<h1>no active badge yet</h1>";
     unloadBtn.style.display = "none";
@@ -137,4 +142,35 @@ async function loadActiveBadge() {
   // badgeNode.querySelector(".badge-name").textContent = badge.name;
   // badgeNode.querySelector(".badge-icon").src = badge.url;
   // badgeList.appendChild(badgeNode);
+}
+
+async function loadMatchHistory() {
+  // match_date ---- match_name ---- participant ---  winner
+  console.log("trying to ask history");
+  let res = await fetch(`/matchHistory/${myId}`);
+  let obj = await res.json();
+  console.log(template.content);
+  if (obj.gamePlayed != 0) {
+    winRate.textContent = obj.winRate + "%";
+
+    obj.history.map((match) => {
+      const historyNode = template.content
+        .querySelector(".match-history")
+        .cloneNode(true);
+      historyNode.querySelector(".match-id").textContent = match.match_id;
+      historyNode.querySelector(".match-time").textContent = match.match_date;
+      historyNode.querySelector(".participant").textContent =
+        match.participants;
+      historyNode.querySelector(".winner").textContent = match.winner;
+
+      matchHistoryList.appendChild(historyNode);
+    });
+    return;
+  } else {
+    winRate.textContent = "N/A";
+  }
+  gamePlayed.textContent = obj.gamePlayed;
+  gameWon.textContent = obj.gameWon;
+
+  // clone node
 }

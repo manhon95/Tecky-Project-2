@@ -23,6 +23,9 @@
       .badge-name {
         color: black;
       }
+     .inline-blk {
+        display: inline-block;
+      }
     </style>
   </head>
   <body>
@@ -86,12 +89,34 @@
       </div>
       <div class="col-6 match-history">
         <h1>Match History</h1>
-        <ul class="match-history-list">
-          
-        </ul>
+        <span>Game Played:</span>
+        <div class="game-played inline-blk">1</div>
+        <span>Game Won:</span>
+        <div class="game-won inline-blk">2</div>
+        <span>Win Rate:</span>
+        <div class="win-rate inline-blk">33.3</div>
+        <table >
+          <thead>
+            <tr>
+              <th>match_id</th>
+              <th>match_time</th>
+              <th>participant</th>
+              <th>winner</th>
+            </tr>
+          </thead>
+          <tbody class="match-history-list">
+
+          </tbody>
+        </table>
       </div>
     </div>
     <template>
+      <tr class="match-history">
+        <td class="match-id"></td>
+        <td class="match-time"></td>
+        <td class="participant"></td>
+        <td class="winner"></td>
+      </tr>
       <div class="badge">
         <div class="badge-name"></div>
         <div>
@@ -99,7 +124,7 @@
         </div>
         <button class="set-active-btn">set active</button>
       </div>
-      <li class="match-history"></li>
+
     </template>
   </body>
   <script src="./js/commonUtils.js"></script>

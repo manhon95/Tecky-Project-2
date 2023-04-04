@@ -4,7 +4,7 @@ import { print } from "listening-on";
 
 import http from "http";
 import { addMiddleware } from "./middleware";
-import { initSocketServer } from "./socketIO/socketIOManager";
+import { initSocketServer, io } from "./socketIO/socketIOManager";
 import { roomRoutes } from "./routes/room.routes";
 import { checkLoginToLobby, hasLogin } from "./guard";
 import grant from "grant";
@@ -23,6 +23,9 @@ const server = http.createServer(app);
 // Initialize Socket.IO server
 initSocketServer(server);
 
+// io.on("connection", (socket) => {
+//   console.log(socket.id);
+// });
 addMiddleware(app);
 
 app.use(

@@ -3,6 +3,7 @@ import database from "./db";
 import formidable from "formidable";
 import fs from "fs";
 import "./middleware";
+import dayjs from "dayjs";
 /* ------------------------ function for Router handler ----------------------- */
 
 export async function patchUsername(req: Request, res: Response) {
@@ -24,10 +25,32 @@ export async function patchUserActiveBadge(req: Request, res: Response) {
   res.json({});
 }
 export async function deleteUserActiveBadge(req: Request, res: Response) {
-  console.log("trying to delete");
   // delete = set null
   // await updateActiveBadgeInDB(+req.params.userId, null);
   res.json({});
+}
+export async function getMatchHistory(req: Request, res: Response) {
+  let winRate, gameWon;
+  const userId = +req.params.userId;
+
+  let history = await readMatchHistoryFromDB(userId);
+  let gamePlayed = history.length;
+  history.map((match) => {
+    match.match_date = dayjs(match.match_date).format("|DD/MM| HH:mm");
+  });
+  if (gamePlayed != 0) {
+    gameWon = history.reduce((acc, curr) => {
+      console.log(`checking ${curr.winner_id == userId}`);
+      return acc + (curr.winner_id == userId ? 1 : 0);
+    }, 0);
+    winRate = +((gameWon / history.length) * 100).toFixed(1);
+  } else {
+    winRate = 0; // -1 means no match played
+    gameWon = 0;
+  }
+
+  console.log({ gameWon, winRate });
+  res.json({ winRate, gameWon, history, gamePlayed });
 }
 /* ----------------------- function for Database query ---------------------- */
 async function updateUsernameInDB(id: number, newName: string) {
@@ -117,6 +140,7 @@ WHERE ub.owner_id = $1;
 }
 
 async function readUserActiveBadgeFromDB(userId: number) {
+  // find active badge id first
   let result = await database.query(
     /* sql */ `
 SELECT active_badge_id 
@@ -125,17 +149,17 @@ WHERE id = $1
   `,
     [userId]
   );
-  let ownershipId = result.rows[0].active_badge_id;
-  if (ownershipId !== null) {
+  // return relevant badge from DB
+  let activeBadgeId = result.rows[0].active_badge_id;
+  if (activeBadgeId !== null) {
     // console.log("have active");
     let badgeResult = await database.query(
       /* sql */ `
 SELECT name, url
 FROM "badge" b
-WHERE b.id  = 
-(select badge_id from "user_badge" ub WHERE ub.id = $1) 
+WHERE b.id  = $1
     `,
-      [ownershipId]
+      [activeBadgeId]
     );
     return badgeResult.rows;
   }
@@ -151,4 +175,26 @@ WHERE id = $1
   `,
     [userId, badgeId == -1 ? null : badgeId]
   );
+}
+
+async function readMatchHistoryFromDB(userId: number) {
+  let result = await database.query(
+    /* sql */ `
+SELECT m.id AS match_id,
+    m.match_name,
+    m.match_date,
+    u.user_name AS winner,
+    u.id AS winner_id,
+    string_agg(u2.user_name, ', ') AS participants
+FROM user_match AS um
+  JOIN match AS m ON um.match_id = m.id -- uId16'match
+  JOIN "user" AS u ON m.winner_id = u.id-- join 
+  JOIN user_match AS um2 ON m.id = um2.match_id
+  JOIN "user" AS u2 ON um2.player_id = u2.id
+WHERE um.player_id = $1
+GROUP BY m.id, m.match_name, m.match_date, u.id, u.user_name;
+`,
+    [userId]
+  );
+  return result.rows;
 }
