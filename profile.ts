@@ -4,6 +4,8 @@ import formidable from "formidable";
 import fs from "fs";
 import "./middleware";
 import dayjs from "dayjs";
+import { sendEmailVerificationCode } from "./utils/sendEmailCode";
+import { hashPassword } from "./utils/hash";
 /* ------------------------ function for Router handler ----------------------- */
 
 export async function patchUsername(req: Request, res: Response) {
@@ -40,7 +42,7 @@ export async function getMatchHistory(req: Request, res: Response) {
   });
   if (gamePlayed != 0) {
     gameWon = history.reduce((acc, curr) => {
-      console.log(`checking ${curr.winner_id == userId}`);
+      // console.log(`checking ${curr.winner_id == userId}`);
       return acc + (curr.winner_id == userId ? 1 : 0);
     }, 0);
     winRate = +((gameWon / history.length) * 100).toFixed(1);
@@ -49,7 +51,7 @@ export async function getMatchHistory(req: Request, res: Response) {
     gameWon = 0;
   }
 
-  console.log({ gameWon, winRate });
+  // console.log({ gameWon, winRate });
   res.json({ winRate, gameWon, history, gamePlayed });
 }
 /* ----------------------- function for Database query ---------------------- */
@@ -197,4 +199,35 @@ GROUP BY m.id, m.match_name, m.match_date, u.id, u.user_name;
     [userId]
   );
   return result.rows;
+}
+
+export async function getPasswordVerifyCode(req: Request, res: Response) {
+  let result = await database.query('select email from "user" where id=($1);', [
+    req.session.user?.id,
+  ]);
+  let verificationCode = await sendEmailVerificationCode(result.rows[0].email);
+  req.session.verificationCode = verificationCode;
+  res.end();
+}
+
+export async function submitVerifyCode(req: Request, res: Response) {
+  if (req.session.verificationCode == req.body.code) {
+    res.json({ pass: true });
+  } else {
+    res.json({ message: "invalid code", pass: false });
+  }
+}
+
+export async function changeNewPassword(req: Request, res: Response) {
+  let password = req.body.password;
+  let ConfirmPassword = req.body.ConfirmPassword;
+  if (password == ConfirmPassword) {
+    const hasdedPassword = await hashPassword(password);
+    database.query(
+      `update "user" set password = '${hasdedPassword}' where id = ${req.session.user?.id}`
+    );
+    res.json({ message: "set new password success" });
+  } else {
+    res.json({ message: "set new password fail" });
+  }
 }

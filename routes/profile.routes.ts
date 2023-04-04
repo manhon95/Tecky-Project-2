@@ -9,7 +9,9 @@ import {
   patchUserActiveBadge,
   patchUsername,
   upLoadProfilePicture,
-} from "../profile";
+  submitVerifyCode,
+  getPasswordVerifyCode,
+  changeNewPassword} from "../profile";
 
 export const profileRoutes = Router();
 
@@ -34,3 +36,10 @@ profileRoutes.patch(
 );
 
 profileRoutes.get("/matchHistory/:userId", getMatchHistory);
+
+profileRoutes.get("/getPasswordVerifyCode", getPasswordVerifyCode);
+
+profileRoutes.post("/submitVerifyCode", submitVerifyCode);
+
+profileRoutes.post("/changeNewPassword", changeNewPassword);
+

@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
 import "./middleware";
 import database from "./db";
-import { checkPassword } from "./hash";
+import { checkPassword } from "./utils/hash";
 
 dotenv.config();
 
@@ -16,7 +16,12 @@ export async function login(req: Request, res: Response) {
   );
 
   const users = result.rows[0];
-  if (users !== undefined && users.password!==null &&(await checkPassword(password, users.password) && users.email_verify==true)) {
+  if (
+    users !== undefined &&
+    users.password !== null &&
+    (await checkPassword(password, users.password)) &&
+    users.email_verify == true
+  ) {
     //password match
     req.session.user = {
       id: String(users.id),
@@ -39,7 +44,6 @@ export async function googleLogin(
   next: NextFunction
 ) {
   try {
-
     let accessToken = req.session?.grant?.response?.access_token;
     const googleRes = await fetch(
       "https://www.googleapis.com/oauth2/v2/userinfo",
@@ -84,7 +88,6 @@ export async function googleLogin(
     };
     req.session.save();
     res.redirect("/user/lobby");
-
   } catch (error) {
     next(error);
   }
