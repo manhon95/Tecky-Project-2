@@ -69,10 +69,21 @@ function socketEventInit() {
     while (playerList.firstChild) {
       playerList.removeChild(playerList.firstChild);
     }
+
     players.map(async (player) => {
       const playerNode = template.content
         .querySelector(".player")
         .cloneNode(true);
+
+      // get userMatch history & profile & profile picture
+      let matchRes = await fetch(`/matchHistory/${player.userId}`);
+      let matchObj = await matchRes.json();
+      let profileRes = await fetch(`/profiles/${player.userId}`);
+      let profileObj = await profileRes.json();
+      let profilePicUrl = profileObj.profilePicUrl;
+      // console.log(profilePicUrl);
+      //  profilePic.src = Result.oldImageName.includes("https")? Result.oldImageName : `./assets/profilePicture/${Result.oldImageName}`
+
       // add event listener first
       playerNode.querySelectorAll(".profile").forEach((profile) => {
         profile.addEventListener("mouseleave", (e) => {
@@ -101,10 +112,39 @@ function socketEventInit() {
         playerName.addEventListener("mouseover", async () => {
           // console.log(`You are hovering ${player.userId}`);
           if (await checkFriend(myId, player.userId)) {
-            playerNode.querySelector(".friend-profile").style.display = "block";
+            const friendProfile = playerNode.querySelector(".friend-profile");
+            friendProfile.style.display = "block";
+            friendProfile.querySelector(".profile-pic").src =
+              profilePicUrl.includes("https")
+                ? profilePicUrl
+                : `./assets/profilePicture/${profilePicUrl}`;
+            friendProfile.querySelector(".profile-username").textContent =
+              profileObj.profile.user_name;
+            friendProfile.querySelector(".profile-elo").textContent =
+              profileObj.profile.elo;
+            friendProfile.querySelector(".profile-game-played").textContent =
+              matchObj.gamePlayed;
+            friendProfile.querySelector(".profile-game-won").textContent =
+              matchObj.gameWon;
+            friendProfile.querySelector(".profile-win-rate").textContent =
+              matchObj.winRate + "%";
+            friendProfile.querySelector(".profile-birthday").textContent =
+              profileObj.profile.birthday;
           } else {
-            playerNode.querySelector(".non-friend-profile").style.display =
-              "block";
+            const nonFriendProfile = playerNode.querySelector(
+              ".non-friend-profile"
+            );
+            nonFriendProfile.style.display = "block";
+            nonFriendProfile.querySelector(".profile-pic").src =
+              profilePicUrl.includes("https")
+                ? profilePicUrl
+                : `./assets/profilePicture/${profilePicUrl}`;
+            nonFriendProfile.querySelector(".profile-username").textContent =
+              profileObj.profile.user_name;
+            nonFriendProfile.querySelector(".profile-elo").textContent =
+              profileObj.profile.elo;
+            nonFriendProfile.querySelector(".profile-game-played").textContent =
+              matchObj.gamePlayed;
           }
         });
         addFriendBtn.addEventListener("click", async () => {

@@ -37,13 +37,17 @@
         position: absolute;
         top: 0;
         left: 0;
-        transform: translate(0, -50%);
+        transform: translate(0, -100%);
         display: none;
         z-index: 2;
       }
       .player-badge {
         width: 30px;
         height: 30px;
+      }
+      .profile-pic {
+        width: 20px;
+        height: 20px;
       }
     </style>
     <title>ChatCord App</title>
@@ -72,9 +76,45 @@
                 <span class="player-name">Ivan</span>
                 <div class="player-ready-state">READY</div>
                 <div class="friend-profile profile">
+                  <div>
+                    <span class="profile-username">Ivan Yiu</span>
+                    <img src="" alt="" class="profile-pic" />
+                  </div>
+                  <div>
+                    <span>elo:</span>
+                    <span class="profile-elo">1000</span>
+                  </div>
+                  <div>
+                    <span>total game:</span>
+                    <span class="profile-game-played">10</span>
+                  </div>
+                  <div>
+                    <span>game won:</span>
+                    <span class="profile-game-won">7</span>
+                  </div>
+                  <div>
+                    <span>win rate:</span>
+                    <span class="profile-win-rate">70%</span>
+                  </div>
+                  <div>
+                    <span>bday:</span>
+                    <span class="profile-birthday">7</span>
+                  </div>
                   <div class="friend-status">friend</div>
                 </div>
                 <div class="non-friend-profile profile">
+                  <div>
+                    <span class="profile-username">Ivan Yiu</span>
+                    <img src="" alt="" class="profile-pic" />
+                  </div>
+                  <div>
+                    <span>elo:</span>
+                    <span class="profile-elo">1000</span>
+                  </div>
+                  <div>
+                    <span>total game:</span>
+                    <span class="profile-game-played">10</span>
+                  </div>
                   <div class="friend-status">not friend</div>
                   <button class="add-friend-btn">add</button>
                 </div>

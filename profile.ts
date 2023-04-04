@@ -40,7 +40,7 @@ export async function getMatchHistory(req: Request, res: Response) {
   });
   if (gamePlayed != 0) {
     gameWon = history.reduce((acc, curr) => {
-      console.log(`checking ${curr.winner_id == userId}`);
+      // console.log(`checking ${curr.winner_id == userId}`);
       return acc + (curr.winner_id == userId ? 1 : 0);
     }, 0);
     winRate = +((gameWon / history.length) * 100).toFixed(1);
@@ -49,7 +49,7 @@ export async function getMatchHistory(req: Request, res: Response) {
     gameWon = 0;
   }
 
-  console.log({ gameWon, winRate });
+  // console.log({ gameWon, winRate });
   res.json({ winRate, gameWon, history, gamePlayed });
 }
 /* ----------------------- function for Database query ---------------------- */
