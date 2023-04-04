@@ -11,7 +11,8 @@ import {
   getCurrentPlayer,
 } from "../room";
 import { createCoupGame } from "../coupGame/coupGameList";
-import { updateMatchRecord } from "../matchRecord";
+import { createGameInDB } from "../utils/matchDb";
+import { begin, commit, rollback } from "../db";
 
 export function addRoomSocketInitEvent(io: socket.Server) {
   io.on("connection", (socket) => {
@@ -67,7 +68,7 @@ function addRoomSocketEvent(socket: socket.Socket, io: socket.Server) {
         let countdown = 3;
 
         /* ----------------------------- GAME START PART ---------------------------- */
-        const countdownInterval = setInterval(() => {
+        const countdownInterval = setInterval(async () => {
           if (player) {
             io.to(player.room).emit(
               "message",
@@ -78,22 +79,21 @@ function addRoomSocketEvent(socket: socket.Socket, io: socket.Server) {
             if (countdown < 0) {
               clearInterval(countdownInterval);
               let players = getRoomPlayers(player.room);
-              let gameId = player.room;
+              let gameName = player.room;
               let roomPlayerList: string[] = [];
               players.map((player) => {
                 roomPlayerList.push(player.userId.toString());
               });
               // pass arg to victor function here
-
-              createCoupGame(gameId, roomPlayerList, io);
-              /* -------------------------------- fake part ------------------------------- */
-              // create fake winner --> create match record --> create user_match
-              const winnerIdx = Math.floor(
-                Math.random() * roomPlayerList.length
-              );
-              const winnerId = +roomPlayerList[winnerIdx];
-              updateMatchRecord(roomPlayerList, gameId, winnerId);
-              /* ------------------------------ fake part end ----------------------------- */
+              begin();
+              try {
+                const gameId = await createGameInDB(gameName, roomPlayerList);
+                createCoupGame(gameId, roomPlayerList, io);
+              } catch (err) {
+                rollback();
+                throw err;
+              }
+              commit();
               io.emit("redirect-to-game");
             }
           }

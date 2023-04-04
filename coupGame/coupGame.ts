@@ -1,5 +1,6 @@
 import { Player } from "./coupPlayer";
 import { Server } from "socket.io";
+import { updateWinner } from "../utils/matchDb";
 
 export function createIoFunction() {
   return {
@@ -228,6 +229,7 @@ export class Game {
           if (this.checkVictory()) {
             this.gameState = "finish";
             this.io.emit("finish", { userID: this.inGamePlayerList[0].userID });
+            updateWinner(this.id, this.inGamePlayerList[0].userID);
           } else {
             if (this.activePlayerIndex >= this.inGamePlayerList.length - 1) {
               this.activePlayerIndex = 0;
