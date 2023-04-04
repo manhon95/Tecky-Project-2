@@ -3,5 +3,6 @@ export type Room = {
   name: string;
   owner: string;
   count: number;
+  playing: boolean;
 };
 export let rooms: Room[] = [];

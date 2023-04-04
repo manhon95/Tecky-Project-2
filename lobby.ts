@@ -21,7 +21,13 @@ export function createRoomAndEmitMsg(req: Request, res: Response) {
         "Room name existed, please try another room name"
       );
     }
-    let room: Room = { id: maxRoomId, name: roomName, owner, count: 0 };
+    let room: Room = {
+      id: maxRoomId,
+      name: roomName,
+      owner,
+      count: 0,
+      playing: false,
+    };
     rooms.push(room);
     res.json({ maxRoomId });
     maxRoomId++;
