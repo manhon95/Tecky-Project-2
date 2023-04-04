@@ -10,7 +10,8 @@ birthday date
 elo smallint
 coins integer
 profilepic text
-active_badge_id integer NULL FK >0- user_badge.id
+email_verify boolean
+active_badge_id integer NULL FK >0- badge.id
 
 
 user_match
