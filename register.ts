@@ -2,9 +2,8 @@ import { Request, Response } from "express";
 import dotenv from "dotenv";
 import database from "./db";
 import "./middleware";
-import { hashPassword } from "./hash";
-import nodemailer from "nodemailer";
-import { env } from "./env";
+import { hashPassword } from "./utils/hash";
+import { sendEmailVerificationCode } from "./utils/sendEmailCode";
 dotenv.config();
 
 export async function saveUserDetails(req: Request, res: Response) {
@@ -66,27 +65,9 @@ export async function saveUserDetails(req: Request, res: Response) {
   } else {
     report["email"] = false;
   }
-  console.log("submit")
   if (checkStatus) {
 
-    const verificationCode = Math.random().toString(36).slice(7)
-    //-----------------------here insert send email content--------
-    console.log("send")
-    let transporter = nodemailer.createTransport({
-      service: "outlook",
-      auth: {
-        user: `${env.NODEMAILER_EMAIL}`, // generated ethereal user
-        pass:`${env.NODEMAILER_PW}`, // generated ethereal password
-      },
-    });
-    // send mail with defined transport object
-      await transporter.sendMail({
-      from: `${env.NODEMAILER_EMAIL}`, // sender address
-      to: `${email}`, // list of receivers
-      subject: "verification ", // Subject line
-      text: "Hello world?", // plain text body
-      html: `<b>enter your code: ${verificationCode}</b>`, // html body
-    });
+    let verificationCode = String(await sendEmailVerificationCode(email))
   
     const newPassword = await hashPassword(password);
     //save email, userName, password,elo into database

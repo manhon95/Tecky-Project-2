@@ -99,8 +99,15 @@
           <button id="changePassword" >change password</button>
           <form id="changePasswordSubmitGroup" class="d-inline-block hidden">
             <p  >we have send to a one time password to your email, please input the code below</p>
-          <input id="changePasswordCode" type="text" name="changePasswordCode" >
+          <input id="changePasswordCode" type="text" name="changePasswordCode" required>
           <input id="changePasswordSubmit" type="submit" >
+          <div id="codeMessage"></div>
+          </form>
+          <form id="newPasswordForm" class="hidden">
+            <input id="newPassword" type="password" name="newPassword" placeholder="New Password" required>
+            <input id="newPasswordConfirm" type="password" name="newPasswordConfirm"  placeholder="Confirm New Password" required>
+            <input id="newPasswordSubmit" type="submit" >
+            <div id="setPasswordMessage"></div>
           </form>
         </div>
       </div>

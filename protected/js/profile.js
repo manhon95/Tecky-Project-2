@@ -17,6 +17,7 @@ const changePassword = document.querySelector("#changePassword");
 const changePasswordSubmitGroup = document.querySelector(
   "#changePasswordSubmitGroup"
 );
+const newPasswordForm = document.querySelector("#newPasswordForm");
 
 let myId;
 
@@ -180,24 +181,6 @@ async function loadMatchHistory() {
   // clone node
 }
 
-changePassword.addEventListener("click", () => {
-  changePasswordSubmitGroup.classList.toggle("hidden");
-  changePassword.classList.add("hidden");
-});
-
-changePasswordSubmitGroup.addEventListener("submit", async function (event) {
-  document.querySelector("#submit").disabled = true;
-  event.preventDefault();
-  const form = event.target;
-
-  const res = await fetch("/changePasswordVerify", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ code: form.changePasswordCode.value }),
-  });
-});
 async function loadMatchHistory() {
   // match_date ---- match_name ---- participant ---  winner
   // console.log("trying to ask history");
@@ -224,25 +207,56 @@ async function loadMatchHistory() {
   }
   gamePlayed.textContent = obj.gamePlayed;
   gameWon.textContent = obj.gameWon;
-
   // clone node
 }
 
-changePassword.addEventListener("click", () => {
-  changePasswordSubmitGroup.classList.toggle("hidden");
+/* -------------------------- get verification code ------------------------- */
+changePassword.addEventListener("click", async () => {
+  changePasswordSubmitGroup.classList.remove("hidden");
   changePassword.classList.add("hidden");
+  await fetch("/getPasswordVerifyCode", {
+    method: "get",
+  });
 });
 
+/* ----------------------- check verificationCode code ---------------------- */
 changePasswordSubmitGroup.addEventListener("submit", async function (event) {
-  document.querySelector("#submit").disabled = true;
   event.preventDefault();
+  document.querySelector("#changePasswordSubmit").disabled = true;
   const form = event.target;
-
-  const res = await fetch("/changePasswordVerify", {
-    method: "POST",
+  const res = await fetch("/submitVerifyCode", {
+    method: "post",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ code: form.changePasswordCode.value }),
   });
+  let result = await res.json();
+  console.log(result);
+  if (result.pass) {
+    changePasswordSubmitGroup.classList.add("hidden");
+    newPasswordForm.classList.remove("hidden");
+  } else {
+    codeMessage.textContent = result.message;
+  }
+});
+
+/* --------------------------- input new password --------------------------- */
+newPasswordForm.addEventListener("submit", async function (event) {
+  event.preventDefault();
+  document.querySelector("#newPasswordSubmit").disabled = true;
+  const form = event.target;
+
+  const res = await fetch("/changeNewPassword", {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      password: form.newPassword.value,
+      ConfirmPassword: form.newPasswordConfirm.value,
+    }),
+  });
+  let result = await res.json();
+  document.querySelector("#setPasswordMessage").textContent = result.message;
 });

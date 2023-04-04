@@ -10,7 +10,6 @@ document.querySelector("#submitForm").addEventListener("submit", async function 
       body: JSON.stringify({code: form.verificationCode.value}),
     });
     const result = await res.json()
-    console.log(result)
     if(result.message){
         location.href = "/user/lobby"
     }else{

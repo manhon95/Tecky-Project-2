@@ -3,7 +3,6 @@ async function loadProfileNamePic(){
     method: "get",
   });
   let Result = await res.json();
-console.log(Result.oldImageName)
   profileName.textContent = Result.userName;
   profilePic.src = Result.oldImageName.includes("https")? Result.oldImageName : `./assets/profilePicture/${Result.oldImageName}`
 };
