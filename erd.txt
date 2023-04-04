@@ -2,7 +2,7 @@
 
 user
 ----
-user_id integer PK
+id integer PK
 user_name varchar(32) unique
 password varchar(255)
 email varchar(255)
@@ -16,7 +16,7 @@ active_badge_id integer NULL FK >0- user_badge.id
 user_match
 ------------
 id integer PK
-user_id integer FK >0- user.user_id
+player_id integer FK >0- user.id
 match_id integer FK >0- match.id
 
 match
@@ -24,14 +24,14 @@ match
 id integer PK
 match_name varhcar(32)
 match_date timestamp NULL
-winner_id FK >0- user.user_id
+winner_id FK >0- user.id
 
 
 friend_request
 --------------
 friend_request_id integer PK
-sender_id integer FK >0- user.user_id
-receiver_id integer FK >0- user.user_id
+sender_id integer FK >0- user.id
+receiver_id integer FK >0- user.id
 meassge text
 accept_time timestamp NULL
 reject_time timestamp NULL
@@ -48,7 +48,7 @@ price smallint
 user_badge
 ----------
 id integer PK
-owner_id integer FK >0- user.user_id
+owner_id integer FK >0- user.id
 badge_id integer FK >0- badge.id
 
 

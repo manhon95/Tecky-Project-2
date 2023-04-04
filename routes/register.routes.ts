@@ -10,4 +10,3 @@ registerRoutes.get("/register", (req: Request, res: Response) => {
 });
 
 registerRoutes.post("/register", saveUserDetails);
-

@@ -2,6 +2,8 @@ import express, { Router } from "express";
 import path from "path";
 import { hasLogin } from "../guard";
 import {
+  deleteUserActiveBadge,
+  getMatchHistory,
   getUserActiveBadge,
   getUserBadges,
   patchUserActiveBadge,
@@ -30,3 +32,5 @@ profileRoutes.patch(
   "/users/:userId/activeBadge/:badgeId",
   patchUserActiveBadge
 );
+
+profileRoutes.get("/matchHistory/:userId", getMatchHistory);
