@@ -1,0 +1,1 @@
+{"name":"asd","state":"resolvingAction","activePlayerIndex":0,"playerList":[{"id":"160","state":"inGame","hand":[7,12],"faceUp":[],"balance":3},{"id":"164","state":"inGame","hand":[14,4],"faceUp":[],"balance":3}],"action":{"id":5,"state":"askForChallenge","askingPlayerIndex":1,"targetIndex":1}}

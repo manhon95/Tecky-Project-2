@@ -47,6 +47,7 @@ display: inline-block;
 
 }
 
+
 .containerRight{
     width: calc(50% - 5px);
     margin-top: 10px;
@@ -62,21 +63,26 @@ display: inline-block;
 .profilePictureOuter{
     border: solid 2px #3a5577;
 }
-
-.badgeContainer{
-margin-top: 10px;
-border: solid 2px #3a5577;
+.font25{
+    font-size: 25px;
 }
 
-.profilHeader{
+.profileHeader{
     background: linear-gradient(#3b5a77, #040c16);
     height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
 }
-.profilePicture{
-    width: 200px;
+.profilContainerInnerLeft{
+    height: 200px;
+    padding: 20px 20px 10px 20px;
+}
+
+#profilePicture{
+    width: 150px;
+    height: 80% ;
+
 }
 
 /* ----------------------------- bedgeCollection ---------------------------- */
@@ -87,7 +93,11 @@ border: solid 2px #3a5577;
 .bedgeCollection{
     width: 100%;
 }
-
+.badgeContainer{
+    margin-top: 10px;
+    border: solid 2px #3a5577;
+    }
+    
 /* ------------------------------ Match History ----------------------------- */
 .matchHistoryContainer{
     border: solid 2px #3a5577;

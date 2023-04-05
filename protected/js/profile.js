@@ -101,6 +101,7 @@ async function upLoadProfilePicture(event) {
   }
 
   profilePic.src = `./assets/profilePicture/${Result}`;
+  profilePicture.src =  `./assets/profilePicture/${Result}`
 }
 
 async function loadUserBadges() {

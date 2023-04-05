@@ -5,6 +5,7 @@ async function loadProfileNamePic(){
   let Result = await res.json();
   profileName.textContent = Result.userName;
   profilePic.src = Result.oldImageName.includes("https")? Result.oldImageName : `./assets/profilePicture/${Result.oldImageName}`
+  profilePicture.src = Result.oldImageName.includes("https")? Result.oldImageName : `./assets/profilePicture/${Result.oldImageName}`
 };
 loadProfileNamePic()
 
