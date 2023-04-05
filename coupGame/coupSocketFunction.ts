@@ -6,7 +6,7 @@ import "../middleware";
 
 type GameJson = {
   my: { id: string; hand: number[]; faceUp: number[]; balance: number };
-  otherPlayerList: { id: string; balance: number; status: string }[];
+  otherPlayerList: { id: string; balance: number; state: string }[];
 };
 
 const {
@@ -22,7 +22,7 @@ export function addCoupSocketFunction(
   socket: socket.Socket,
   session: Session & Partial<SessionData>
 ) {
-  socket.on("askGameInit", (arg) => {
+  socket.on("askCoupInit", (arg) => {
     if (!session.user || !session.user.id) {
       throw new Error("User not found");
     }
@@ -48,13 +48,13 @@ export function addCoupSocketFunction(
         gameJson.otherPlayerList[i] = {
           id: player.userId,
           balance: player.getBalance(),
-          status: player.getStatus(),
+          state: player.getState(),
         };
         i++;
       }
     }
-    socket.emit("ansGameInit", gameJson);
-    socket.on("gameInitFinished", () => {
+    socket.emit("ansCoupInit", gameJson);
+    socket.on("CoupInitFinished", () => {
       game.sendState();
     });
 

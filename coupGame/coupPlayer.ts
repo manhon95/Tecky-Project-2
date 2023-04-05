@@ -2,15 +2,22 @@ import { Socket } from "socket.io";
 import { Game } from "./coupGame";
 
 export class Player {
-  private faceUp: number[] = [];
-  private status: string = "inGame";
+  private faceUp: number[];
+  private state: string;
   private sockets: Socket | undefined = undefined;
   constructor(
     public readonly userId: string,
     private balance: number,
     private hand: number[],
-    private game: Game
-  ) {}
+    private game: Game,
+    saveData?: {
+      state: string;
+      faceUp: number[];
+    }
+  ) {
+    this.state = saveData ? saveData.state : "inGame";
+    this.faceUp = saveData ? saveData.faceUp : [];
+  }
 
   setSocket(inputSocket: Socket) {
     this.sockets = inputSocket;
@@ -42,8 +49,8 @@ export class Player {
     );
   }
 
-  getStatus(): string {
-    return this.status;
+  getState(): string {
+    return this.state;
   }
 
   getBalance(): number {
@@ -88,7 +95,7 @@ export class Player {
       chosenCard: chosenCard.toString(),
     });
     if (this.getHand().length == 0) {
-      this.status = "outGame";
+      this.state = "outGame";
       this.game.io.emit("outGame", {
         userId: this.userId,
       });

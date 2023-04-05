@@ -5,7 +5,7 @@ import { print } from "listening-on";
 import socket from "socket.io";
 import path from "path";
 import { addCoupSocketFunction } from "./coupSocketFunction";
-import { createCoupGame, getGameById } from "./coupGameList";
+import { createCoupGame, getGameById, loadCoupGame } from "./coupGameList";
 import "../middleware";
 
 declare module "express-session" {
@@ -43,7 +43,7 @@ app.get("/", (req: Request, res: Response) => {
 
 app.get("/coup", (req: Request, res: Response) => {
   if (typeof req.query.game == "string" && getGameById(req.query.game)) {
-    res.sendFile(path.resolve("../protected", "coup-game.html"));
+    res.sendFile(path.resolve("../protected", "coup.html"));
   } else {
     res.redirect("/");
   }
