@@ -6,7 +6,7 @@ let myId;
 
 async function init() {
   const socket = io();
-  myId = await getUserId();
+  myId = await getuserId();
   username.textContent = await getUsername(myId);
   showBadges(await getUnboughtBadges(myId));
   coins.textContent = await getCoins(myId);

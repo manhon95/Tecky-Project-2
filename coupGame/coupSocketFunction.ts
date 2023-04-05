@@ -6,7 +6,7 @@ import "../middleware";
 
 type GameJson = {
   my: { id: string; hand: number[]; faceUp: number[]; balance: number };
-  otherPlayerList: { id: string; balance: number; status: string }[];
+  otherPlayerList: { id: string; balance: number; state: string }[];
 };
 
 const {
@@ -22,20 +22,20 @@ export function addCoupSocketFunction(
   socket: socket.Socket,
   session: Session & Partial<SessionData>
 ) {
-  socket.on("askGameInit", (arg) => {
+  socket.on("askCoupInit", (arg) => {
     if (!session.user || !session.user.id) {
       throw new Error("User not found");
     }
     let myId = session.user.id;
     let game: Game = getGameById(arg.game.id);
-    let my = game.playerList.find((player) => player.userID === myId);
+    let my = game.playerList.find((player) => player.userId === myId);
     if (!my) {
       throw new Error("player not found");
     }
     socket.join(game.id);
     let gameJson: GameJson = {
       my: {
-        id: my.userID,
+        id: my.userId,
         hand: my.getHand(),
         faceUp: my.getFaceUp(),
         balance: my.getBalance(),
@@ -44,17 +44,17 @@ export function addCoupSocketFunction(
     };
     let i = 0;
     for (let player of game.playerList) {
-      if (player.userID !== myId) {
+      if (player.userId !== myId) {
         gameJson.otherPlayerList[i] = {
-          id: player.userID,
+          id: player.userId,
           balance: player.getBalance(),
-          status: player.getStatus(),
+          state: player.getState(),
         };
         i++;
       }
     }
-    socket.emit("ansGameInit", gameJson);
-    socket.on("gameInitFinished", () => {
+    socket.emit("ansCoupInit", gameJson);
+    socket.on("CoupInitFinished", () => {
       game.sendState();
     });
 

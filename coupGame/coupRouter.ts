@@ -8,5 +8,5 @@ coupRouter.get("/test", (req: Request, res: Response) => {
 });
 
 coupRouter.get("/coup", (req: Request, res: Response) => {
-  res.sendFile(path.resolve("protected", "coup-game.html"));
+  res.sendFile(path.resolve("protected", "coup.html"));
 });
