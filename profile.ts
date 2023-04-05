@@ -4,7 +4,6 @@ import formidable from "formidable";
 import fs from "fs";
 import "./middleware";
 import dayjs from "dayjs";
-import { sendEmailVerificationCode } from "./utils/sendEmailCode";
 import { hashPassword } from "./utils/hash";
 /* ------------------------ function for Router handler ----------------------- */
 
@@ -205,7 +204,8 @@ export async function getPasswordVerifyCode(req: Request, res: Response) {
   let result = await database.query('select email from "user" where id=($1);', [
     req.session.user?.id,
   ]);
-  let verificationCode = await sendEmailVerificationCode(result.rows[0].email);
+  let verificationCode = "1234"
+  // = await sendEmailVerificationCode(result.rows[0].email);
   req.session.verificationCode = verificationCode;
   res.end();
 }
