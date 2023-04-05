@@ -25,7 +25,7 @@ init();
 
 async function init() {
   const socket = io();
-  myId = await getUserId();
+  myId = await getuserId();
   await loadProfile();
   await loadUserBadges();
   await loadActiveBadge();
@@ -75,7 +75,7 @@ async function loadProfile() {
   userElo.textContent = result.profile.elo;
   return result;
 }
-async function getUserId() {
+async function getuserId() {
   let res = await fetch("/user-id");
   let result = await res.json();
   return result.id;

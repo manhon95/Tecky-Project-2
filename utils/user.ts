@@ -24,7 +24,7 @@ export async function getUsername(req: Request, res: Response) {
   });
 }
 
-export async function getSessionUserId(req: Request, res: Response) {
+export async function getSessionuserId(req: Request, res: Response) {
   let id = req.session.user?.id;
   if (id === undefined) {
     res.json({ error: "id not exist" });

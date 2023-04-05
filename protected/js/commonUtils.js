@@ -1,4 +1,4 @@
-async function getUserId() {
+async function getuserId() {
   let res = await fetch("/user-id");
   let result = await res.json();
   return result.id;

@@ -11,7 +11,8 @@ import {
   upLoadProfilePicture,
   submitVerifyCode,
   getPasswordVerifyCode,
-  changeNewPassword} from "../profile";
+  changeNewPassword,
+} from "../profile";
 
 export const profileRoutes = Router();
 
@@ -42,4 +43,3 @@ profileRoutes.get("/getPasswordVerifyCode", getPasswordVerifyCode);
 profileRoutes.post("/submitVerifyCode", submitVerifyCode);
 
 profileRoutes.post("/changeNewPassword", changeNewPassword);
-

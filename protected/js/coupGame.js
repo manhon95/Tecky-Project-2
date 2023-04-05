@@ -187,60 +187,60 @@ function init(game) {
   });
 
   socket.on("addBalance", function (arg) {
-    document.querySelector(`#player-${arg.userID} #balance`).textContent =
+    document.querySelector(`#player-${arg.userId} #balance`).textContent =
       arg.balance;
   });
 
   socket.on("lowerBalance", function (arg) {
-    document.querySelector(`#player-${arg.userID} #balance`).textContent =
+    document.querySelector(`#player-${arg.userId} #balance`).textContent =
       arg.balance;
   });
 
   socket.on("askForAction", function (arg) {
     actionButton.forEach((button) => {
-      button.disabled = !(arg.userID == myId);
+      button.disabled = !(arg.userId == myId);
     });
   });
 
   socket.on("outGame", function (arg) {
-    let node = document.querySelector(`#player-${arg.userID}`);
+    let node = document.querySelector(`#player-${arg.userId}`);
     node.setAttribute("status", "outGame");
     changePlayerStyle(node);
   });
 
   socket.on("askForCounterAction", function (arg) {
     counteractionButton.forEach((button) => {
-      button.disabled = !(arg.userID == myId);
+      button.disabled = !(arg.userId == myId);
     });
   });
   socket.on("askForChallenge", function (arg) {
     challengeButton.forEach((button) => {
-      button.disabled = !(arg.userID == myId);
+      button.disabled = !(arg.userId == myId);
     });
   });
 
   socket.on("askCard", function (arg) {
-    if (arg.userID == myId) {
+    if (arg.userId == myId) {
       chooseCards = true;
       loadCards(arg.hand, arg.faceUp);
     }
   });
 
   socket.on("updateCard", function (arg) {
-    if (arg.userID == myId) {
+    if (arg.userId == myId) {
       loadCards(arg.hand, arg.faceUp);
     }
   });
 
   socket.on("askTarget", function (arg) {
-    chooseTargets = arg.userID == myId;
+    chooseTargets = arg.userId == myId;
     document.querySelectorAll(`.other`).forEach((player) => {
       changePlayerStyle(player);
     });
   });
 
   socket.on("loseInfluence", function (arg) {
-    if (arg.userID == myId) {
+    if (arg.userId == myId) {
       document
         .querySelector(`[cardNo = "${arg.chosenCard}"]`)
         .setAttribute("location", "face-up");
@@ -249,7 +249,7 @@ function init(game) {
       });
     } else {
       const remainHand = document.querySelector(
-        `#player-${arg.userID} [location="hand"]`
+        `#player-${arg.userId} [location="hand"]`
       );
       if (remainHand) {
         remainHand.setAttribute("location", "face-up");
@@ -262,7 +262,7 @@ function init(game) {
     msgBox.innerHTML += arg;
   });
   socket.on("finish", function (arg) {
-    msgBox.innerHTML += `User ${arg.userID} Win<br>`;
+    msgBox.innerHTML += `User ${arg.userId} Win<br>`;
     location.href = `/user/room?room=${arg.gameName}`;
   });
 

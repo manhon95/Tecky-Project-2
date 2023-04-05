@@ -28,14 +28,14 @@ export function addCoupSocketFunction(
     }
     let myId = session.user.id;
     let game: Game = getGameById(arg.game.id);
-    let my = game.playerList.find((player) => player.userID === myId);
+    let my = game.playerList.find((player) => player.userId === myId);
     if (!my) {
       throw new Error("player not found");
     }
     socket.join(game.id);
     let gameJson: GameJson = {
       my: {
-        id: my.userID,
+        id: my.userId,
         hand: my.getHand(),
         faceUp: my.getFaceUp(),
         balance: my.getBalance(),
@@ -44,9 +44,9 @@ export function addCoupSocketFunction(
     };
     let i = 0;
     for (let player of game.playerList) {
-      if (player.userID !== myId) {
+      if (player.userId !== myId) {
         gameJson.otherPlayerList[i] = {
-          id: player.userID,
+          id: player.userId,
           balance: player.getBalance(),
           status: player.getStatus(),
         };

@@ -4,7 +4,6 @@ import http from "http";
 import { print } from "listening-on";
 import socket from "socket.io";
 import path from "path";
-import { Game } from "./coupGame";
 import { addCoupSocketFunction } from "./coupSocketFunction";
 import { createCoupGame, getGameById } from "./coupGameList";
 import "../middleware";

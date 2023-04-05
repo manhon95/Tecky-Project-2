@@ -5,7 +5,7 @@ let myId;
 
 async function init() {
   const socket = io();
-  myId = await getUserId();
+  myId = await getuserId();
   console.log(myId);
   username.textContent = await getUsername(myId);
 
@@ -54,7 +54,7 @@ function showFriends(friends) {
         }).then(async (result) => {
           /* Read more about isConfirmed, isDenied below */
           if (result.isConfirmed) {
-            let userId = await getUserId();
+            let userId = await getuserId();
             let res = await fetch(`/users/${userId}/friends/${friend.id}`, {
               method: "DELETE",
               headers: {

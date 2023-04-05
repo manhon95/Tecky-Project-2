@@ -16,7 +16,7 @@ async function init() {
   // always init socket event first
   socketEventInit();
 
-  myId = await getUserId();
+  myId = await getuserId();
   myName = await getUsername(myId);
   usernameDisplay.textContent = myName;
   roomCapacity = await getRoomCapacity();
