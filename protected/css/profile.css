@@ -1,0 +1,121 @@
+/* -------------------------------- Utilities ------------------------------- */
+table {
+  margin-top: 1rem;
+  width: 80%;
+}
+.tableAlign{
+    display: flex;
+    justify-content: center;
+}
+
+table,th,td {
+  border: 1px solid black;
+  text-align: center;
+}
+
+.badge-name {
+  color: black;
+}
+    
+.hidden{
+display:none !important;
+}
+.show{
+display:block;
+}
+
+.inline-blk {
+display: inline-block;
+}
+
+.textAlign{
+    text-align: center;
+}
+
+.maincontainer{
+    display: flex;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+
+}
+
+.containerLeft{
+    width: calc(50% - 5px);
+    height: 100%;
+    margin-top: 10px;
+    margin-right: 5px;
+
+}
+
+
+.containerRight{
+    width: calc(50% - 5px);
+    margin-top: 10px;
+    margin-left: 5px;
+}
+.headerText{
+    font-size: larger;
+    font-weight: bolder;
+    color: #d1e5f5;
+}
+
+/* ------------------------------ user details ------------------------------ */
+.profilePictureOuter{
+    border: solid 2px #3a5577;
+}
+.font25{
+    font-size: 25px;
+}
+
+.profileHeader{
+    background: linear-gradient(#3b5a77, #040c16);
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.profilContainerInnerLeft{
+    height: 200px;
+    padding: 20px 20px 10px 20px;
+}
+
+#profilePicture{
+    width: 150px;
+    height: 80% ;
+
+}
+
+/* ----------------------------- bedgeCollection ---------------------------- */
+.activeBadge{
+    width: 200px;
+}
+
+.bedgeCollection{
+    width: 100%;
+}
+.badgeContainer{
+    margin-top: 10px;
+    border: solid 2px #3a5577;
+    }
+    
+/* ------------------------------ Match History ----------------------------- */
+.matchHistoryContainer{
+    border: solid 2px #3a5577;
+height: 100%;
+}
+
+/* --------------------------- small screen layout -------------------------- */
+@media screen and (max-width: 901px){
+    .containerLeft{
+    width: 100%;
+    margin-right: 0px;
+
+}
+
+.containerRight{
+    width: 100%;
+    margin-left: 0px;
+
+}
+
+}
