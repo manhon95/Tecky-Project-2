@@ -10,7 +10,7 @@ import {
   togglePlayerReady,
   getCurrentPlayer,
 } from "../room";
-import { createCoupGame } from "../coupGame/coupGameList";
+import { createCoupGame } from "../coupList";
 import { createGameInDB } from "../utils/matchDb";
 import { begin, commit, rollback } from "../db";
 

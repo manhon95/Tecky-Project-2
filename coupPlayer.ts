@@ -1,34 +1,53 @@
 import { Socket } from "socket.io";
 import { Game } from "./coupGame";
 
+export type PlayerSave = {
+  userId: string;
+  state: string;
+  hand: number[];
+  faceUp: number[];
+  balance: number;
+};
+
 export class Player {
-  private faceUp: number[];
   private state: string;
+  private hand: number[];
+  private faceUp: number[];
+  private balance: number;
   private sockets: Socket | undefined = undefined;
   constructor(
     public readonly userId: string,
-    private balance: number,
-    private hand: number[],
     private game: Game,
-    saveData?: {
-      state: string;
-      faceUp: number[];
-    }
+    saveData?: PlayerSave
   ) {
     this.state = saveData ? saveData.state : "inGame";
+    this.hand = saveData ? saveData.hand : this.game.drawCard(2);
     this.faceUp = saveData ? saveData.faceUp : [];
+    this.balance = saveData ? saveData.balance : 2;
   }
 
   setSocket(inputSocket: Socket) {
     this.sockets = inputSocket;
   }
 
+  getState(): string {
+    return this.state;
+  }
+  getHand(): number[] {
+    return this.hand;
+  }
+  getFaceUp(): number[] {
+    return this.faceUp;
+  }
+  getBalance(): number {
+    return this.balance;
+  }
+
   addBalance(amount: number) {
     this.balance += amount;
-    this.game.io.emit("addBalance", {
+    this.game.io.emit("updateBalance", {
       userId: this.userId,
       balance: this.balance,
-      amount: amount,
     });
     this.game.io.emit(
       "message",
@@ -38,27 +57,14 @@ export class Player {
 
   lowerBalance(amount: number) {
     this.balance -= amount;
-    this.game.io.emit("lowerBalance", {
+    this.game.io.emit("updateBalance", {
       userId: this.userId,
       balance: this.balance,
-      amount: amount,
     });
     this.game.io.emit(
       "message",
       `User ${this.userId} balance lower ${amount}<br>`
     );
-  }
-
-  getState(): string {
-    return this.state;
-  }
-
-  getBalance(): number {
-    return this.balance;
-  }
-
-  getHand(): number[] {
-    return this.hand;
   }
 
   addHand(newCards: number[]): void {
@@ -70,10 +76,6 @@ export class Player {
     });
   }
 
-  getFaceUp(): number[] {
-    return this.faceUp;
-  }
-
   discardHand(chosenCards: number): void {
     this.hand = this.hand.filter((card) => card != chosenCards);
     this.game.io.emit("updateCard", {
@@ -83,7 +85,7 @@ export class Player {
     });
   }
 
-  loseInfluence(chosenCard: number) {
+  loseInfluence(chosenCard: number): void {
     if (!this.hand.includes(chosenCard)) {
       throw new Error("Invalid cards");
     }

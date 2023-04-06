@@ -1,37 +1,7 @@
-import { Player } from "./coupPlayer";
+import { Player, PlayerSave } from "./coupPlayer";
 import { Server } from "socket.io";
-//import { updateWinner } from "../utils/matchDb";
+import { updateWinner } from "./utils/matchDb";
 import pfs from "fs/promises";
-
-export function createIoFunction() {
-  return {
-    answerAction: function (game: Game) {
-      return (arg: gameArgument) => {
-        game.transition(arg);
-      };
-    },
-    answerCounteraction: function (game: Game) {
-      return (arg: gameArgument) => {
-        game.transition(arg);
-      };
-    },
-    answerChallenge: function (game: Game) {
-      return (arg: gameArgument) => {
-        game.transition(arg);
-      };
-    },
-    answerCard: function (game: Game) {
-      return (arg: gameArgument) => {
-        game.transition(arg);
-      };
-    },
-    answerTarget: function (game: Game) {
-      return (arg: gameArgument) => {
-        game.transition(arg);
-      };
-    },
-  };
-}
 
 // card mapping
 // ambassador 1,2,3
@@ -66,7 +36,7 @@ counteractionMap.set(2, 8);
 counteractionMap.set(5, 9);
 counteractionMap.set(7, 10);
 
-type gameArgument = {
+type transitionArgument = {
   counteraction: boolean;
   challenge: boolean;
   targetId: string;
@@ -82,25 +52,17 @@ export type GameSave = {
   action?: ActionSave;
 };
 
-type PlayerSave = {
-  id: string;
-  state: string;
-  hand: number[];
-  faceUp: number[];
-  balance: number;
-};
-
 type ActionSave = {
   id: number;
   state: string;
-  askingPlayerIndex?: number;
+  askPlayerIndex?: number;
   counteraction?: CounteractionSave;
   challenge?: ChallengeSave;
   targetIndex?: number;
 };
 type CounteractionSave = {
   state: string;
-  askingPlayerIndex: number;
+  askPlayerIndex: number;
   challenge?: ChallengeSave;
 };
 type ChallengeSave = {
@@ -109,17 +71,15 @@ type ChallengeSave = {
 
 /* ---------------------------------- Game ---------------------------------- */
 export class Game {
-  private readonly startingBalance = 2;
-  private readonly startingHandSize = 2;
   //create randomize deck
   private deck: number[] = this.shuffle([
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
   ]);
-  private state = "askForAction";
-  private action: Action | null = null;
+  private state = "askAction";
+  private activePlayerIndex: number = 0;
   public readonly playerList: Player[];
   public inGamePlayerList: Player[];
-  private activePlayerIndex: number = 0;
+  private action: Action | null = null;
   public readonly io: any; //TODO any to specific type
 
   constructor(
@@ -139,11 +99,7 @@ export class Game {
       this.activePlayerIndex = gameSave.activePlayerIndex;
       //load player from save
       this.playerList = gameSave.playerList.map(
-        (playerData) =>
-          new Player(playerData.id, playerData.balance, playerData.hand, this, {
-            state: playerData.state,
-            faceUp: playerData.faceUp,
-          })
+        (playerSave) => new Player(playerSave.userId, this, playerSave)
       );
       this.inGamePlayerList = this.playerList.filter(
         (player) => player.getState() === "inGame"
@@ -172,13 +128,7 @@ export class Game {
     } else if (loadData.playerIdList) {
       //create player list from user id list
       this.playerList = loadData.playerIdList.map(
-        (playerId) =>
-          new Player(
-            playerId,
-            this.startingBalance,
-            this.drawCard(this.startingHandSize),
-            this
-          )
+        (playerId) => new Player(playerId, this)
       );
       //randomize player list
       this.inGamePlayerList = this.shuffle(this.playerList);
@@ -235,12 +185,13 @@ export class Game {
     });
   }
 
-  checkVictory() {
+  checkVictory(): boolean {
     this.inGamePlayerList = this.inGamePlayerList.filter(
       (player) => player.getState() == "inGame"
     );
     return this.inGamePlayerList.length == 1;
   }
+
   async save(): Promise<void> {
     const gameSave: GameSave = {
       name: this.name,
@@ -248,7 +199,7 @@ export class Game {
       activePlayerIndex: this.activePlayerIndex,
       playerList: this.playerList.map(function (player) {
         return {
-          id: player.userId,
+          userId: player.userId,
           state: player.getState(),
           hand: player.getHand(),
           faceUp: player.getFaceUp(),
@@ -259,14 +210,13 @@ export class Game {
         ? {
             id: this.action.id,
             state: this.action.getState(),
-            askingPlayerIndex: this.action.getAskingPlayerIndex
-              ? this.action.getAskingPlayerIndex()
+            askPlayerIndex: this.action.getAskPlayerIndex
+              ? this.action.getAskPlayerIndex()
               : undefined,
             counteraction: this.action.counteraction
               ? {
                   state: this.action.counteraction.getState(),
-                  askingPlayerIndex:
-                    this.action.counteraction.getAskingPlayerIndex(),
+                  askPlayerIndex: this.action.counteraction.getAskPlayerIndex(),
                   challenge: this.action.counteraction.challenge
                     ? {
                         state: this.action.counteraction.challenge.getState(),
@@ -286,16 +236,16 @@ export class Game {
         : undefined,
     };
     try {
-      await pfs.access("save");
+      await pfs.access("coupSave");
     } catch (e) {
-      pfs.mkdir("save");
+      pfs.mkdir("coupSave");
     }
-    pfs.writeFile(`save/${this.id}.json`, JSON.stringify(gameSave));
+    pfs.writeFile(`coupSave/${this.id}.json`, JSON.stringify(gameSave));
   }
 
-  transition(arg?: gameArgument) {
+  transition(arg?: transitionArgument) {
     switch (this.state) {
-      case "askForAction": {
+      case "askAction": {
         if (arg && arg.chosenAction) {
           switch (arg.chosenAction) {
             case "income": {
@@ -310,7 +260,7 @@ export class Game {
               if (
                 this.inGamePlayerList[this.activePlayerIndex].getBalance() < 7
               ) {
-                this.io.emit("askForAction", {
+                this.io.emit("askAction", {
                   userId: this.inGamePlayerList[this.activePlayerIndex].userId,
                 });
                 return;
@@ -326,7 +276,7 @@ export class Game {
               if (
                 this.inGamePlayerList[this.activePlayerIndex].getBalance() < 3
               ) {
-                this.io.emit("askForAction", {
+                this.io.emit("askAction", {
                   userId: this.inGamePlayerList[this.activePlayerIndex].userId,
                 });
                 return;
@@ -363,15 +313,15 @@ export class Game {
               userId: this.inGamePlayerList[0].userId,
               gameName: this.name,
             });
-            //updateWinner(this.id, this.inGamePlayerList[0].userId);
+            updateWinner(this.id, this.inGamePlayerList[0].userId);
           } else {
             if (this.activePlayerIndex >= this.inGamePlayerList.length - 1) {
               this.activePlayerIndex = 0;
             } else {
               this.activePlayerIndex++;
             }
-            this.state = "askForAction";
-            this.io.emit("askForAction", {
+            this.state = "askAction";
+            this.io.emit("askAction", {
               userId: this.inGamePlayerList[this.activePlayerIndex].userId,
             });
           }
@@ -391,10 +341,10 @@ interface Action {
   challenge?: Challenge | null;
   counteraction?: Counteraction | null;
   targetIndex?: number | null;
-  transition(arg?: gameArgument): void;
+  transition(arg?: transitionArgument): void;
   setActionValid(result: boolean): void;
   getState(): string;
-  getAskingPlayerIndex?(): number;
+  getAskPlayerIndex?(): number;
 }
 
 /* --------------------------------- Income --------------------------------- */
@@ -418,7 +368,7 @@ class Income implements Action {
     return this.state;
   }
 
-  transition(arg?: gameArgument): void {
+  transition(arg?: transitionArgument): void {
     switch (this.state) {
       case "effect": {
         this.callingGame.inGamePlayerList[this.activePlayerIndex].addBalance(1);
@@ -439,7 +389,7 @@ class Income implements Action {
 class ForeignAid implements Action {
   public readonly id = 2;
   private state: string;
-  private askingPlayerIndex: number = -1;
+  private askPlayerIndex: number = -1;
   public counteraction: Counteraction | null = null;
   private actionValid: boolean = true;
   constructor(
@@ -447,15 +397,15 @@ class ForeignAid implements Action {
     public readonly activePlayerIndex: number,
     saveData?: Omit<ActionSave, "id">
   ) {
-    this.state = saveData ? saveData.state : "askForCounterAction";
-    this.askingPlayerIndex =
-      saveData && saveData.askingPlayerIndex ? saveData.askingPlayerIndex : -1;
+    this.state = saveData ? saveData.state : "askCounterAction";
+    this.askPlayerIndex =
+      saveData && saveData.askPlayerIndex ? saveData.askPlayerIndex : -1;
     this.counteraction =
       saveData && saveData.counteraction
         ? new Counteraction(
             this.callingGame,
             this,
-            this.askingPlayerIndex,
+            this.askPlayerIndex,
             saveData.counteraction
           )
         : null;
@@ -469,46 +419,45 @@ class ForeignAid implements Action {
     return this.state;
   }
 
-  getAskingPlayerIndex(): number {
-    return this.askingPlayerIndex;
+  getAskPlayerIndex(): number {
+    return this.askPlayerIndex;
   }
 
-  transition(arg?: gameArgument): void {
+  transition(arg?: transitionArgument): void {
     switch (this.state) {
-      case "askForCounterAction": {
+      case "askCounterAction": {
         if (arg && arg.counteraction) {
           this.state = "resolveCounterAction";
           this.callingGame.io.emit(
             "message",
             `User ${
-              this.callingGame.inGamePlayerList[this.askingPlayerIndex].userId
+              this.callingGame.inGamePlayerList[this.askPlayerIndex].userId
             } block!<br>`
           );
           this.counteraction = new Counteraction(
             this.callingGame,
             this,
-            this.askingPlayerIndex
+            this.askPlayerIndex
           );
           this.counteraction.transition();
         } else if (
-          this.askingPlayerIndex !==
+          this.askPlayerIndex !==
           this.callingGame.inGamePlayerList.length - 1
         ) {
-          this.askingPlayerIndex++;
-          if (this.askingPlayerIndex === this.activePlayerIndex) {
-            this.askingPlayerIndex++;
+          this.askPlayerIndex++;
+          if (this.askPlayerIndex === this.activePlayerIndex) {
+            this.askPlayerIndex++;
             if (
-              this.askingPlayerIndex ===
-              this.callingGame.inGamePlayerList.length
+              this.askPlayerIndex === this.callingGame.inGamePlayerList.length
             ) {
               this.state = "effect";
               this.transition();
               break;
             }
           }
-          this.callingGame.io.emit("askForCounterAction", {
+          this.callingGame.io.emit("askCounterAction", {
             userId:
-              this.callingGame.inGamePlayerList[this.askingPlayerIndex].userId,
+              this.callingGame.inGamePlayerList[this.askPlayerIndex].userId,
           });
         } else {
           this.state = "effect";
@@ -569,7 +518,7 @@ class Coup implements Action {
     return this.state;
   }
 
-  transition(arg?: gameArgument): void {
+  transition(arg?: transitionArgument): void {
     switch (this.state) {
       case "choosingTarget": {
         if (arg && arg.targetId) {
@@ -619,7 +568,7 @@ class Coup implements Action {
 class Tax implements Action {
   public readonly id = 4;
   private state: string;
-  private askingPlayerIndex: number;
+  private askPlayerIndex: number;
   public challenge: Challenge | null;
   private actionValid: boolean = true;
   constructor(
@@ -627,15 +576,15 @@ class Tax implements Action {
     public readonly activePlayerIndex: number,
     saveData?: Omit<ActionSave, "id">
   ) {
-    this.state = saveData ? saveData.state : "askForChallenge";
-    this.askingPlayerIndex =
-      saveData && saveData.askingPlayerIndex ? saveData.askingPlayerIndex : -1;
+    this.state = saveData ? saveData.state : "askChallenge";
+    this.askPlayerIndex =
+      saveData && saveData.askPlayerIndex ? saveData.askPlayerIndex : -1;
     this.challenge =
       saveData && saveData.challenge
         ? new Challenge(
             this.callingGame,
             this,
-            this.askingPlayerIndex,
+            this.askPlayerIndex,
             this.activePlayerIndex,
             saveData.challenge
           )
@@ -650,43 +599,42 @@ class Tax implements Action {
     return this.state;
   }
 
-  transition(arg?: gameArgument): void {
+  transition(arg?: transitionArgument): void {
     switch (this.state) {
-      case "askForChallenge": {
+      case "askChallenge": {
         if (arg && arg.challenge) {
           this.state = "resolveChallenge";
           this.callingGame.io.emit(
             "message",
             `User ${
-              this.callingGame.inGamePlayerList[this.askingPlayerIndex].userId
+              this.callingGame.inGamePlayerList[this.askPlayerIndex].userId
             } Challenge!<br>`
           );
           this.challenge = new Challenge(
             this.callingGame,
             this,
-            this.askingPlayerIndex,
+            this.askPlayerIndex,
             this.activePlayerIndex
           );
           this.challenge.transition();
         } else if (
-          this.askingPlayerIndex !==
+          this.askPlayerIndex !==
           this.callingGame.inGamePlayerList.length - 1
         ) {
-          this.askingPlayerIndex++;
-          if (this.askingPlayerIndex === this.activePlayerIndex) {
-            this.askingPlayerIndex++;
+          this.askPlayerIndex++;
+          if (this.askPlayerIndex === this.activePlayerIndex) {
+            this.askPlayerIndex++;
             if (
-              this.askingPlayerIndex ===
-              this.callingGame.inGamePlayerList.length
+              this.askPlayerIndex === this.callingGame.inGamePlayerList.length
             ) {
               this.state = "effect";
               this.transition();
               break;
             }
           }
-          this.callingGame.io.emit("askForChallenge", {
+          this.callingGame.io.emit("askChallenge", {
             userId:
-              this.callingGame.inGamePlayerList[this.askingPlayerIndex].userId,
+              this.callingGame.inGamePlayerList[this.askPlayerIndex].userId,
           });
         } else {
           this.state = "effect";
@@ -721,7 +669,7 @@ class Tax implements Action {
 class Assassinate implements Action {
   public readonly id = 5;
   private state: string;
-  private askingPlayerIndex: number = -1;
+  private askPlayerIndex: number = -1;
   public counteraction: Counteraction | null;
   public challenge: Challenge | null;
   public targetIndex: number | null = null;
@@ -732,14 +680,14 @@ class Assassinate implements Action {
     saveData?: Omit<ActionSave, "id">
   ) {
     this.state = saveData ? saveData.state : "choosingTarget";
-    this.askingPlayerIndex =
-      saveData && saveData.askingPlayerIndex ? saveData.askingPlayerIndex : -1;
+    this.askPlayerIndex =
+      saveData && saveData.askPlayerIndex ? saveData.askPlayerIndex : -1;
     this.counteraction =
       saveData && saveData.counteraction
         ? new Counteraction(
             this.callingGame,
             this,
-            this.askingPlayerIndex,
+            this.askPlayerIndex,
             saveData.counteraction
           )
         : null;
@@ -748,7 +696,7 @@ class Assassinate implements Action {
         ? new Challenge(
             this.callingGame,
             this,
-            this.askingPlayerIndex,
+            this.askPlayerIndex,
             this.activePlayerIndex,
             saveData.challenge
           )
@@ -765,11 +713,11 @@ class Assassinate implements Action {
     return this.state;
   }
 
-  getAskingPlayerIndex(): number {
-    return this.askingPlayerIndex;
+  getAskPlayerIndex(): number {
+    return this.askPlayerIndex;
   }
 
-  transition(arg?: gameArgument): void {
+  transition(arg?: transitionArgument): void {
     switch (this.state) {
       case "choosingTarget": {
         if (arg && arg.targetId) {
@@ -782,7 +730,7 @@ class Assassinate implements Action {
               this.callingGame.inGamePlayerList[this.targetIndex].userId
             }!<br>`
           );
-          this.state = "askForChallenge";
+          this.state = "askChallenge";
           this.transition();
         } else {
           this.callingGame.io.emit("askTarget", {
@@ -792,52 +740,51 @@ class Assassinate implements Action {
         }
         break;
       }
-      case "askForChallenge": {
+      case "askChallenge": {
         if (arg && arg.challenge) {
           this.state = "resolveChallenge";
           this.callingGame.io.emit(
             "message",
             `User ${
-              this.callingGame.inGamePlayerList[this.askingPlayerIndex].userId
+              this.callingGame.inGamePlayerList[this.askPlayerIndex].userId
             } Challenge!<br>`
           );
           this.challenge = new Challenge(
             this.callingGame,
             this,
-            this.askingPlayerIndex,
+            this.askPlayerIndex,
             this.activePlayerIndex
           );
           this.challenge.transition();
         } else if (
-          this.askingPlayerIndex !==
+          this.askPlayerIndex !==
           this.callingGame.inGamePlayerList.length - 1
         ) {
-          this.askingPlayerIndex++;
-          if (this.askingPlayerIndex === this.activePlayerIndex) {
-            this.askingPlayerIndex++;
+          this.askPlayerIndex++;
+          if (this.askPlayerIndex === this.activePlayerIndex) {
+            this.askPlayerIndex++;
             if (
-              this.askingPlayerIndex ===
-              this.callingGame.inGamePlayerList.length
+              this.askPlayerIndex === this.callingGame.inGamePlayerList.length
             ) {
               this.callingGame.inGamePlayerList[
                 this.activePlayerIndex
               ].lowerBalance(3);
-              this.askingPlayerIndex = -1;
-              this.state = "askForCounterAction";
+              this.askPlayerIndex = -1;
+              this.state = "askCounterAction";
               this.transition();
               break;
             }
           }
-          this.callingGame.io.emit("askForChallenge", {
+          this.callingGame.io.emit("askChallenge", {
             userId:
-              this.callingGame.inGamePlayerList[this.askingPlayerIndex].userId,
+              this.callingGame.inGamePlayerList[this.askPlayerIndex].userId,
           });
         } else {
           this.callingGame.inGamePlayerList[
             this.activePlayerIndex
           ].lowerBalance(3);
-          this.askingPlayerIndex = -1;
-          this.state = "askForCounterAction";
+          this.askPlayerIndex = -1;
+          this.state = "askCounterAction";
           this.transition();
         }
         break;
@@ -849,8 +796,8 @@ class Assassinate implements Action {
           this.callingGame.inGamePlayerList[
             this.activePlayerIndex
           ].lowerBalance(3);
-          this.askingPlayerIndex = -1;
-          this.state = "askForCounterAction";
+          this.askPlayerIndex = -1;
+          this.state = "askCounterAction";
           this.transition();
         } else {
           this.state = "finish";
@@ -858,30 +805,30 @@ class Assassinate implements Action {
         }
         break;
       }
-      case "askForCounterAction": {
+      case "askCounterAction": {
         if (arg && arg.counteraction) {
           this.state = "resolveCounterAction";
           this.callingGame.io.emit(
             "message",
             `User ${
-              this.callingGame.inGamePlayerList[this.askingPlayerIndex].userId
+              this.callingGame.inGamePlayerList[this.askPlayerIndex].userId
             } block!<br>`
           );
           this.counteraction = new Counteraction(
             this.callingGame,
             this,
-            this.askingPlayerIndex
+            this.askPlayerIndex
           );
           this.counteraction.transition();
         } else if (
-          this.askingPlayerIndex !==
+          this.askPlayerIndex !==
           this.callingGame.inGamePlayerList.length - 1
         ) {
-          this.askingPlayerIndex++;
-          if (this.askingPlayerIndex === this.activePlayerIndex) {
-            this.askingPlayerIndex++;
+          this.askPlayerIndex++;
+          if (this.askPlayerIndex === this.activePlayerIndex) {
+            this.askPlayerIndex++;
             if (
-              this.askingPlayerIndex ===
+              this.askPlayerIndex ===
                 this.callingGame.inGamePlayerList.length &&
               this.targetIndex
             ) {
@@ -900,9 +847,9 @@ class Assassinate implements Action {
               break;
             }
           }
-          this.callingGame.io.emit("askForCounterAction", {
+          this.callingGame.io.emit("askCounterAction", {
             userId:
-              this.callingGame.inGamePlayerList[this.askingPlayerIndex].userId,
+              this.callingGame.inGamePlayerList[this.askPlayerIndex].userId,
           });
         } else if (this.targetIndex) {
           this.callingGame.io.emit("askCard", {
@@ -954,7 +901,7 @@ class Assassinate implements Action {
 class Exchange implements Action {
   public readonly id = 6;
   private state: string;
-  private askingPlayerIndex: number;
+  private askPlayerIndex: number;
   public challenge: Challenge | null;
   private actionValid: boolean = true;
   constructor(
@@ -962,15 +909,15 @@ class Exchange implements Action {
     public readonly activePlayerIndex: number,
     saveData?: Omit<ActionSave, "id">
   ) {
-    this.state = saveData ? saveData.state : "askForChallenge";
-    this.askingPlayerIndex =
-      saveData && saveData.askingPlayerIndex ? saveData.askingPlayerIndex : -1;
+    this.state = saveData ? saveData.state : "askChallenge";
+    this.askPlayerIndex =
+      saveData && saveData.askPlayerIndex ? saveData.askPlayerIndex : -1;
     this.challenge =
       saveData && saveData.challenge
         ? new Challenge(
             this.callingGame,
             this,
-            this.askingPlayerIndex,
+            this.askPlayerIndex,
             this.activePlayerIndex,
             saveData.challenge
           )
@@ -985,47 +932,46 @@ class Exchange implements Action {
     return this.state;
   }
 
-  getAskingPlayerIndex(): number {
-    return this.askingPlayerIndex;
+  getAskPlayerIndex(): number {
+    return this.askPlayerIndex;
   }
 
-  transition(arg?: gameArgument): void {
+  transition(arg?: transitionArgument): void {
     switch (this.state) {
-      case "askForChallenge": {
+      case "askChallenge": {
         if (arg && arg.challenge) {
           this.state = "resolveChallenge";
           this.callingGame.io.emit(
             "message",
             `User ${
-              this.callingGame.inGamePlayerList[this.askingPlayerIndex].userId
+              this.callingGame.inGamePlayerList[this.askPlayerIndex].userId
             } Challenge!<br>`
           );
           this.challenge = new Challenge(
             this.callingGame,
             this,
-            this.askingPlayerIndex,
+            this.askPlayerIndex,
             this.activePlayerIndex
           );
           this.challenge.transition();
         } else if (
-          this.askingPlayerIndex !==
+          this.askPlayerIndex !==
           this.callingGame.inGamePlayerList.length - 1
         ) {
-          this.askingPlayerIndex++;
-          if (this.askingPlayerIndex === this.activePlayerIndex) {
-            this.askingPlayerIndex++;
+          this.askPlayerIndex++;
+          if (this.askPlayerIndex === this.activePlayerIndex) {
+            this.askPlayerIndex++;
             if (
-              this.askingPlayerIndex ===
-              this.callingGame.inGamePlayerList.length
+              this.askPlayerIndex === this.callingGame.inGamePlayerList.length
             ) {
               this.state = "effect";
               this.transition();
               break;
             }
           }
-          this.callingGame.io.emit("askForChallenge", {
+          this.callingGame.io.emit("askChallenge", {
             userId:
-              this.callingGame.inGamePlayerList[this.askingPlayerIndex].userId,
+              this.callingGame.inGamePlayerList[this.askPlayerIndex].userId,
           });
         } else {
           this.state = "effect";
@@ -1104,7 +1050,7 @@ class Exchange implements Action {
 class Steal implements Action {
   public readonly id = 7;
   private state: string;
-  private askingPlayerIndex: number;
+  private askPlayerIndex: number;
   public counteraction: Counteraction | null;
   public challenge: Challenge | null;
   public targetIndex: number | null;
@@ -1115,14 +1061,14 @@ class Steal implements Action {
     saveData?: Omit<ActionSave, "id">
   ) {
     this.state = saveData ? saveData.state : "choosingTarget";
-    this.askingPlayerIndex =
-      saveData && saveData.askingPlayerIndex ? saveData.askingPlayerIndex : -1;
+    this.askPlayerIndex =
+      saveData && saveData.askPlayerIndex ? saveData.askPlayerIndex : -1;
     this.counteraction =
       saveData && saveData.counteraction
         ? new Counteraction(
             this.callingGame,
             this,
-            this.askingPlayerIndex,
+            this.askPlayerIndex,
             saveData.counteraction
           )
         : null;
@@ -1131,7 +1077,7 @@ class Steal implements Action {
         ? new Challenge(
             this.callingGame,
             this,
-            this.askingPlayerIndex,
+            this.askPlayerIndex,
             this.activePlayerIndex,
             saveData.challenge
           )
@@ -1148,11 +1094,11 @@ class Steal implements Action {
     return this.state;
   }
 
-  getAskingPlayerIndex(): number {
-    return this.askingPlayerIndex;
+  getAskPlayerIndex(): number {
+    return this.askPlayerIndex;
   }
 
-  transition(arg?: gameArgument): void {
+  transition(arg?: transitionArgument): void {
     switch (this.state) {
       case "choosingTarget": {
         if (arg && arg.targetId) {
@@ -1165,7 +1111,7 @@ class Steal implements Action {
               this.callingGame.inGamePlayerList[this.targetIndex].userId
             }!<br>`
           );
-          this.state = "askForChallenge";
+          this.state = "askChallenge";
           this.transition();
         } else {
           this.callingGame.io.emit("askTarget", {
@@ -1175,46 +1121,45 @@ class Steal implements Action {
         }
         break;
       }
-      case "askForChallenge": {
+      case "askChallenge": {
         if (arg && arg.challenge) {
           this.state = "resolveChallenge";
           this.callingGame.io.emit(
             "message",
             `User ${
-              this.callingGame.inGamePlayerList[this.askingPlayerIndex].userId
+              this.callingGame.inGamePlayerList[this.askPlayerIndex].userId
             } Challenge!<br>`
           );
           this.challenge = new Challenge(
             this.callingGame,
             this,
-            this.askingPlayerIndex,
+            this.askPlayerIndex,
             this.activePlayerIndex
           );
           this.challenge.transition();
         } else if (
-          this.askingPlayerIndex !==
+          this.askPlayerIndex !==
           this.callingGame.inGamePlayerList.length - 1
         ) {
-          this.askingPlayerIndex++;
-          if (this.askingPlayerIndex === this.activePlayerIndex) {
-            this.askingPlayerIndex++;
+          this.askPlayerIndex++;
+          if (this.askPlayerIndex === this.activePlayerIndex) {
+            this.askPlayerIndex++;
             if (
-              this.askingPlayerIndex ===
-              this.callingGame.inGamePlayerList.length
+              this.askPlayerIndex === this.callingGame.inGamePlayerList.length
             ) {
-              this.askingPlayerIndex = -1;
-              this.state = "askForCounterAction";
+              this.askPlayerIndex = -1;
+              this.state = "askCounterAction";
               this.transition();
               break;
             }
           }
-          this.callingGame.io.emit("askForChallenge", {
+          this.callingGame.io.emit("askChallenge", {
             userId:
-              this.callingGame.inGamePlayerList[this.askingPlayerIndex].userId,
+              this.callingGame.inGamePlayerList[this.askPlayerIndex].userId,
           });
         } else {
-          this.askingPlayerIndex = -1;
-          this.state = "askForCounterAction";
+          this.askPlayerIndex = -1;
+          this.state = "askCounterAction";
           this.transition();
         }
         break;
@@ -1223,8 +1168,8 @@ class Steal implements Action {
         if (this.challenge?.getState() !== "finish") {
           this.challenge?.transition(arg);
         } else if (this.actionValid) {
-          this.askingPlayerIndex = -1;
-          this.state = "askForCounterAction";
+          this.askPlayerIndex = -1;
+          this.state = "askCounterAction";
           this.transition();
         } else {
           this.state = "finish";
@@ -1232,40 +1177,39 @@ class Steal implements Action {
         }
         break;
       }
-      case "askForCounterAction": {
+      case "askCounterAction": {
         if (arg && arg.counteraction) {
           this.state = "resolveCounterAction";
           this.callingGame.io.emit(
             "message",
             `User ${
-              this.callingGame.inGamePlayerList[this.askingPlayerIndex].userId
+              this.callingGame.inGamePlayerList[this.askPlayerIndex].userId
             } block!<br>`
           );
           this.counteraction = new Counteraction(
             this.callingGame,
             this,
-            this.askingPlayerIndex
+            this.askPlayerIndex
           );
           this.counteraction.transition();
         } else if (
-          this.askingPlayerIndex !==
+          this.askPlayerIndex !==
           this.callingGame.inGamePlayerList.length - 1
         ) {
-          this.askingPlayerIndex++;
-          if (this.askingPlayerIndex === this.activePlayerIndex) {
-            this.askingPlayerIndex++;
+          this.askPlayerIndex++;
+          if (this.askPlayerIndex === this.activePlayerIndex) {
+            this.askPlayerIndex++;
             if (
-              this.askingPlayerIndex ===
-              this.callingGame.inGamePlayerList.length
+              this.askPlayerIndex === this.callingGame.inGamePlayerList.length
             ) {
               this.state = "effect";
               this.transition();
               break;
             }
           }
-          this.callingGame.io.emit("askForCounterAction", {
+          this.callingGame.io.emit("askCounterAction", {
             userId:
-              this.callingGame.inGamePlayerList[this.askingPlayerIndex].userId,
+              this.callingGame.inGamePlayerList[this.askPlayerIndex].userId,
           });
         } else {
           this.state = "effect";
@@ -1319,7 +1263,7 @@ class Steal implements Action {
 class Counteraction implements Action {
   public id: number;
   private state: string;
-  private askingPlayerIndex: number;
+  private askPlayerIndex: number;
   public challenge: Challenge | null;
   private actionValid = true;
 
@@ -1330,15 +1274,15 @@ class Counteraction implements Action {
     saveData?: CounteractionSave
   ) {
     this.id = counteractionMap.get(this.callingAction.id);
-    this.state = saveData ? saveData.state : "askForChallenge";
-    this.askingPlayerIndex =
-      saveData && saveData.askingPlayerIndex ? saveData.askingPlayerIndex : -1;
+    this.state = saveData ? saveData.state : "askChallenge";
+    this.askPlayerIndex =
+      saveData && saveData.askPlayerIndex ? saveData.askPlayerIndex : -1;
     this.challenge =
       saveData && saveData.challenge
         ? new Challenge(
             this.callingGame,
             this,
-            this.askingPlayerIndex,
+            this.askPlayerIndex,
             this.counteractionPlayerIndex
           )
         : null;
@@ -1352,38 +1296,37 @@ class Counteraction implements Action {
     return this.state;
   }
 
-  getAskingPlayerIndex(): number {
-    return this.askingPlayerIndex;
+  getAskPlayerIndex(): number {
+    return this.askPlayerIndex;
   }
 
-  transition(arg?: gameArgument): void {
+  transition(arg?: transitionArgument): void {
     switch (this.state) {
-      case "askForChallenge": {
+      case "askChallenge": {
         if (arg && arg.challenge) {
           this.state = "resolveChallenge";
           this.callingGame.io.emit(
             "message",
             `User ${
-              this.callingGame.inGamePlayerList[this.askingPlayerIndex].userId
+              this.callingGame.inGamePlayerList[this.askPlayerIndex].userId
             } Challenge!<br>`
           );
           this.challenge = new Challenge(
             this.callingGame,
             this,
-            this.askingPlayerIndex,
+            this.askPlayerIndex,
             this.counteractionPlayerIndex
           );
           this.challenge.transition();
         } else if (
-          this.askingPlayerIndex !==
+          this.askPlayerIndex !==
           this.callingGame.inGamePlayerList.length - 1
         ) {
-          this.askingPlayerIndex++;
-          if (this.askingPlayerIndex === this.counteractionPlayerIndex) {
-            this.askingPlayerIndex++;
+          this.askPlayerIndex++;
+          if (this.askPlayerIndex === this.counteractionPlayerIndex) {
+            this.askPlayerIndex++;
             if (
-              this.askingPlayerIndex ===
-              this.callingGame.inGamePlayerList.length
+              this.askPlayerIndex === this.callingGame.inGamePlayerList.length
             ) {
               this.callingAction.setActionValid(false);
               this.state = "finish";
@@ -1391,9 +1334,9 @@ class Counteraction implements Action {
               break;
             }
           }
-          this.callingGame.io.emit("askForChallenge", {
+          this.callingGame.io.emit("askChallenge", {
             userId:
-              this.callingGame.inGamePlayerList[this.askingPlayerIndex].userId,
+              this.callingGame.inGamePlayerList[this.askPlayerIndex].userId,
           });
         } else {
           this.callingAction.setActionValid(false);
@@ -1468,7 +1411,7 @@ class Challenge {
     return this.state;
   }
 
-  transition(arg?: gameArgument): void {
+  transition(arg?: transitionArgument): void {
     switch (this.state) {
       case "targetLoseInfluence": {
         if (arg && arg.chosenCard) {

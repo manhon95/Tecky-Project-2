@@ -10,10 +10,12 @@ const { combine, colorize, simple } = winston.format;
 //   debug: 5
 //   silly: 6
 
+const loggerLevel = "debug";
+
 export const logger = winston.createLogger({
-  level: "debug", //	Log only if log level is less than or equal to this level
+  level: loggerLevel, //	Log only if log level is less than or equal to this level
   format: combine(colorize(), simple()),
   transports: [new winston.transports.Console()],
 });
 
-logger.info("Logger started");
+logger.info(`Logger started at level: ${loggerLevel}`);

@@ -1,9 +1,9 @@
-import { loadCoupGame } from "./coupGameList";
+import { loadCoupGame } from "./coupList";
 import express, { Request, Response } from "express";
 import http from "http";
 import socket from "socket.io";
 
-import "../middleware";
+import "./middleware";
 
 declare module "express-session" {
   interface SessionData {

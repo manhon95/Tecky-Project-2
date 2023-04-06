@@ -1,4 +1,5 @@
 import database from "../db";
+import { logger } from "../logger";
 
 /* ----------------------------- database query ----------------------------- */
 export async function createGameInDB(gameName: string, userIdList: string[]) {
@@ -39,4 +40,18 @@ WHERE id = $2
 `,
     [amount, playerId]
   );
+}
+
+export async function inMatch(playerId: string, matchId: string) {
+  const result = await database.query(
+    "select count(*) from user_match where player_id = $1 and match_id = $2",
+    [playerId, matchId]
+  );
+  logger.debug(`inMatch result: ${result}`);
+  if (result.rows[0] > 1) {
+    logger.warn(
+      `player_id: ${playerId} - match_id: ${matchId} have more than one entry in database`
+    );
+  }
+  return result.rows[0] !== 0;
 }

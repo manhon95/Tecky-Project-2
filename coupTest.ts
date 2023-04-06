@@ -4,9 +4,9 @@ import http from "http";
 import { print } from "listening-on";
 import socket from "socket.io";
 import path from "path";
-import { addCoupSocketFunction } from "./coupSocketFunction";
-import { createCoupGame, getGameById, loadCoupGame } from "./coupGameList";
-import "../middleware";
+import { addCoupSocketInitEvent } from "./socketIO/coup.io";
+import { createCoupGame, getGameById, loadCoupGame } from "./coupList";
+import "./middleware";
 
 declare module "express-session" {
   interface SessionData {
@@ -27,8 +27,8 @@ const sessionMiddleware = session({
   resave: true,
   saveUninitialized: true,
 });
-app.use(express.static("../public"));
-app.use(express.static("../protected"));
+app.use(express.static("public"));
+app.use(express.static("protected"));
 app.use(sessionMiddleware);
 
 io.use((socket, next) => {
@@ -38,17 +38,19 @@ io.use((socket, next) => {
 });
 
 app.get("/", (req: Request, res: Response) => {
-  res.sendFile(path.resolve("../protected", "testgameroom.html"));
+  res.sendFile(path.resolve("protected", "testgameroom.html"));
 });
 
 app.get("/coup", (req: Request, res: Response) => {
   if (typeof req.query.game == "string" && getGameById(req.query.game)) {
-    res.sendFile(path.resolve("../protected", "coup.html"));
+    res.sendFile(path.resolve("protected", "coup.html"));
   } else {
     res.redirect("/");
   }
 });
-
+/* -------------------------------- important ------------------------------- */
+addCoupSocketInitEvent(io);
+/* ----------------------------------- end ---------------------------------- */
 io.on("connection", (socket) => {
   const req = socket.request as express.Request;
   // setup user id
@@ -100,12 +102,6 @@ io.on("connection", (socket) => {
     }
     io.emit("playerIn", { roomPlayerList: roomPlayerList });
   });
-  /* -------------------------------- important ------------------------------- */
-  addCoupSocketFunction(io, socket, req.session);
-  /* ----------------------------------- end ---------------------------------- */
-});
-app.get("/checkSession", (req, res) => {
-  console.log("sessionID", req.sessionID);
 });
 
 server.listen(8000, () => {

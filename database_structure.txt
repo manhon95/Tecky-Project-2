@@ -16,7 +16,7 @@ create table "friend_request" (
     ,message TEXT
     ,accept_time timestamp null
     ,reject_time timestamp null
-)
+);
 
 alter TABLE "user" ALTER COLUMN PASSWORD DROP NOT NULL;
 alter TABLE "user" ALTER COLUMN birthday DROP NOT NULL;
@@ -31,7 +31,7 @@ create table "user_badge"(
 
 create table "badge" (
     id serial primary key
-    name varchar(32) not null
+    ,name varchar(32) not null
     ,url varchar(60) not null
     ,price smallint not null
 );
@@ -83,4 +83,4 @@ create table "user_match" (
     ,FOREIGN KEY (match_id) REFERENCES "match"(id)
 );
 
-alter table "user" add column email_verify boolean not null 
+alter table "user" add column email_verify boolean not null;

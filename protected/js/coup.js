@@ -12,8 +12,14 @@ const msgBox = document.querySelector("#message-box");
 const myCardBoard = document.querySelector("#my #card-board");
 const myBalance = document.querySelector(`#my #balance`);
 const CardNode = document.querySelector(`#my .card`);
-const actionButton = document.querySelectorAll("#turn-button-board .btn");
 const myInfo = document.querySelector("#my");
+const actionButton = document.querySelectorAll("#turn-button-board .btn");
+const counteractionButton = document.querySelectorAll(
+  "#counteraction-button-board .btn"
+);
+const challengeButton = document.querySelectorAll(
+  "#challenge-button-board .btn"
+);
 /* --------------------------------- Utils; --------------------------------- */
 const socket = io();
 const url = new URL(location.href);
@@ -27,6 +33,11 @@ const cardPathMap = [
   "/img/contessa.jpg",
   "/img/duke.jpg",
 ];
+const counteractionButtonResponse = { counter: true, "no-counter": false };
+const challengeButtonResponse = {
+  challenge: true,
+  "no-challenge": false,
+};
 let chooseCards = false;
 let chooseTargets = false;
 
@@ -35,6 +46,7 @@ init();
 function init() {
   socket.emit("askCoupInit", { game: { id: gameId } });
   socket.on("ansCoupInit", function (game) {
+    console.log("init");
     /* --------------------------------- My Info -------------------------------- */
     const myId = game.my.id;
     myInfo.id = `player-${myId}`;
@@ -55,10 +67,7 @@ function init() {
         });
       });
     });
-    const counteractionButton = document.querySelectorAll(
-      "#counteraction-button-board .btn"
-    );
-    const counteractionButtonResponse = { counter: true, "no-counter": false };
+
     counteractionButton.forEach((button) => {
       button.disabled = true;
       button.addEventListener("click", function () {
@@ -71,10 +80,6 @@ function init() {
       });
     });
 
-    const challengeButton = document.querySelectorAll(
-      "#challenge-button-board .btn"
-    );
-    const challengeButtonResponse = { challenge: true, "no-challenge": false };
     challengeButton.forEach((button) => {
       button.disabled = true;
       button.addEventListener("click", function () {
@@ -93,34 +98,23 @@ function init() {
 }
 
 function socketEventInit(socket, myId) {
-  socket.on("addBalance", function (arg) {
+  socket.on("updateBalance", function (arg) {
     document.querySelector(`#player-${arg.userId} #balance`).textContent =
       arg.balance;
   });
 
-  socket.on("lowerBalance", function (arg) {
-    document.querySelector(`#player-${arg.userId} #balance`).textContent =
-      arg.balance;
-  });
-
-  socket.on("askForAction", function (arg) {
+  socket.on("askAction", function (arg) {
     actionButton.forEach((button) => {
       button.disabled = !(arg.userId == myId);
     });
   });
 
-  socket.on("outGame", function (arg) {
-    let node = document.querySelector(`#player-${arg.userId}`);
-    node.setAttribute("state", "outGame");
-    changePlayerStyle(node);
-  });
-
-  socket.on("askForCounterAction", function (arg) {
+  socket.on("askCounterAction", function (arg) {
     counteractionButton.forEach((button) => {
       button.disabled = !(arg.userId == myId);
     });
   });
-  socket.on("askForChallenge", function (arg) {
+  socket.on("askChallenge", function (arg) {
     challengeButton.forEach((button) => {
       button.disabled = !(arg.userId == myId);
     });
@@ -133,17 +127,23 @@ function socketEventInit(socket, myId) {
     }
   });
 
+  socket.on("askTarget", function (arg) {
+    chooseTargets = arg.userId == myId;
+    document.querySelectorAll(`.other`).forEach((player) => {
+      changePlayerStyle(player);
+    });
+  });
+
   socket.on("updateCard", function (arg) {
     if (arg.userId == myId) {
       loadCards(arg.hand, arg.faceUp);
     }
   });
 
-  socket.on("askTarget", function (arg) {
-    chooseTargets = arg.userId == myId;
-    document.querySelectorAll(`.other`).forEach((player) => {
-      changePlayerStyle(player);
-    });
+  socket.on("outGame", function (arg) {
+    let node = document.querySelector(`#player-${arg.userId}`);
+    node.setAttribute("state", "outGame");
+    changePlayerStyle(node);
   });
 
   socket.on("loseInfluence", function (arg) {
