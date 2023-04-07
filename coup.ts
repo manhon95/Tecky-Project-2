@@ -6,7 +6,7 @@ import path from "path";
 
 const filename = path.basename(__filename);
 
-export async function sendCoupPage(req: Request, res: Response) {
+export function sendCoupPage(req: Request, res: Response) {
   if (
     !req.query.game ||
     typeof req.query.game !== "string" ||
@@ -17,7 +17,7 @@ export async function sendCoupPage(req: Request, res: Response) {
   } else if (!inMatch(req.session.user?.id, req.query.game)) {
     res.status(400);
     res.send("You are not in this game"); //TODO
-  } else if (await getGameById(req.query.game)) {
+  } else if (getGameById(req.query.game)) {
     logger.debug(`${filename} - req.query.game: ${req.query.game}`);
     res.sendFile(path.resolve("protected", "coup.html"));
     // res.sendFile(path.resolve("protected", `coup.html?game=${req.query.game}`));

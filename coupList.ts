@@ -1,5 +1,5 @@
 import { Game, GameSave2 } from "./coupGame";
-import pfs from "fs/promises";
+import fs from "fs";
 import { io } from "./socketIO/socketIOManager";
 import { logger } from "./logger";
 import path from "path";
@@ -22,9 +22,9 @@ export function createCoupGame(
   );
 }
 
-export async function loadCoupGame(gameId: string) {
+export function loadCoupGame(gameId: string) {
   try {
-    const contents = await pfs.readFile(`coupSave/${gameId}.json`);
+    const contents = fs.readFileSync(`coupSave/${gameId}.json`);
     const save: GameSave2 = JSON.parse(contents.toString());
     gameList.set(gameId, new Game(save.name, gameId, io, { save2: save }));
     logger.info(`${filename} - Game Loaded id: ${gameId}`);
@@ -39,10 +39,10 @@ export function deleteCoupGame(gameId: string) {
   logger.info(`${filename} - Game delete id: ${gameId}`);
 }
 
-export async function getGameById(gameId: string): Promise<Game> {
-  logger.debug(`${filename} - in getGameById`);
+export function getGameById(gameId: string): Game {
+  logger.debug(`${filename} - In getGameById`);
   if (!gameList.has(gameId)) {
-    await loadCoupGame(gameId);
+    loadCoupGame(gameId);
   }
   return gameList.get(gameId);
 }

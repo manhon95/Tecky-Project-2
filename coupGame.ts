@@ -1,7 +1,7 @@
 import { Player, PlayerSave } from "./coupPlayer";
 import { Server } from "socket.io";
 import { updateWinner } from "./utils/matchDb";
-import pfs from "fs/promises";
+import fs from "fs";
 import { logger } from "./logger";
 import path from "path";
 
@@ -300,7 +300,6 @@ export class Game {
     } else {
       msg = this.state;
       arg = { userId: this.inGamePlayerList[this.activePlayerIndex].userId };
-      this.io.emit(this.state, {});
     }
     logger.info(
       `${filename} - Sending game ${
@@ -317,7 +316,7 @@ export class Game {
     return this.inGamePlayerList.length == 1;
   }
 
-  async save(): Promise<void> {
+  save(): void {
     if (this.save1Enable) {
       const gameSave: GameSave = {
         name: this.name,
@@ -364,21 +363,24 @@ export class Game {
           : undefined,
       };
       try {
-        await pfs.access("coupSave");
+        fs.accessSync("coupSave");
       } catch (e) {
-        pfs.mkdir("coupSave");
+        fs.mkdirSync("coupSave");
       }
-      pfs.writeFile(`coupSave/${this.id}.json`, JSON.stringify(gameSave));
+      fs.writeFileSync(`coupSave/${this.id}.json`, JSON.stringify(gameSave));
     }
   }
 
-  async save2() {
+  save2() {
     try {
-      await pfs.access("coupSave");
+      fs.accessSync("coupSave");
     } catch (e) {
-      pfs.mkdir("coupSave");
+      fs.mkdirSync("coupSave");
     }
-    pfs.writeFile(`coupSave/${this.id}.json`, JSON.stringify(this.save2Buffer));
+    fs.writeFileSync(
+      `coupSave/${this.id}.json`,
+      JSON.stringify(this.save2Buffer)
+    );
   }
 
   transition(arg?: transitionArgument) {
@@ -993,13 +995,8 @@ class Assassinate implements Action {
           this.counteraction?.transition(arg);
         } else if (this.actionValid && this.targetIndex !== null) {
           this.counteraction = null;
-          this.callingGame.io.emit("askCard", {
-            userId: this.callingGame.inGamePlayerList[this.targetIndex].userId,
-            hand: this.callingGame.inGamePlayerList[this.targetIndex].getHand(),
-            faceUp:
-              this.callingGame.inGamePlayerList[this.targetIndex].getFaceUp(),
-          });
           this.state = "effect";
+          this.transition();
         } else {
           this.state = "finish";
           this.callingGame.transition(arg);
@@ -1007,12 +1004,24 @@ class Assassinate implements Action {
         break;
       }
       case "effect": {
-        if (arg && arg.chosenCard && this.targetIndex !== null) {
-          this.callingGame.inGamePlayerList[this.targetIndex].loseInfluence(
-            arg.chosenCard
-          );
-          this.state = "finish";
-          this.callingGame.transition(arg);
+        if (this.targetIndex !== null) {
+          if (arg && arg.chosenCard) {
+            this.callingGame.inGamePlayerList[this.targetIndex].loseInfluence(
+              arg.chosenCard
+            );
+            this.state = "finish";
+            this.callingGame.transition(arg);
+          } else {
+            this.callingGame.io.emit("askCard", {
+              userId:
+                this.callingGame.inGamePlayerList[this.targetIndex].userId,
+              hand: this.callingGame.inGamePlayerList[
+                this.targetIndex
+              ].getHand(),
+              faceUp:
+                this.callingGame.inGamePlayerList[this.targetIndex].getFaceUp(),
+            });
+          }
         }
         break;
       }
@@ -1403,6 +1412,7 @@ class Counteraction implements Action {
     public readonly counteractionPlayerIndex: number,
     saveData?: CounteractionSave
   ) {
+    logger.debug(`${filename} - Counteraction finish`);
     this.id = counteractionMap.get(this.callingAction.id);
     this.state = saveData ? saveData.state : "askChallenge";
     this.askPlayerIndex =
@@ -1482,9 +1492,11 @@ class Counteraction implements Action {
         } else if (this.actionValid) {
           this.callingAction.setActionValid(false);
           this.state = "finish";
+          logger.debug(`${filename} - Counteraction finish`);
           this.callingAction.transition(arg);
         } else {
           this.state = "finish";
+          logger.debug(`${filename} - Counteraction finish`);
           this.callingAction.transition(arg);
         }
         break;
@@ -1507,6 +1519,7 @@ class Challenge {
     public readonly targetIndex: number,
     saveData?: ChallengeSave
   ) {
+    logger.debug(`${filename} - Challenge created`);
     if (saveData) {
       this.state = saveData.state;
     } else {
@@ -1551,6 +1564,7 @@ class Challenge {
           );
           this.callingAction.setActionValid(false);
           this.state = "finish";
+          logger.debug(`${filename} - Challenge finish`);
           this.callingAction.transition(arg);
         } else {
           this.callingGame.io.emit("askCard", {
@@ -1568,6 +1582,7 @@ class Challenge {
             arg.chosenCard
           );
           this.state = "finish";
+          logger.debug(`${filename} - Challenge finish`);
           this.callingAction.transition(arg);
         } else {
           this.callingGame.io.emit("askCard", {

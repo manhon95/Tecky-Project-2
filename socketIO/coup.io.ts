@@ -13,16 +13,16 @@ type GameJson = {
   otherPlayerList: { id: string; balance: number; state: string }[];
 };
 
-export async function addCoupSocketInitEvent(io: socket.Server) {
+export function addCoupSocketInitEvent(io: socket.Server) {
   io.on("connection", (socket) => {
     const req = socket.request as express.Request;
     socket.on("askCoupInit", async (arg) => {
-      logger.debug(`${filename} - On askCoupInit`);
+      logger.debug(`${filename} - In askCoupInit`);
       if (!req.session.user || !req.session.user.id) {
         logger.warn(`${filename} - Unauthorized access`);
         return;
       }
-      const game: Game = await getGameById(arg.game.id);
+      const game: Game = getGameById(arg.game.id);
       if (!game) {
         logger.error(`${filename} - Game not found`);
         return;
@@ -36,6 +36,8 @@ export async function addCoupSocketInitEvent(io: socket.Server) {
       }
       socket.join(game.id);
       game.socketList.push(socket.id);
+      logger.info(`${filename} - Socket ${socket.id} join`);
+      logger.debug(`${filename} - socket list: ${game.socketList}`);
       const gameJson: GameJson = {
         my: {
           id: my.userId,
@@ -45,17 +47,6 @@ export async function addCoupSocketInitEvent(io: socket.Server) {
         },
         otherPlayerList: [],
       };
-      // let i = 0;
-      // for (let player of game.playerList) {
-      //   if (player.userId !== my.userId) {
-      //     gameJson.otherPlayerList[i] = {
-      //       id: player.userId,
-      //       balance: player.getBalance(),
-      //       state: player.getState(),
-      //     };
-      //     i++;
-      //   }
-      // }
 
       gameJson.otherPlayerList = game.playerList
         .map(function (player) {
@@ -86,13 +77,19 @@ function addCoupSocketEvent(
     game.sendState();
   });
   socket.on("answerAction", (arg) => {
-    logger.debug(`${filename} - answerAction from user: ${userId}, arg:${arg}`);
+    logger.debug(
+      `${filename} - answerAction from user: ${userId}, arg:${JSON.stringify(
+        arg
+      )}`
+    );
     game.addTransitionRecord({ from: userId, arg: arg });
     game.transition(arg);
   });
   socket.on("answerCounteraction", (arg) => {
     logger.debug(
-      `${filename} - answerCounteraction from user: ${userId}, arg:${arg}`
+      `${filename} - answerCounteraction from user: ${userId}, arg:${JSON.stringify(
+        arg
+      )}`
     );
     game.addTransitionRecord({
       from: userId,
@@ -102,26 +99,37 @@ function addCoupSocketEvent(
   });
   socket.on("answerChallenge", (arg) => {
     logger.debug(
-      `${filename} - answerChallenge from user: ${userId}, arg:${arg}`
+      `${filename} - answerChallenge from user: ${userId}, arg:${JSON.stringify(
+        arg
+      )}`
     );
     game.addTransitionRecord({ from: userId, arg: arg });
     game.transition(arg);
   });
   socket.on("answerCard", (arg) => {
-    logger.debug(`${filename} - answerCard from user: ${userId}, arg:${arg}`);
+    logger.debug(
+      `${filename} - answerCard from user: ${userId}, arg:${JSON.stringify(
+        arg
+      )}`
+    );
     game.addTransitionRecord({ from: userId, arg: arg });
     game.transition(arg);
   });
   socket.on("answerTarget", (arg) => {
-    logger.debug(`${filename} - answerTarget from user: ${userId}, arg:${arg}`);
+    logger.debug(
+      `${filename} - answerTarget from user: ${userId}, arg:${JSON.stringify(
+        arg
+      )}`
+    );
     game.addTransitionRecord({ from: userId, arg: arg });
     game.transition(arg);
   });
   socket.on("disconnect", () => {
-    game.socketList.filter((socketId) => socketId != socket.id);
-    logger.info(
-      `${filename} - Socket disconnected, socket list: ${game.socketList}`
+    logger.info(`${filename} - Socket ${socket.id} disconnected`);
+    game.socketList = game.socketList.filter(
+      (socketId) => socketId != socket.id
     );
+    logger.debug(`${filename} - socket list: ${game.socketList}`);
     if (game.socketList.length <= 0) {
       deleteCoupGame(game.id);
     }

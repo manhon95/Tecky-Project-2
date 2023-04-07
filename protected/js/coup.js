@@ -1,3 +1,6 @@
+/* --------------------------------- Logger --------------------------------- */
+const logger = log4javascript.getDefaultLogger();
+// const logger = log4javascript.getNullLogger();
 /* -------------------------------- DOM -------------------------------- */
 const income = document.querySelector("#income");
 const foreignAid = document.querySelector("#foreign-aid");
@@ -49,6 +52,7 @@ function init() {
     console.log("init");
     /* --------------------------------- My Info -------------------------------- */
     const myId = game.my.id;
+    logger.info(`My ID: ${myId}, Game ID: ${gameId}`);
     myInfo.id = `player-${myId}`;
     loadCards(game.my.hand, game.my.faceUp);
     myBalance.textContent = game.my.balance;
@@ -93,34 +97,40 @@ function init() {
     });
     socketEventInit(socket, myId);
     /* ------------------------------- finish init ------------------------------ */
+    logger.debug(`Finish init`);
     socket.emit("CoupInitFinished");
   });
 }
 
 function socketEventInit(socket, myId) {
   socket.on("updateBalance", function (arg) {
+    logger.debug(`updateBalance called with ${JSON.stringify(arg)}`);
     document.querySelector(`#player-${arg.userId} #balance`).textContent =
       arg.balance;
   });
 
   socket.on("askAction", function (arg) {
+    logger.debug(`askAction called with ${JSON.stringify(arg)}`);
     actionButton.forEach((button) => {
       button.disabled = !(arg.userId == myId);
     });
   });
 
   socket.on("askCounterAction", function (arg) {
+    logger.debug(`askCounterAction called with ${JSON.stringify(arg)}`);
     counteractionButton.forEach((button) => {
       button.disabled = !(arg.userId == myId);
     });
   });
   socket.on("askChallenge", function (arg) {
+    logger.debug(`askChallenge called with ${JSON.stringify(arg)}`);
     challengeButton.forEach((button) => {
       button.disabled = !(arg.userId == myId);
     });
   });
 
   socket.on("askCard", function (arg) {
+    logger.debug(`askCard called with ${JSON.stringify(arg)}`);
     if (arg.userId == myId) {
       chooseCards = true;
       loadCards(arg.hand, arg.faceUp);
@@ -128,6 +138,7 @@ function socketEventInit(socket, myId) {
   });
 
   socket.on("askTarget", function (arg) {
+    logger.debug(`askTarget called with ${JSON.stringify(arg)}`);
     chooseTargets = arg.userId == myId;
     document.querySelectorAll(`.other`).forEach((player) => {
       changePlayerStyle(player);
@@ -135,18 +146,21 @@ function socketEventInit(socket, myId) {
   });
 
   socket.on("updateCard", function (arg) {
+    logger.debug(`updateCard called with ${JSON.stringify(arg)}`);
     if (arg.userId == myId) {
       loadCards(arg.hand, arg.faceUp);
     }
   });
 
   socket.on("outGame", function (arg) {
+    logger.debug(`outGame called with ${JSON.stringify(arg)}`);
     let node = document.querySelector(`#player-${arg.userId}`);
     node.setAttribute("state", "outGame");
     changePlayerStyle(node);
   });
 
   socket.on("loseInfluence", function (arg) {
+    logger.debug(`loseInfluence called with ${JSON.stringify(arg)}`);
     if (arg.userId == myId) {
       document
         .querySelector(`[cardNo = "${arg.chosenCard}"]`)
@@ -166,9 +180,11 @@ function socketEventInit(socket, myId) {
   });
 
   socket.on("message", function (arg) {
+    logger.debug(`message called with ${JSON.stringify(arg)}`);
     msgBox.innerHTML += arg;
   });
   socket.on("finish", function (arg) {
+    logger.debug(`finish called with ${JSON.stringify(arg)}`);
     msgBox.innerHTML += `User ${arg.userId} Win<br>`;
     location.href = `/user/room?room=${arg.gameName}`;
   });
