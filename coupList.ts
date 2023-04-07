@@ -1,4 +1,4 @@
-import { Game, GameSave } from "./coupGame";
+import { Game, GameSave2 } from "./coupGame";
 import pfs from "fs/promises";
 import { io } from "./socketIO/socketIOManager";
 import { logger } from "./logger";
@@ -25,8 +25,8 @@ export function createCoupGame(
 export async function loadCoupGame(gameId: string) {
   try {
     const contents = await pfs.readFile(`coupSave/${gameId}.json`);
-    const save: GameSave = JSON.parse(contents.toString());
-    gameList.set(gameId, new Game(save.name, gameId, io, { save: save }));
+    const save: GameSave2 = JSON.parse(contents.toString());
+    gameList.set(gameId, new Game(save.name, gameId, io, { save2: save }));
     logger.info(`${filename} - Game Loaded id: ${gameId}`);
   } catch (e) {
     logger.warn(`${filename} - Game save file error: ${e}`);

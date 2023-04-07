@@ -80,36 +80,48 @@ function addCoupSocketEvent(
   const userId = req.session.user?.id;
   if (!userId) {
     logger.warn(`${filename} - userId not found`);
+    return;
   }
   socket.on("CoupInitFinished", () => {
     game.sendState();
   });
   socket.on("answerAction", (arg) => {
     logger.debug(`${filename} - answerAction from user: ${userId}, arg:${arg}`);
+    game.addTransitionRecord({ from: userId, arg: arg });
     game.transition(arg);
   });
   socket.on("answerCounteraction", (arg) => {
     logger.debug(
       `${filename} - answerCounteraction from user: ${userId}, arg:${arg}`
     );
+    game.addTransitionRecord({
+      from: userId,
+      arg: arg,
+    });
     game.transition(arg);
   });
   socket.on("answerChallenge", (arg) => {
     logger.debug(
       `${filename} - answerChallenge from user: ${userId}, arg:${arg}`
     );
+    game.addTransitionRecord({ from: userId, arg: arg });
     game.transition(arg);
   });
   socket.on("answerCard", (arg) => {
     logger.debug(`${filename} - answerCard from user: ${userId}, arg:${arg}`);
+    game.addTransitionRecord({ from: userId, arg: arg });
     game.transition(arg);
   });
   socket.on("answerTarget", (arg) => {
     logger.debug(`${filename} - answerTarget from user: ${userId}, arg:${arg}`);
+    game.addTransitionRecord({ from: userId, arg: arg });
     game.transition(arg);
   });
   socket.on("disconnect", () => {
     game.socketList.filter((socketId) => socketId != socket.id);
+    logger.info(
+      `${filename} - Socket disconnected, socket list: ${game.socketList}`
+    );
     if (game.socketList.length <= 0) {
       deleteCoupGame(game.id);
     }
