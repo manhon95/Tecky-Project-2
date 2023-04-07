@@ -128,7 +128,7 @@ export class Game {
       for (let index in this.save2Buffer.transitionRecords) {
         const transition = this.save2Buffer.transitionRecords[index];
         logger.info(
-          `${filename} - Loading transition record${index}: {from:${
+          `${filename} - Loading transition record ${index}: {from:${
             transition.from
           }, arg:${JSON.stringify(transition.arg)}`
         );
@@ -251,6 +251,8 @@ export class Game {
   }
 
   sendState() {
+    let msg: string;
+    let arg;
     if (this.action) {
       if (this.action.challenge) {
         const challengeState = this.action.challenge.getState();
@@ -258,11 +260,12 @@ export class Game {
           challengeState == "targetLoseInfluence"
             ? this.inGamePlayerList[this.action.challenge.targetIndex]
             : this.inGamePlayerList[this.action.challenge.challengerIndex];
-        this.io.emit("askCard", {
+        msg = "askCard";
+        arg = {
           userId: currentPlayer.userId,
           hand: currentPlayer.getHand(),
           faceUp: currentPlayer.getFaceUp(),
-        });
+        };
       } else if (this.action.counteraction) {
         if (this.action.counteraction.challenge) {
           const challengeState = this.action.counteraction.challenge.getState();
@@ -274,28 +277,37 @@ export class Game {
               : this.inGamePlayerList[
                   this.action.counteraction.challenge.challengerIndex
                 ];
-          this.io.emit("askCard", {
+          msg = "askCard";
+          arg = {
             userId: currentPlayer.userId,
             hand: currentPlayer.getHand(),
             faceUp: currentPlayer.getFaceUp(),
-          });
+          };
         } else {
-          this.io.emit(this.action.counteraction.getState(), {
+          msg = this.action.counteraction.getState();
+          arg = {
             userId: this.action.counteraction.getAskPlayerIndex(),
-          });
+          };
         }
       } else {
-        this.io.emit(this.action.getState(), {
+        msg = this.action.getState();
+        arg = {
           userId: this.action.getAskPlayerIndex
             ? this.action.getAskPlayerIndex()
             : undefined,
-        });
+        };
       }
     } else {
-      this.io.emit(this.state, {
-        userId: this.inGamePlayerList[this.activePlayerIndex].userId,
-      });
+      msg = this.state;
+      arg = { userId: this.inGamePlayerList[this.activePlayerIndex].userId };
+      this.io.emit(this.state, {});
     }
+    logger.info(
+      `${filename} - Sending game ${
+        this.id
+      } state msg: ${msg} arg: ${JSON.stringify(arg)}`
+    );
+    this.io.emit(msg, arg);
   }
 
   checkVictory(): boolean {
