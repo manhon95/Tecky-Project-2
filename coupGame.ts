@@ -2,6 +2,10 @@ import { Player, PlayerSave } from "./coupPlayer";
 import { Server } from "socket.io";
 import { updateWinner } from "./utils/matchDb";
 import pfs from "fs/promises";
+import { logger } from "./logger";
+import path from "path";
+
+const filename = path.basename(__filename);
 
 // card mapping
 // ambassador 1,2,3
@@ -47,6 +51,7 @@ type transitionArgument = {
 export type GameSave = {
   name: string;
   state: string;
+  deck: number[];
   activePlayerIndex: number;
   playerList: PlayerSave[];
   action?: ActionSave;
@@ -69,19 +74,32 @@ type ChallengeSave = {
   state: string;
 };
 
+export type GameSave2 = {
+  name: string;
+  playerIdList: string[];
+  startingDeck: number[];
+  transitionRecords: TransitionSave[];
+  shuffleRecords: number[][];
+};
+
+type TransitionSave = {
+  from: string;
+  arg: transitionArgument;
+};
+
 /* ---------------------------------- Game ---------------------------------- */
 export class Game {
-  //create randomize deck
-  private deck: number[] = this.shuffle([
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-  ]);
+  private save1Enable = false;
   private state = "askAction";
+  private deck: number[];
   private activePlayerIndex: number = 0;
   public readonly playerList: Player[];
   public inGamePlayerList: Player[];
   private action: Action | null = null;
   public readonly io: any; //TODO any to specific type
   public socketList: string[] = [];
+  private readonly save2Buffer?: GameSave2;
+  private deckShuffleCount = 0;
   constructor(
     public readonly name: string,
     public readonly id: string,
@@ -89,12 +107,36 @@ export class Game {
     loadData: {
       playerIdList?: string[];
       save?: GameSave;
+      save2?: GameSave2;
     }
   ) {
     //create gameRoom Io socket
     this.io = io.to(this.id);
-    if (loadData.save) {
+    if (loadData.save2) {
+      this.save2Buffer = loadData.save2;
+      this.deck = this.save2Buffer.startingDeck;
+      //create player list from user id list
+      this.playerList = this.save2Buffer.playerIdList.map(
+        (playerId) => new Player(playerId, this)
+      );
+      this.inGamePlayerList = this.playerList.filter(
+        (player) => player.getState() === "inGame"
+      );
+      // this.save2Buffer.transitionRecords.forEach((transition) =>
+      //   this.transition(transition.arg)
+      // );
+      for (let index in this.save2Buffer.transitionRecords) {
+        const transition = this.save2Buffer.transitionRecords[index];
+        logger.info(
+          `${filename} - Loading transition record ${index}: {from:${
+            transition.from
+          }, arg:${JSON.stringify(transition.arg)}`
+        );
+        this.transition(transition.arg);
+      }
+    } else if (loadData.save) {
       const gameSave = loadData.save;
+      this.deck = gameSave.deck;
       this.state = gameSave.state;
       this.activePlayerIndex = gameSave.activePlayerIndex;
       //load player from save
@@ -126,13 +168,24 @@ export class Game {
           : null;
       }
     } else if (loadData.playerIdList) {
+      this.save2Buffer = {
+        name: this.name,
+        playerIdList: this.shuffle(loadData.playerIdList),
+        startingDeck: this.shuffle([
+          1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+        ]),
+        transitionRecords: [],
+        shuffleRecords: [],
+      };
+      this.deck = [...this.save2Buffer.startingDeck];
+
       //create player list from user id list
-      this.playerList = loadData.playerIdList.map(
+      this.playerList = this.save2Buffer.playerIdList.map(
         (playerId) => new Player(playerId, this)
       );
-      //randomize player list
-      this.inGamePlayerList = this.shuffle(this.playerList);
-      this.save();
+      this.inGamePlayerList = this.playerList;
+      //this.save;
+      this.save2();
     } else {
       throw new Error("no load data for new coup");
     }
@@ -160,6 +213,25 @@ export class Game {
     this.deck = this.shuffle(this.deck);
   }
 
+  addTransitionRecord(record: TransitionSave) {
+    this.save2Buffer?.transitionRecords.push(record);
+    this.save2();
+  }
+
+  shuffleDeck() {
+    let shuffledDeck = this.shuffle(this.deck);
+    if (this.save2Buffer) {
+      if (this.deckShuffleCount > this.save2Buffer.shuffleRecords.length - 1) {
+        this.save2Buffer.shuffleRecords.push(shuffledDeck);
+        this.save2();
+      } else {
+        shuffledDeck = this.save2Buffer.shuffleRecords[this.deckShuffleCount];
+        this.deckShuffleCount++;
+      }
+    }
+    return shuffledDeck;
+  }
+
   shuffle<T>(array: T[]): T[] {
     var m = array.length,
       t,
@@ -179,10 +251,63 @@ export class Game {
   }
 
   sendState() {
-    //TODO: finish this
-    this.io.emit(this.state, {
-      userId: this.inGamePlayerList[this.activePlayerIndex].userId,
-    });
+    let msg: string;
+    let arg;
+    if (this.action) {
+      if (this.action.challenge) {
+        const challengeState = this.action.challenge.getState();
+        const currentPlayer =
+          challengeState == "targetLoseInfluence"
+            ? this.inGamePlayerList[this.action.challenge.targetIndex]
+            : this.inGamePlayerList[this.action.challenge.challengerIndex];
+        msg = "askCard";
+        arg = {
+          userId: currentPlayer.userId,
+          hand: currentPlayer.getHand(),
+          faceUp: currentPlayer.getFaceUp(),
+        };
+      } else if (this.action.counteraction) {
+        if (this.action.counteraction.challenge) {
+          const challengeState = this.action.counteraction.challenge.getState();
+          const currentPlayer =
+            challengeState == "targetLoseInfluence"
+              ? this.inGamePlayerList[
+                  this.action.counteraction.challenge.targetIndex
+                ]
+              : this.inGamePlayerList[
+                  this.action.counteraction.challenge.challengerIndex
+                ];
+          msg = "askCard";
+          arg = {
+            userId: currentPlayer.userId,
+            hand: currentPlayer.getHand(),
+            faceUp: currentPlayer.getFaceUp(),
+          };
+        } else {
+          msg = this.action.counteraction.getState();
+          arg = {
+            userId: this.action.counteraction.getAskPlayerIndex(),
+          };
+        }
+      } else {
+        msg = this.action.getState();
+        arg = {
+          userId: this.action.getAskPlayerIndex
+            ? this.action.getAskPlayerIndex()
+            : undefined,
+        };
+      }
+    } else {
+      msg = this.state;
+      arg = { userId: this.inGamePlayerList[this.activePlayerIndex].userId };
+      this.io.emit(this.state, {});
+    }
+    logger.info(
+      `${filename} - Sending game ${
+        this.id
+      } state msg: ${msg} arg: ${JSON.stringify(arg)}`
+    );
+    this.io.emit(msg, arg);
   }
 
   checkVictory(): boolean {
@@ -193,54 +318,67 @@ export class Game {
   }
 
   async save(): Promise<void> {
-    const gameSave: GameSave = {
-      name: this.name,
-      state: this.state,
-      activePlayerIndex: this.activePlayerIndex,
-      playerList: this.playerList.map(function (player) {
-        return {
-          userId: player.userId,
-          state: player.getState(),
-          hand: player.getHand(),
-          faceUp: player.getFaceUp(),
-          balance: player.getBalance(),
-        };
-      }),
-      action: this.action
-        ? {
-            id: this.action.id,
-            state: this.action.getState(),
-            askPlayerIndex: this.action.getAskPlayerIndex
-              ? this.action.getAskPlayerIndex()
-              : undefined,
-            counteraction: this.action.counteraction
-              ? {
-                  state: this.action.counteraction.getState(),
-                  askPlayerIndex: this.action.counteraction.getAskPlayerIndex(),
-                  challenge: this.action.counteraction.challenge
-                    ? {
-                        state: this.action.counteraction.challenge.getState(),
-                      }
-                    : undefined,
-                }
-              : undefined,
-            challenge: this.action.challenge
-              ? {
-                  state: this.action.challenge.getState(),
-                }
-              : undefined,
-            targetIndex: this.action.targetIndex
-              ? this.action.targetIndex
-              : undefined,
-          }
-        : undefined,
-    };
+    if (this.save1Enable) {
+      const gameSave: GameSave = {
+        name: this.name,
+        state: this.state,
+        deck: this.deck,
+        activePlayerIndex: this.activePlayerIndex,
+        playerList: this.playerList.map(function (player) {
+          return {
+            userId: player.userId,
+            state: player.getState(),
+            hand: player.getHand(),
+            faceUp: player.getFaceUp(),
+            balance: player.getBalance(),
+          };
+        }),
+        action: this.action
+          ? {
+              id: this.action.id,
+              state: this.action.getState(),
+              askPlayerIndex: this.action.getAskPlayerIndex
+                ? this.action.getAskPlayerIndex()
+                : undefined,
+              counteraction: this.action.counteraction
+                ? {
+                    state: this.action.counteraction.getState(),
+                    askPlayerIndex:
+                      this.action.counteraction.getAskPlayerIndex(),
+                    challenge: this.action.counteraction.challenge
+                      ? {
+                          state: this.action.counteraction.challenge.getState(),
+                        }
+                      : undefined,
+                  }
+                : undefined,
+              challenge: this.action.challenge
+                ? {
+                    state: this.action.challenge.getState(),
+                  }
+                : undefined,
+              targetIndex: this.action.targetIndex
+                ? this.action.targetIndex
+                : undefined,
+            }
+          : undefined,
+      };
+      try {
+        await pfs.access("coupSave");
+      } catch (e) {
+        pfs.mkdir("coupSave");
+      }
+      pfs.writeFile(`coupSave/${this.id}.json`, JSON.stringify(gameSave));
+    }
+  }
+
+  async save2() {
     try {
       await pfs.access("coupSave");
     } catch (e) {
       pfs.mkdir("coupSave");
     }
-    pfs.writeFile(`coupSave/${this.id}.json`, JSON.stringify(gameSave));
+    pfs.writeFile(`coupSave/${this.id}.json`, JSON.stringify(this.save2Buffer));
   }
 
   transition(arg?: transitionArgument) {
@@ -452,7 +590,7 @@ class ForeignAid implements Action {
             ) {
               this.state = "effect";
               this.transition();
-              break;
+              return;
             }
           }
           this.callingGame.io.emit("askCounterAction", {
@@ -469,6 +607,7 @@ class ForeignAid implements Action {
         if (this.counteraction?.getState() !== "finish") {
           this.counteraction?.transition(arg);
         } else if (this.actionValid) {
+          this.counteraction = null;
           this.state = "effect";
           this.transition();
         } else {
@@ -547,7 +686,7 @@ class Coup implements Action {
         break;
       }
       case "effect": {
-        if (arg && arg.chosenCard && this.targetIndex) {
+        if (arg && arg.chosenCard && this.targetIndex !== null) {
           this.callingGame.inGamePlayerList[this.targetIndex].loseInfluence(
             arg.chosenCard
           );
@@ -629,7 +768,7 @@ class Tax implements Action {
             ) {
               this.state = "effect";
               this.transition();
-              break;
+              return;
             }
           }
           this.callingGame.io.emit("askChallenge", {
@@ -646,6 +785,7 @@ class Tax implements Action {
         if (this.challenge?.getState() !== "finish") {
           this.challenge?.transition(arg);
         } else if (this.actionValid) {
+          this.challenge = null;
           this.state = "effect";
           this.transition();
         } else {
@@ -772,7 +912,7 @@ class Assassinate implements Action {
               this.askPlayerIndex = -1;
               this.state = "askCounterAction";
               this.transition();
-              break;
+              return;
             }
           }
           this.callingGame.io.emit("askChallenge", {
@@ -793,6 +933,7 @@ class Assassinate implements Action {
         if (this.challenge?.getState() !== "finish") {
           this.challenge?.transition(arg);
         } else if (this.actionValid) {
+          this.challenge = null;
           this.callingGame.inGamePlayerList[
             this.activePlayerIndex
           ].lowerBalance(3);
@@ -830,42 +971,28 @@ class Assassinate implements Action {
             if (
               this.askPlayerIndex ===
                 this.callingGame.inGamePlayerList.length &&
-              this.targetIndex
+              this.targetIndex !== null
             ) {
-              this.callingGame.io.emit("askCard", {
-                userId:
-                  this.callingGame.inGamePlayerList[this.targetIndex].userId,
-                hand: this.callingGame.inGamePlayerList[
-                  this.targetIndex
-                ].getHand(),
-                faceUp:
-                  this.callingGame.inGamePlayerList[
-                    this.targetIndex
-                  ].getFaceUp(),
-              });
               this.state = "effect";
-              break;
+              this.transition();
+              return;
             }
           }
           this.callingGame.io.emit("askCounterAction", {
             userId:
               this.callingGame.inGamePlayerList[this.askPlayerIndex].userId,
           });
-        } else if (this.targetIndex) {
-          this.callingGame.io.emit("askCard", {
-            userId: this.callingGame.inGamePlayerList[this.targetIndex].userId,
-            hand: this.callingGame.inGamePlayerList[this.targetIndex].getHand(),
-            faceUp:
-              this.callingGame.inGamePlayerList[this.targetIndex].getFaceUp(),
-          });
+        } else if (this.targetIndex !== null) {
           this.state = "effect";
+          this.transition();
         }
         break;
       }
       case "resolveCounterAction": {
         if (this.counteraction?.getState() !== "finish") {
           this.counteraction?.transition(arg);
-        } else if (this.actionValid && this.targetIndex) {
+        } else if (this.actionValid && this.targetIndex !== null) {
+          this.counteraction = null;
           this.callingGame.io.emit("askCard", {
             userId: this.callingGame.inGamePlayerList[this.targetIndex].userId,
             hand: this.callingGame.inGamePlayerList[this.targetIndex].getHand(),
@@ -880,7 +1007,7 @@ class Assassinate implements Action {
         break;
       }
       case "effect": {
-        if (arg && arg.chosenCard && this.targetIndex) {
+        if (arg && arg.chosenCard && this.targetIndex !== null) {
           this.callingGame.inGamePlayerList[this.targetIndex].loseInfluence(
             arg.chosenCard
           );
@@ -966,7 +1093,7 @@ class Exchange implements Action {
             ) {
               this.state = "effect";
               this.transition();
-              break;
+              return;
             }
           }
           this.callingGame.io.emit("askChallenge", {
@@ -983,6 +1110,7 @@ class Exchange implements Action {
         if (this.challenge?.getState() !== "finish") {
           this.challenge?.transition(arg);
         } else if (this.actionValid) {
+          this.challenge = null;
           this.state = "effect";
           this.transition();
         } else {
@@ -1150,7 +1278,7 @@ class Steal implements Action {
               this.askPlayerIndex = -1;
               this.state = "askCounterAction";
               this.transition();
-              break;
+              return;
             }
           }
           this.callingGame.io.emit("askChallenge", {
@@ -1168,6 +1296,7 @@ class Steal implements Action {
         if (this.challenge?.getState() !== "finish") {
           this.challenge?.transition(arg);
         } else if (this.actionValid) {
+          this.challenge = null;
           this.askPlayerIndex = -1;
           this.state = "askCounterAction";
           this.transition();
@@ -1204,7 +1333,7 @@ class Steal implements Action {
             ) {
               this.state = "effect";
               this.transition();
-              break;
+              return;
             }
           }
           this.callingGame.io.emit("askCounterAction", {
@@ -1221,6 +1350,7 @@ class Steal implements Action {
         if (this.counteraction?.getState() !== "finish") {
           this.counteraction?.transition(arg);
         } else if (this.actionValid) {
+          this.counteraction = null;
           this.state = "effect";
           this.transition();
         } else {
@@ -1230,7 +1360,7 @@ class Steal implements Action {
         break;
       }
       case "effect": {
-        if (this.targetIndex) {
+        if (this.targetIndex !== null) {
           const targetBalance =
             this.callingGame.inGamePlayerList[this.targetIndex].getBalance();
           if (targetBalance < 2) {
@@ -1400,6 +1530,7 @@ class Challenge {
         this.callingGame.inGamePlayerList[this.targetIndex].discardHand(
           matchCardId
         );
+        this.callingGame.shuffleDeck();
         this.callingGame.inGamePlayerList[this.targetIndex].addHand(
           this.callingGame.drawCard(1)
         );
@@ -1457,6 +1588,5 @@ class Challenge {
         throw new Error("State: " + this.state + " not supported");
       }
     }
-    this.callingGame.save();
   }
 }
