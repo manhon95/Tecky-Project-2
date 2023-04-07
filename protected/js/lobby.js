@@ -62,15 +62,6 @@ newRoomName.addEventListener("keypress", (event) => {
   }
 });
 
-//Log out function
-document
-  .querySelector(".logOutButton")
-  .addEventListener("click", async function () {
-    const res = await fetch("/login/logout", {
-      method: "post",
-    });
-    location.href = "/login";
-  });
 
 //debug msg to see if I can room capacity
 
