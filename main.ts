@@ -1,7 +1,5 @@
 import express, { NextFunction, Request, Response } from "express";
-
 import { print } from "listening-on";
-
 import http from "http";
 import { addMiddleware } from "./middleware";
 import { initSocketServer, io } from "./socketIO/socketIOManager";
@@ -17,6 +15,7 @@ import { commonRoutes } from "./routes/common.routes";
 import { profileRoutes } from "./routes/profile.routes";
 import { socialRoutes } from "./routes/social.routes";
 import { verifyRoutes } from "./routes/verify.routes";
+import { coupRoutes } from "./routes/coup.route";
 
 const app = express();
 const server = http.createServer(app);
@@ -55,7 +54,8 @@ app.use(profileRoutes);
 app.use(roomRoutes);
 app.use(socialRoutes);
 app.use(shopRoutes);
-app.use(verifyRoutes)
+app.use(verifyRoutes);
+app.use(coupRoutes);
 
 app.use(checkLoginToLobby);
 

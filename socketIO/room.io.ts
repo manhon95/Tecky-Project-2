@@ -13,6 +13,10 @@ import {
 import { createCoupGame } from "../coupList";
 import { createGameInDB } from "../utils/matchDb";
 import { begin, commit, rollback } from "../db";
+import { logger } from "../logger";
+import path from "path";
+
+const filename = path.basename(__filename);
 
 export function addRoomSocketInitEvent(io: socket.Server) {
   io.on("connection", (socket) => {
@@ -20,6 +24,10 @@ export function addRoomSocketInitEvent(io: socket.Server) {
     socket.on("askRoomInit", ({ username, room, myId }) => {
       let rid = rooms.findIndex((rmName) => rmName.name == room);
       // if room.playing == true, set it back to false(people returning to lobby)
+      if (!rooms[rid]) {
+        logger.warn(`${filename} - Unauthorized access`);
+        return;
+      }
       if (rooms[rid].playing) {
         rooms[rid].playing = false;
       }
@@ -95,7 +103,7 @@ function addRoomSocketEvent(socket: socket.Socket, io: socket.Server) {
               begin();
               try {
                 const gameId = await createGameInDB(gameName, roomPlayerList);
-                createCoupGame(gameName, gameId, roomPlayerList, io);
+                createCoupGame(gameName, gameId, roomPlayerList);
                 if (player) {
                   let playerRoom = player.room;
                   let roomIdx = rooms.findIndex(

@@ -80,7 +80,7 @@ io.on("connection", (socket) => {
     let gameName = "1";
     let gameId = "1";
     /* -------------------------------- important ------------------------------- */
-    createCoupGame(gameName, gameId, roomPlayerList, io);
+    createCoupGame(gameName, gameId, roomPlayerList);
     /* ----------------------------------- end ---------------------------------- */
     //game.playerList[0].setSocket(socket);
     io.emit("gameCreated", { game: { id: gameId } });

@@ -1,4 +1,7 @@
 import winston from "winston";
+import path from "path";
+
+const filename = path.basename(__filename);
 
 const { combine, colorize, simple } = winston.format;
 
@@ -18,4 +21,4 @@ export const logger = winston.createLogger({
   transports: [new winston.transports.Console()],
 });
 
-logger.info(`Logger started at level: ${loggerLevel}`);
+logger.info(`${filename} - Logger started at level: ${loggerLevel}`);

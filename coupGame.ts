@@ -81,7 +81,7 @@ export class Game {
   public inGamePlayerList: Player[];
   private action: Action | null = null;
   public readonly io: any; //TODO any to specific type
-
+  public socketList: string[] = [];
   constructor(
     public readonly name: string,
     public readonly id: string,
