@@ -75,7 +75,7 @@ async function loadProfile() {
   const result = await res.json();
   userId.textContent = result.profile.id;
   userName.textContent = result.profile.user_name;
-  userBirthday.textContent = result.profile.birthday;
+  // userBirthday.textContent = result.profile.birthday;
   userElo.textContent = result.profile.elo;
   return result;
 }

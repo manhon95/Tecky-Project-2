@@ -2,7 +2,7 @@ document.querySelector("#submitForm").addEventListener("submit", async function 
     event.preventDefault();
     const form = event.target;
 
-    const res = await fetch("/verify", {
+    const res = await fetch("/forgetPasswordVerify", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -10,8 +10,8 @@ document.querySelector("#submitForm").addEventListener("submit", async function 
       body: JSON.stringify({code: form.verificationCode.value}),
     });
     const result = await res.json()
-    if(result.verify){
-        location.href = "/user/lobby"
+    if(result.pass){
+        location.href = "/forgetPasswordChangePassword.html"
     }else{
     document.querySelector("#message").textContent = result.message;
     }

@@ -1,15 +1,24 @@
 /* -------------------------------- Utilities ------------------------------- */
+body{
+   min-width: 700px;
+}
 table {
   margin-top: 1rem;
-  width: 80%;
+  width: 90%;
+  border: solid 3px var(--button-boarder);
 }
+
+th{
+
+}
+
 .tableAlign{
     display: flex;
     justify-content: center;
 }
 
 table,th,td {
-  border: 1px solid black;
+  /* border: 1px solid black; */
   text-align: center;
 }
 
@@ -47,6 +56,9 @@ display: inline-block;
 
 }
 
+.containerBG{
+    background: var(--container-BG);
+}
 
 .containerRight{
     width: calc(50% - 5px);
@@ -62,6 +74,8 @@ display: inline-block;
 /* ------------------------------ user details ------------------------------ */
 .profilePictureOuter{
     border: solid 2px #3a5577;
+    border-radius: 8px;
+    overflow: hidden;
 }
 .font25{
     font-size: 25px;
@@ -74,15 +88,59 @@ display: inline-block;
     justify-content: center;
     align-items: center;
 }
+
 .profilContainerInnerLeft{
     height: 200px;
     padding: 20px 20px 10px 20px;
 }
 
+.profilContainerInnerRight{
+    width: 100%;
+}
+
+input[type="submit"]{
+    padding: 5px;
+    background: #265499;
+    color: aliceblue;
+    border: solid 2px var(--button-boarder);
+    border-left: solid 1px var(--light-color);
+    border-radius: 0px 8px 8px 0px;
+    font-size: 15px;
+}
+
+#changeName{
+    height: 34px;
+}
+.custom-file-upload {
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 6px;
+    cursor: pointer;
+    background: #265499;
+    color: aliceblue;
+    border: solid 2px var(--button-boarder);
+    border-right: solid 1px var(--light-color);
+    border-radius: 8px 0px 0px 8px;
+    font-size: 15px;
+}
+
+button{
+    padding: 5px;
+    background: #265499;
+    color: aliceblue;
+    border: solid 2px var(--button-boarder);
+    border-radius: 5px;
+    font-size: 15px;
+
+}
+
+.profilePic[type="file"] {
+    display: none;
+}
+
 #profilePicture{
     width: 150px;
-    height: 80% ;
-
+    height: 80%;
 }
 
 /* ----------------------------- bedgeCollection ---------------------------- */
@@ -90,20 +148,33 @@ display: inline-block;
     width: 200px;
 }
 
+h1{
+    font-size: 35px;
+    text-align: center;
+}
 .bedgeCollection{
     width: 100%;
 }
 .badgeContainer{
     margin-top: 10px;
     border: solid 2px #3a5577;
+    border-radius: 8px;
+    overflow: hidden;
+
     }
     
 /* ------------------------------ Match History ----------------------------- */
 .matchHistoryContainer{
     border: solid 2px #3a5577;
 height: 100%;
+border-radius: 8px;
+overflow: hidden;
 }
 
+#winRate{
+    font-size: 20px;
+    font-weight: bolder;
+}
 /* --------------------------- small screen layout -------------------------- */
 @media screen and (max-width: 901px){
     .containerLeft{

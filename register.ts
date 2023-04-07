@@ -66,7 +66,7 @@ export async function saveUserDetails(req: Request, res: Response) {
     report["email"] = false;
   }
   if (checkStatus) {
-    const verificationCode = String(await sendEmailVerificationCode(email));
+    const verificationCode = String("1234") //await sendEmailVerificationCode(email));
     const newPassword = await hashPassword(password);
     //save email, userName, password,elo into database
     await database.query(
@@ -81,11 +81,7 @@ export async function saveUserDetails(req: Request, res: Response) {
     report["success"] = "success";
     console.log(verificationCode);
     req.session.verificationCode = verificationCode;
-    req.session.user = {
-      id: id.rows[0].id,
-      username: userName,
-      profilePic: null,
-    };
+    req.session.email = email
     req.session.save();
   } else {
     res.status(400);
