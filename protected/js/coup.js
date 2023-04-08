@@ -1,6 +1,6 @@
 /* --------------------------------- Logger --------------------------------- */
-// const logger = log4javascript.getDefaultLogger();
-const logger = log4javascript.getNullLogger();
+const logger = log4javascript.getDefaultLogger();
+//const logger = log4javascript.getNullLogger();
 /* -------------------------------- DOM -------------------------------- */
 const income = document.querySelector("#income");
 const foreignAid = document.querySelector("#foreign-aid");
@@ -11,7 +11,8 @@ const exchange = document.querySelector("#exchange");
 const steal = document.querySelector("#steal");
 const playersInfoBoard = document.querySelector("#players-info-board");
 const playerNode = document.querySelector("#players-1");
-const msgBox = document.querySelector("#message-box");
+const actionRecordBoard = document.querySelector("#record-board");
+const actionRecordNode = document.querySelector(".action-record");
 const myCardBoard = document.querySelector("#my #card-board");
 const myBalance = document.querySelector(`#my #balance`);
 const CardNode = document.querySelector(`#my .card`);
@@ -36,11 +37,38 @@ const cardPathMap = [
   "/img/contessa.jpg",
   "/img/duke.jpg",
 ];
+const userIdNameMap = {};
+const cardIdNameMap = {
+  1: "Ambassador",
+  2: "Ambassador",
+  3: "Ambassador",
+  4: "Assassin",
+  5: "Assassin",
+  6: "Assassin",
+  7: "Captain",
+  8: "Captain",
+  9: "Captain",
+  10: "Contessa",
+  11: "Contessa",
+  12: "Contessa",
+  13: "Duke",
+  14: "Duke",
+};
+const actionNameMap = {
+  income: "Income",
+  "foreign-aid": "Foreign Aid",
+  coup: "Coup",
+  tax: "Tax",
+  assassinate: "Assassinate",
+  exchange: "Exchange",
+  steal: "Steal",
+};
 const counteractionButtonResponse = { counter: true, "no-counter": false };
 const challengeButtonResponse = {
   challenge: true,
   "no-challenge": false,
 };
+let myId;
 let chooseCards = false;
 let chooseTargets = false;
 
@@ -49,9 +77,9 @@ init();
 function init() {
   socket.emit("askCoupInit", { game: { id: gameId } });
   socket.on("ansCoupInit", function (game) {
-    console.log("init");
     /* --------------------------------- My Info -------------------------------- */
-    const myId = game.my.id;
+    myId = game.my.id;
+    userIdNameMap[game.my.id] = game.my.name;
     logger.info(`My ID: ${myId}, Game ID: ${gameId}`);
     myInfo.id = `player-${myId}`;
     loadCards(game.my.hand, game.my.faceUp);
@@ -95,6 +123,15 @@ function init() {
         });
       });
     });
+
+    /* ----------------------------- Action Records ----------------------------- */
+    if (game.transitionRecords) {
+      logger.info(
+        `transitionRecords found: ${JSON.stringify(game.transitionRecords)}`
+      );
+      loadActionRecords(game.transitionRecords);
+    }
+    /* ------------------------------ socket event ------------------------------ */
     socketEventInit(socket, myId);
     /* ------------------------------- finish init ------------------------------ */
     logger.debug(`Finish init`);
@@ -179,13 +216,13 @@ function socketEventInit(socket, myId) {
     }
   });
 
-  socket.on("message", function (arg) {
-    logger.debug(`message called with ${JSON.stringify(arg)}`);
-    msgBox.innerHTML += arg;
+  socket.on("addRecord", function (arg) {
+    logger.debug(`addRecord called with ${JSON.stringify(arg)}`);
+    createActionRecord(arg);
   });
+
   socket.on("finish", function (arg) {
     logger.debug(`finish called with ${JSON.stringify(arg)}`);
-    msgBox.innerHTML += `User ${arg.userId} Win<br>`;
     location.href = `/user/room?room=${arg.gameName}`;
   });
 }
@@ -250,12 +287,13 @@ function loadPlayers(playerList) {
     const newPlayerNode = playerNode.cloneNode(true);
     playersInfoBoard.appendChild(newPlayerNode);
     newPlayerNode.id = `player-${player.id}`;
+    userIdNameMap[player.id] = player.name;
     newPlayerNode.setAttribute("user-id", `${player.id}`);
     newPlayerNode.setAttribute("state", `${player.state}`);
     document.querySelector(`#player-${player.id} #balance`).textContent =
       player.balance;
     document.querySelector(`#player-${player.id} #name`).textContent =
-      player.id;
+      player.name;
     if (player.state == "inGame") {
       newPlayerNode.addEventListener("click", (event) => {
         if (
@@ -286,4 +324,38 @@ function changePlayerStyle(playerNode) {
   } else {
     playerNode.style.border = "4px solid red";
   }
+}
+/* --------------------------- Load Action Record --------------------------- */
+function loadActionRecords(recordList) {
+  while (actionRecordBoard.firstChild) {
+    actionRecordBoard.removeChild(actionRecordBoard.lastChild);
+  }
+  for (let record of recordList) {
+    createActionRecord(record);
+  }
+}
+
+function createActionRecord(record) {
+  logger.debug(`record: ${JSON.stringify(record)}`);
+  const newActionRecordNode = actionRecordNode.cloneNode(true);
+  actionRecordBoard.appendChild(newActionRecordNode);
+  newActionRecordNode.id = `record-${record.id}`;
+  newActionRecordNode.textContent = formatMessage(record.msg);
+  newActionRecordNode.setAttribute("currentAction", true);
+  newActionRecordNode.addEventListener("click", (event) => {
+    socket.emit("askRecordSnapshot", { recordId: record.id });
+  });
+}
+
+function formatMessage(message) {
+  Object.keys(userIdNameMap).forEach((key) => {
+    message = message.replace(`[p${key}]`, userIdNameMap[key]);
+  });
+  Object.keys(cardIdNameMap).forEach((key) => {
+    message = message.replace(`[c${key}]`, cardIdNameMap[key]);
+  });
+  Object.keys(actionNameMap).forEach((key) => {
+    message = message.replace(`[a${key}]`, actionNameMap[key]);
+  });
+  return message;
 }

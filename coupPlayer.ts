@@ -45,11 +45,11 @@ export class Player {
 
   addBalance(amount: number) {
     this.balance += amount;
-    this.game.io.emit("updateBalance", {
+    this.game.ioEmit("updateBalance", {
       userId: this.userId,
       balance: this.balance,
     });
-    this.game.io.emit(
+    this.game.ioEmit(
       "message",
       `User ${this.userId} balance add ${amount}<br>`
     );
@@ -57,11 +57,11 @@ export class Player {
 
   lowerBalance(amount: number) {
     this.balance -= amount;
-    this.game.io.emit("updateBalance", {
+    this.game.ioEmit("updateBalance", {
       userId: this.userId,
       balance: this.balance,
     });
-    this.game.io.emit(
+    this.game.ioEmit(
       "message",
       `User ${this.userId} balance lower ${amount}<br>`
     );
@@ -69,7 +69,7 @@ export class Player {
 
   addHand(newCards: number[]): void {
     this.hand = this.hand.concat(newCards);
-    this.game.io.emit("updateCard", {
+    this.game.ioEmit("updateCard", {
       userId: this.userId,
       hand: this.getHand(),
       faceUp: this.getFaceUp(),
@@ -78,7 +78,7 @@ export class Player {
 
   discardHand(chosenCards: number): void {
     this.hand = this.hand.filter((card) => card != chosenCards);
-    this.game.io.emit("updateCard", {
+    this.game.ioEmit("updateCard", {
       userId: this.userId,
       hand: this.getHand(),
       faceUp: this.getFaceUp(),
@@ -92,16 +92,16 @@ export class Player {
     this.faceUp = this.faceUp.concat(
       this.hand.splice(this.hand.indexOf(chosenCard), 1)
     );
-    this.game.io.emit("loseInfluence", {
+    this.game.ioEmit("loseInfluence", {
       userId: this.userId,
       chosenCard: chosenCard.toString(),
     });
     if (this.getHand().length == 0) {
       this.state = "outGame";
-      this.game.io.emit("outGame", {
+      this.game.ioEmit("outGame", {
         userId: this.userId,
       });
-      this.game.io.emit("message", `User ${this.userId} Out Game!<br>`);
+      this.game.ioEmit("message", `User ${this.userId} Out Game!<br>`);
     }
   }
 }

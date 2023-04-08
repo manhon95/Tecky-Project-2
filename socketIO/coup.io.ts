@@ -1,16 +1,29 @@
 import socket from "socket.io";
 import express from "express";
-import { Game } from "../coupGame";
+import { Game, TransitionSave } from "../coupGame";
 import { deleteCoupGame, getGameById } from "../coupList";
 import "../middleware";
 import { logger } from "../logger";
 import path from "path";
+import { readUsernameFromDB } from "../utils/user";
 
 const filename = path.basename(__filename);
 
 type GameJson = {
-  my: { id: string; hand: number[]; faceUp: number[]; balance: number };
-  otherPlayerList: { id: string; balance: number; state: string }[];
+  my: {
+    id: string;
+    name: string;
+    hand: number[];
+    faceUp: number[];
+    balance: number;
+  };
+  otherPlayerList: {
+    id: string;
+    name: string;
+    balance: number;
+    state: string;
+  }[];
+  transitionRecords?: TransitionSave[];
 };
 
 export function addCoupSocketInitEvent(io: socket.Server) {
@@ -41,22 +54,27 @@ export function addCoupSocketInitEvent(io: socket.Server) {
       const gameJson: GameJson = {
         my: {
           id: my.userId,
+          name: await readUsernameFromDB(+my.userId),
           hand: my.getHand(),
           faceUp: my.getFaceUp(),
           balance: my.getBalance(),
         },
         otherPlayerList: [],
+        transitionRecords: game.getTransitionRecords(),
       };
-
-      gameJson.otherPlayerList = game.playerList
-        .map(function (player) {
+      gameJson.otherPlayerList = await Promise.all(
+        game.playerList.map(async function (player) {
           return {
             id: player.userId,
+            name: await readUsernameFromDB(+player.userId),
             balance: player.getBalance(),
             state: player.getState(),
           };
         })
-        .filter((player) => player.id !== my.userId);
+      );
+      gameJson.otherPlayerList = gameJson.otherPlayerList.filter(
+        (player) => player.id !== my.userId
+      );
       socket.emit("ansCoupInit", gameJson);
       addCoupSocketEvent(socket, req, game);
     });
@@ -74,7 +92,7 @@ function addCoupSocketEvent(
     return;
   }
   socket.on("CoupInitFinished", () => {
-    game.sendState();
+    game.sendState(socket);
   });
   socket.on("answerAction", (arg) => {
     logger.debug(
@@ -82,7 +100,7 @@ function addCoupSocketEvent(
         arg
       )}`
     );
-    game.addTransitionRecord({ from: userId, arg: arg });
+    // game.addTransitionRecord({ from: userId, arg: arg });
     game.transition(arg);
   });
   socket.on("answerCounteraction", (arg) => {
@@ -91,10 +109,7 @@ function addCoupSocketEvent(
         arg
       )}`
     );
-    game.addTransitionRecord({
-      from: userId,
-      arg: arg,
-    });
+    // game.addTransitionRecord({ from: userId, arg: arg });
     game.transition(arg);
   });
   socket.on("answerChallenge", (arg) => {
@@ -103,7 +118,7 @@ function addCoupSocketEvent(
         arg
       )}`
     );
-    game.addTransitionRecord({ from: userId, arg: arg });
+    // game.addTransitionRecord({ from: userId, arg: arg });
     game.transition(arg);
   });
   socket.on("answerCard", (arg) => {
@@ -112,7 +127,7 @@ function addCoupSocketEvent(
         arg
       )}`
     );
-    game.addTransitionRecord({ from: userId, arg: arg });
+    // game.addTransitionRecord({ from: userId, arg: arg });
     game.transition(arg);
   });
   socket.on("answerTarget", (arg) => {
@@ -121,7 +136,7 @@ function addCoupSocketEvent(
         arg
       )}`
     );
-    game.addTransitionRecord({ from: userId, arg: arg });
+    // game.addTransitionRecord({ from: userId, arg: arg });
     game.transition(arg);
   });
   socket.on("disconnect", () => {
