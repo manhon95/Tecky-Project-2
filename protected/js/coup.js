@@ -1,6 +1,6 @@
 /* --------------------------------- Logger --------------------------------- */
-const logger = log4javascript.getDefaultLogger();
-//const logger = log4javascript.getNullLogger();
+//const logger = log4javascript.getDefaultLogger();
+const logger = log4javascript.getNullLogger();
 /* -------------------------------- DOM -------------------------------- */
 const income = document.querySelector("#income");
 const foreignAid = document.querySelector("#foreign-aid");
