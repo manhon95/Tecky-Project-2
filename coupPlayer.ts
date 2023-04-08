@@ -87,7 +87,7 @@ export class Player {
 
   loseInfluence(chosenCard: number): void {
     if (!this.hand.includes(chosenCard)) {
-      throw new Error("Invalid cards");
+      throw new Error(`Invalid cards: given ${chosenCard}, hand ${this.hand}`);
     }
     this.faceUp = this.faceUp.concat(
       this.hand.splice(this.hand.indexOf(chosenCard), 1)

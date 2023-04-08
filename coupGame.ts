@@ -121,7 +121,7 @@ export class Game {
     this.snapshotMode = loadData.snapshotMode;
     if (loadData.save2) {
       this.save2Buffer = loadData.save2;
-      this.deck = this.save2Buffer.startingDeck;
+      this.deck = [...this.save2Buffer.startingDeck];
       //create player list from user id list
       this.playerList = this.save2Buffer.playerIdList.map(
         (playerId) => new Player(playerId, this)
@@ -256,9 +256,13 @@ export class Game {
     if (this.save2Buffer) {
       if (this.deckShuffleCount > this.save2Buffer.shuffleRecords.length - 1) {
         this.save2Buffer.shuffleRecords.push(shuffledDeck);
+        logger.debug(`${filename} - new shuffled deck record pushed`);
         this.save2();
       } else {
         shuffledDeck = this.save2Buffer.shuffleRecords[this.deckShuffleCount];
+        logger.debug(
+          `${filename} - shuffled deck record load: ${shuffledDeck}`
+        );
         this.deckShuffleCount++;
       }
     }
@@ -423,12 +427,6 @@ export class Game {
     switch (this.state) {
       case "askAction": {
         if (arg && arg.chosenAction) {
-          this.addTransitionRecord({
-            arg: arg,
-            msg: `[p${
-              this.inGamePlayerList[this.activePlayerIndex].userId
-            }] use [a${arg.chosenAction}]`,
-          });
           switch (arg.chosenAction) {
             case "income": {
               this.action = new Income(this, this.activePlayerIndex);
@@ -475,6 +473,12 @@ export class Game {
               break;
             }
           }
+          this.addTransitionRecord({
+            arg: arg,
+            msg: `[p${
+              this.inGamePlayerList[this.activePlayerIndex].userId
+            }] use [a${arg.chosenAction}]`,
+          });
           this.state = "resolvingAction";
           this.action?.transition();
         }
@@ -1617,6 +1621,7 @@ class Challenge {
           targetBluff ? "bluff" : "saying truth"
         }!<br>`
       );
+      this.callingAction.setActionValid(!targetBluff);
       if (!targetBluff) {
         this.callingGame.addToDeck(matchCardId);
         this.callingGame.inGamePlayerList[this.targetIndex].discardHand(
@@ -1651,7 +1656,6 @@ class Challenge {
           this.callingGame.inGamePlayerList[this.loserIndex].loseInfluence(
             arg.chosenCard
           );
-          this.callingAction.setActionValid(false);
           this.state = "finish";
           logger.debug(`${filename} - challenge finish`);
           this.callingAction.transition();
