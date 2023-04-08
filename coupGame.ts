@@ -476,7 +476,7 @@ export class Game {
             }
           }
           this.state = "resolvingAction";
-          this.action?.transition(arg);
+          this.action?.transition();
         }
         break;
       }
