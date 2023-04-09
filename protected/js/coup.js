@@ -82,60 +82,83 @@ function init() {
     userIdNameMap[game.my.id] = game.my.name;
     logger.info(`My ID: ${myId}, Game ID: ${gameId}`);
     myInfo.id = `player-${myId}`;
-    loadCards(game.my.hand, game.my.faceUp);
-    myBalance.textContent = game.my.balance;
-
     /* ---------------------------- Other Player Info --------------------------- */
-
-    loadPlayers(game.otherPlayerList);
-
-    /* ------------------------------- Button Init ------------------------------ */
-    actionButton.forEach((button) => {
-      button.disabled = true;
-      button.addEventListener("click", function () {
-        socket.emit("answerAction", { chosenAction: button.id });
-        actionButton.forEach((button) => {
-          button.disabled = true;
-        });
-      });
-    });
-
-    counteractionButton.forEach((button) => {
-      button.disabled = true;
-      button.addEventListener("click", function () {
-        socket.emit("answerCounteraction", {
-          counteraction: counteractionButtonResponse[button.id],
-        });
-        counteractionButton.forEach((button) => {
-          button.disabled = true;
-        });
-      });
-    });
-
-    challengeButton.forEach((button) => {
-      button.disabled = true;
-      button.addEventListener("click", function () {
-        socket.emit("answerChallenge", {
-          challenge: challengeButtonResponse[button.id],
-        });
-        challengeButton.forEach((button) => {
-          button.disabled = true;
-        });
-      });
-    });
-
-    /* ----------------------------- Action Records ----------------------------- */
-    if (game.transitionRecords) {
-      logger.info(
-        `transitionRecords found: ${JSON.stringify(game.transitionRecords)}`
-      );
-      loadActionRecords(game.transitionRecords);
+    while (playersInfoBoard.firstChild) {
+      playersInfoBoard.removeChild(playersInfoBoard.lastChild);
     }
-    /* ------------------------------ socket event ------------------------------ */
-    socketEventInit(socket, myId);
-    /* ------------------------------- finish init ------------------------------ */
-    logger.debug(`Finish init`);
-    socket.emit("CoupInitFinished");
+    for (let player of game.otherPlayerList) {
+      const newPlayerNode = playerNode.cloneNode(true);
+      playersInfoBoard.appendChild(newPlayerNode);
+      newPlayerNode.id = `player-${player.id}`;
+      userIdNameMap[player.id] = player.name;
+      newPlayerNode.setAttribute("user-id", `${player.id}`);
+      newPlayerNode.setAttribute("state", `${player.state}`);
+      if (player.state == "inGame") {
+        newPlayerNode.addEventListener("click", (event) => {
+          if (
+            chooseTargets &&
+            event.currentTarget.getAttribute("state") == "inGame"
+          ) {
+            socket.emit("answerTarget", {
+              targetId: event.currentTarget.getAttribute("user-id"),
+            });
+            chooseTargets = false;
+            document.querySelectorAll(`.other`).forEach((player) => {
+              changePlayerStyle(player);
+            });
+          }
+        });
+      }
+      /* ----------------------------- Load Game Board ---------------------------- */
+      loadGameBoard(game);
+      /* ------------------------------- Button Init ------------------------------ */
+      actionButton.forEach((button) => {
+        button.disabled = true;
+        button.addEventListener("click", function () {
+          socket.emit("answerAction", { chosenAction: button.id });
+          actionButton.forEach((button) => {
+            button.disabled = true;
+          });
+        });
+      });
+
+      counteractionButton.forEach((button) => {
+        button.disabled = true;
+        button.addEventListener("click", function () {
+          socket.emit("answerCounteraction", {
+            counteraction: counteractionButtonResponse[button.id],
+          });
+          counteractionButton.forEach((button) => {
+            button.disabled = true;
+          });
+        });
+      });
+
+      challengeButton.forEach((button) => {
+        button.disabled = true;
+        button.addEventListener("click", function () {
+          socket.emit("answerChallenge", {
+            challenge: challengeButtonResponse[button.id],
+          });
+          challengeButton.forEach((button) => {
+            button.disabled = true;
+          });
+        });
+      });
+
+      /* ----------------------------- Action Records ----------------------------- */
+      if (game.transitionRecords) {
+        logger.info(
+          `transitionRecords found: ${JSON.stringify(game.transitionRecords)}`
+        );
+        loadActionRecords(game.transitionRecords);
+      }
+      /* ------------------------------ socket event ------------------------------ */
+      socketEventInit(socket, myId);
+      /* ------------------------------- finish init ------------------------------ */
+      logger.debug(`Finish init`);
+      socket.emit("CoupInitFinished");
+    }
   });
 }
 
@@ -221,11 +244,26 @@ function socketEventInit(socket, myId) {
     createActionRecord(arg);
   });
 
+  socket.on("answerRecordSnapshot", function (arg) {
+    logger.debug(`answerRecordSnapshot called with ${JSON.stringify(arg)}`);
+    loadGameBoard(arg);
+  });
+
   socket.on("finish", function (arg) {
     logger.debug(`finish called with ${JSON.stringify(arg)}`);
     location.href = `/user/room?room=${arg.gameName}`;
   });
 }
+
+function loadGameBoard(game) {
+  /* --------------------------------- My Info -------------------------------- */
+  loadCards(game.my.hand, game.my.faceUp);
+  myBalance.textContent = game.my.balance;
+
+  /* ---------------------------- Other Player Info --------------------------- */
+  loadPlayers(game.otherPlayerList);
+}
+
 /* ------------------------------- Load Cards ------------------------------- */
 function loadCards(cardList, faceUpList) {
   let nodeClass =
@@ -280,37 +318,27 @@ function changeCardStyle(cardNode) {
 }
 /* ------------------------------ Load Players ------------------------------ */
 function loadPlayers(playerList) {
-  while (playersInfoBoard.firstChild) {
-    playersInfoBoard.removeChild(playersInfoBoard.lastChild);
-  }
   for (let player of playerList) {
-    const newPlayerNode = playerNode.cloneNode(true);
-    playersInfoBoard.appendChild(newPlayerNode);
-    newPlayerNode.id = `player-${player.id}`;
-    userIdNameMap[player.id] = player.name;
-    newPlayerNode.setAttribute("user-id", `${player.id}`);
-    newPlayerNode.setAttribute("state", `${player.state}`);
     document.querySelector(`#player-${player.id} #balance`).textContent =
       player.balance;
     document.querySelector(`#player-${player.id} #name`).textContent =
       player.name;
-    if (player.state == "inGame") {
-      newPlayerNode.addEventListener("click", (event) => {
-        if (
-          chooseTargets &&
-          event.currentTarget.getAttribute("state") == "inGame"
-        ) {
-          socket.emit("answerTarget", {
-            targetId: event.currentTarget.getAttribute("user-id"),
-          });
-          chooseTargets = false;
-          document.querySelectorAll(`.other`).forEach((player) => {
-            changePlayerStyle(player);
-          });
-        }
+    changePlayerStyle(document.querySelector(`#player-${player.id}`));
+    document
+      .querySelectorAll(`#player-${player.id} .card`)
+      .forEach((cardNode) => {
+        cardNode.setAttribute("location", "hand");
+        cardNode.src = "/img/cardBack.jpg";
       });
+    for (let cardId of player.faceUp) {
+      const remainHand = document.querySelector(
+        `#player-${player.id} [location="hand"]`
+      );
+      if (remainHand) {
+        remainHand.setAttribute("location", "face-up");
+        remainHand.src = cardPathMap[Math.floor(parseInt(cardId) / 3)];
+      }
     }
-    changePlayerStyle(newPlayerNode);
   }
 }
 /* --------------------------- Change Player Style -------------------------- */

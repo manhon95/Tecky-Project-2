@@ -22,6 +22,7 @@ type GameJson = {
     name: string;
     balance: number;
     state: string;
+    faceUp: number[];
   }[];
   transitionRecords?: TransitionSave[];
 };
@@ -40,43 +41,17 @@ export function addCoupSocketInitEvent(io: socket.Server) {
         logger.error(`${filename} - Game not found`);
         return;
       }
-      const my = game.playerList.find(
-        (player) => player.userId === req.session.user?.id
-      );
-      if (!my) {
-        logger.error(`${filename} - Player not found`);
+      const userId = req.session.user?.id;
+      if (!userId) {
+        logger.warn(`${filename} - userId not found`);
         return;
       }
       socket.join(game.id);
-      game.socketList.push(socket.id);
       logger.info(`${filename} - Socket ${socket.id} join`);
+      game.socketList.push(socket.id);
       logger.debug(`${filename} - socket list: ${game.socketList}`);
-      const gameJson: GameJson = {
-        my: {
-          id: my.userId,
-          name: await readUsernameFromDB(+my.userId),
-          hand: my.getHand(),
-          faceUp: my.getFaceUp(),
-          balance: my.getBalance(),
-        },
-        otherPlayerList: [],
-        transitionRecords: game.getTransitionRecords(),
-      };
-      gameJson.otherPlayerList = await Promise.all(
-        game.playerList.map(async function (player) {
-          return {
-            id: player.userId,
-            name: await readUsernameFromDB(+player.userId),
-            balance: player.getBalance(),
-            state: player.getState(),
-          };
-        })
-      );
-      gameJson.otherPlayerList = gameJson.otherPlayerList.filter(
-        (player) => player.id !== my.userId
-      );
-      socket.emit("ansCoupInit", gameJson);
-      addCoupSocketEvent(socket, req, game);
+      socket.emit("ansCoupInit", await createCoupJson(game, userId));
+      addCoupSocketEvent(socket, req, game, userId);
     });
   });
 }
@@ -84,15 +59,17 @@ export function addCoupSocketInitEvent(io: socket.Server) {
 function addCoupSocketEvent(
   socket: socket.Socket,
   req: express.Request,
-  game: Game
+  game: Game,
+  userId: string
 ) {
-  const userId = req.session.user?.id;
-  if (!userId) {
-    logger.warn(`${filename} - userId not found`);
-    return;
-  }
   socket.on("CoupInitFinished", () => {
     game.sendState(socket);
+  });
+  socket.on("askRecordSnapshot", async (arg) => {
+    socket.emit(
+      "answerRecordSnapshot",
+      await createCoupJson(game.createSnapshot(arg.recordId), userId)
+    );
   });
   socket.on("answerAction", (arg) => {
     logger.debug(
@@ -149,4 +126,41 @@ function addCoupSocketEvent(
       deleteCoupGame(game.id);
     }
   });
+}
+
+async function createCoupJson(
+  game: Game,
+  userId: string
+): Promise<GameJson | undefined> {
+  const my = game.playerList.find((player) => player.userId === userId);
+  if (!my) {
+    logger.error(`${filename} - Player not found`);
+    return;
+  }
+  const gameJson: GameJson = {
+    my: {
+      id: my.userId,
+      name: await readUsernameFromDB(+my.userId),
+      hand: my.getHand(),
+      faceUp: my.getFaceUp(),
+      balance: my.getBalance(),
+    },
+    otherPlayerList: [],
+    transitionRecords: game.getTransitionRecords(),
+  };
+  gameJson.otherPlayerList = await Promise.all(
+    game.playerList.map(async function (player) {
+      return {
+        id: player.userId,
+        name: await readUsernameFromDB(+player.userId),
+        balance: player.getBalance(),
+        state: player.getState(),
+        faceUp: player.getFaceUp(),
+      };
+    })
+  );
+  gameJson.otherPlayerList = gameJson.otherPlayerList.filter(
+    (player) => player.id !== my.userId
+  );
+  return gameJson;
 }

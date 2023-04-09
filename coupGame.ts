@@ -94,33 +94,34 @@ export type TransitionSave = {
 export class Game {
   private snapshotMode: boolean;
   private save1Enable = false;
+  public readonly name: string;
   private state = "askAction";
   private deck: number[];
   private activePlayerIndex: number = 0;
   public readonly playerList: Player[];
   public inGamePlayerList: Player[];
   private action: Action | null = null;
-  public readonly io: any; //TODO any to specific type
   public socketList: string[] = [];
-  private readonly save2Buffer?: GameSave2;
+  private readonly save2Buffer: GameSave2;
   private deckShuffleCount = 0;
   private recordCount = 0;
   constructor(
-    public readonly name: string,
     public readonly id: string,
-    io: Server,
+    private readonly io: Server,
     loadData: {
+      save2?: boolean;
       snapshotMode: boolean;
+      recordId?: number;
+      name?: string;
       playerIdList?: string[];
-      save?: GameSave;
-      save2?: GameSave2;
     }
   ) {
     //create gameRoom Io socket
-    this.io = io.to(this.id);
     this.snapshotMode = loadData.snapshotMode;
     if (loadData.save2) {
-      this.save2Buffer = loadData.save2;
+      const contents = fs.readFileSync(`coupSave/${this.id}.json`);
+      this.save2Buffer = JSON.parse(contents.toString());
+      this.name = this.save2Buffer.name;
       this.deck = [...this.save2Buffer.startingDeck];
       //create player list from user id list
       this.playerList = this.save2Buffer.playerIdList.map(
@@ -129,6 +130,13 @@ export class Game {
       this.inGamePlayerList = this.playerList.filter(
         (player) => player.getState() === "inGame"
       );
+      if (loadData.recordId !== undefined) {
+        const recordId = loadData.recordId;
+        this.save2Buffer.transitionRecords =
+          this.save2Buffer.transitionRecords.filter(
+            (transition) => transition.id <= recordId
+          );
+      }
       this.save2Buffer.transitionRecords.forEach((transition) => {
         logger.debug(
           `${filename} - Loading transition record ${
@@ -138,40 +146,8 @@ export class Game {
         this.transition(transition.arg);
       });
       this.snapshotMode = false;
-    } else if (loadData.save) {
-      const gameSave = loadData.save;
-      this.deck = gameSave.deck;
-      this.state = gameSave.state;
-      this.activePlayerIndex = gameSave.activePlayerIndex;
-      //load player from save
-      this.playerList = gameSave.playerList.map(
-        (playerSave) => new Player(playerSave.userId, this, playerSave)
-      );
-      this.inGamePlayerList = this.playerList.filter(
-        (player) => player.getState() === "inGame"
-      );
-      //load action
-      const actionSave = gameSave.action ? gameSave.action : undefined;
-      if (actionSave) {
-        this.action = !gameSave.action
-          ? null
-          : actionSave.id == 1
-          ? new Income(this, this.activePlayerIndex, actionSave)
-          : actionSave.id == 2
-          ? new ForeignAid(this, this.activePlayerIndex, actionSave)
-          : actionSave.id == 3
-          ? new Coup(this, this.activePlayerIndex, actionSave)
-          : actionSave.id == 4
-          ? new Tax(this, this.activePlayerIndex, actionSave)
-          : actionSave.id == 5
-          ? new Assassinate(this, this.activePlayerIndex, actionSave)
-          : actionSave.id == 6
-          ? new Exchange(this, this.activePlayerIndex, actionSave)
-          : actionSave.id == 7
-          ? new Steal(this, this.activePlayerIndex, actionSave)
-          : null;
-      }
-    } else if (loadData.playerIdList) {
+    } else if (loadData.playerIdList && loadData.name) {
+      this.name = loadData.name;
       this.save2Buffer = {
         name: this.name,
         playerIdList: this.shuffle(loadData.playerIdList),
@@ -182,7 +158,6 @@ export class Game {
         shuffleRecords: [],
       };
       this.deck = [...this.save2Buffer.startingDeck];
-
       //create player list from user id list
       this.playerList = this.save2Buffer.playerIdList.map(
         (playerId) => new Player(playerId, this)
@@ -221,7 +196,7 @@ export class Game {
       logger.debug(
         `${filename} - io emit: event:${event} arg:${JSON.stringify(arg)}`
       );
-      this.io.emit(event, arg);
+      this.io.to(this.id).emit(event, arg);
     }
   }
 
@@ -421,6 +396,17 @@ export class Game {
       `coupSave/${this.id}.json`,
       JSON.stringify(this.save2Buffer)
     );
+  }
+
+  createSnapshot(recordId: number): Game {
+    logger.info(
+      `${filename} - Creating snapshot at Game#${this.id} record:${recordId}`
+    );
+    return new Game(this.id, this.io, {
+      snapshotMode: true,
+      save2: true,
+      recordId: recordId,
+    });
   }
 
   transition(arg?: transitionArgument) {

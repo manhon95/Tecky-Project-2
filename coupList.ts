@@ -1,5 +1,4 @@
-import { Game, GameSave2 } from "./coupGame";
-import fs from "fs";
+import { Game } from "./coupGame";
 import { io } from "./socketIO/socketIOManager";
 import { logger } from "./logger";
 import path from "path";
@@ -15,8 +14,9 @@ export function createCoupGame(
 ) {
   gameList.set(
     gameId,
-    new Game(gameName, gameId, io, {
+    new Game(gameId, io, {
       snapshotMode: false,
+      name: gameName,
       playerIdList: playerIdList,
     })
   );
@@ -27,11 +27,9 @@ export function createCoupGame(
 
 export function loadCoupGame(gameId: string) {
   try {
-    const contents = fs.readFileSync(`coupSave/${gameId}.json`);
-    const save: GameSave2 = JSON.parse(contents.toString());
     gameList.set(
       gameId,
-      new Game(save.name, gameId, io, { snapshotMode: true, save2: save })
+      new Game(gameId, io, { snapshotMode: true, save2: true })
     );
     logger.info(`${filename} - Game Loaded id: ${gameId}`);
   } catch (e) {
