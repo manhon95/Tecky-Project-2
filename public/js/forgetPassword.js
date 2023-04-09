@@ -19,7 +19,6 @@ document
     });
 
     const result = await res.json(); // { error: string|undefined }
-    console.log()
     if (result.verify) {
         location.href = "forgetPasswordVerify.html";
         submit.removeAttribute("disabled")

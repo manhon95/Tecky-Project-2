@@ -238,7 +238,6 @@ changePasswordSubmitGroup.addEventListener("submit", async function (event) {
     body: JSON.stringify({ code: form.changePasswordCode.value }),
   });
   let result = await res.json();
-  console.log(result);
   if (result.pass) {
     changePasswordSubmitGroup.classList.add("hidden");
     newPasswordForm.classList.remove("hidden");

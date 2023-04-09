@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 import database from "./db";
 import "./middleware";
 import { hashPassword } from "./utils/hash";
-import { sendEmailVerificationCode } from "./utils/sendEmailCode";
 dotenv.config();
 
 export async function saveUserDetails(req: Request, res: Response) {
@@ -79,7 +78,6 @@ export async function saveUserDetails(req: Request, res: Response) {
       [userName]
     );
     report["success"] = "success";
-    console.log(verificationCode);
     req.session.verificationCode = verificationCode;
     req.session.email = email
     req.session.save();
