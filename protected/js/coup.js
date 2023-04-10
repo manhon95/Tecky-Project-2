@@ -75,6 +75,12 @@ let chooseTargets = false;
 init();
 
 function init() {
+  // document.querySelector("#try").addEventListener("click", function (event) {
+  //   const bsOffcanvas = new bootstrap.Offcanvas(
+  //     document.querySelector(".offcanvas")
+  //   );
+  //   bsOffcanvas.toggle();
+  // });
   socket.emit("askCoupInit", { game: { id: gameId } });
   socket.on("ansCoupInit", function (game) {
     /* --------------------------------- My Info -------------------------------- */
