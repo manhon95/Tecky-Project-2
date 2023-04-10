@@ -16,6 +16,8 @@ import { profileRoutes } from "./routes/profile.routes";
 import { socialRoutes } from "./routes/social.routes";
 import { verifyRoutes } from "./routes/verify.routes";
 import { coupRoutes } from "./routes/coup.route";
+import { admin } from "./routes/adminPage.routes";
+
 
 const app = express();
 const server = http.createServer(app);
@@ -56,6 +58,8 @@ app.use(socialRoutes);
 app.use(shopRoutes);
 app.use(verifyRoutes);
 app.use(coupRoutes);
+app.use(admin);
+
 
 app.use(checkLoginToLobby);
 

@@ -43,7 +43,7 @@ export function addCoupSocketInitEvent(io: socket.Server) {
       }
       const userId = req.session.user?.id;
       if (!userId) {
-        logger.warn(`${filename} - userId not found`);
+        logger.warn(`${filename} - userId not found session user id: ${req.session.user?.id}`);
         return;
       }
       socket.join(game.id);

@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import database from "./db";
 import "./middleware";
 import { hashPassword } from "./utils/hash";
+import { sendEmailVerificationCode } from "./utils/sendEmailCode";
 dotenv.config();
 
 export async function saveUserDetails(req: Request, res: Response) {
@@ -14,7 +15,6 @@ export async function saveUserDetails(req: Request, res: Response) {
   const elo = 1000;
   const coins = 100;
   const userName: string = req.body.userName;
-  // let birthday2 = req.body.monthOfBirth + "/" + req.body.yearOfBirth;
   const birthday = new Date();
   birthday.setFullYear(req.body.yearOfBirth, req.body.monthOfBirth - 1, 1);
   birthday.setHours(0, 0, 0, 0);
@@ -65,7 +65,7 @@ export async function saveUserDetails(req: Request, res: Response) {
     report["email"] = false;
   }
   if (checkStatus) {
-    const verificationCode = String("1234") //await sendEmailVerificationCode(email));
+    const verificationCode = await sendEmailVerificationCode(email);
     const newPassword = await hashPassword(password);
     //save email, userName, password,elo into database
     await database.query(

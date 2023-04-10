@@ -38,7 +38,7 @@ export async function getMatchHistory(req: Request, res: Response) {
   let history = await readMatchHistoryFromDB(userId);
   let gamePlayed = history.length;
   history.map((match) => {
-    match.match_date = dayjs(match.match_date).format("|DD/MM| HH:mm");
+    match.match_date = dayjs(match.match_date).format("mm:HH DD/MM");
   });
   if (gamePlayed != 0) {
     gameWon = history.reduce((acc, curr) => {

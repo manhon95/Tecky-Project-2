@@ -11,9 +11,11 @@ export async function verify(req: Request, res: Response) {
     const result = await database.query(
       `select id, user_name from "user" where email=($1)`,
       [req.session.email]
-    );
+    );  
+     console.log("save session id: "+result.rows[0].id)
     req.session.user = {
-      id: result.rows[0].id,
+   
+      id: String(result.rows[0].id),
       username: result.rows[0].user_name,
       profilePic: null,
     }
