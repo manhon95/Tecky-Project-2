@@ -371,6 +371,10 @@ function createActionRecord(record) {
   newActionRecordNode.textContent = formatMessage(record.msg);
   newActionRecordNode.setAttribute("currentAction", true);
   newActionRecordNode.addEventListener("click", (event) => {
+    document
+      .querySelectorAll(".action-record")
+      .forEach((recordNode) => recordNode.classList.remove("active"));
+    newActionRecordNode.classList.add("active");
     socket.emit("askRecordSnapshot", { recordId: record.id });
   });
 }

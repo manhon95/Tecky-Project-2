@@ -64,7 +64,7 @@ type ActionSave = {
   askPlayerIndex?: number;
   counteraction?: CounteractionSave;
   challenge?: ChallengeSave;
-  targetIndex?: number;
+  targetIndex?: number | null;
 };
 type CounteractionSave = {
   state: string;
@@ -267,33 +267,25 @@ export class Game {
     let arg;
     if (this.action) {
       if (this.action.challenge) {
-        const challengeState = this.action.challenge.getState();
-        const currentPlayer =
-          challengeState == "targetLoseInfluence"
-            ? this.inGamePlayerList[this.action.challenge.targetIndex]
-            : this.inGamePlayerList[this.action.challenge.challengerIndex];
-        msg = "askCard";
+        const loser =
+          this.inGamePlayerList[this.action.challenge.getLoserIndex()];
+        msg = this.action.challenge.getState();
         arg = {
-          userId: currentPlayer.userId,
-          hand: currentPlayer.getHand(),
-          faceUp: currentPlayer.getFaceUp(),
+          userId: loser.userId,
+          hand: loser.getHand(),
+          faceUp: loser.getFaceUp(),
         };
       } else if (this.action.counteraction) {
         if (this.action.counteraction.challenge) {
-          const challengeState = this.action.counteraction.challenge.getState();
-          const currentPlayer =
-            challengeState == "targetLoseInfluence"
-              ? this.inGamePlayerList[
-                  this.action.counteraction.challenge.targetIndex
-                ]
-              : this.inGamePlayerList[
-                  this.action.counteraction.challenge.challengerIndex
-                ];
-          msg = "askCard";
+          const loser =
+            this.inGamePlayerList[
+              this.action.counteraction.challenge.getLoserIndex()
+            ];
+          msg = this.action.counteraction.challenge.getState();
           arg = {
-            userId: currentPlayer.userId,
-            hand: currentPlayer.getHand(),
-            faceUp: currentPlayer.getFaceUp(),
+            userId: loser.userId,
+            hand: loser.getHand(),
+            faceUp: loser.getFaceUp(),
           };
         } else {
           msg = this.action.counteraction.getState();
@@ -303,11 +295,56 @@ export class Game {
         }
       } else {
         msg = this.action.getState();
-        arg = {
-          userId: this.action.getAskPlayerIndex
-            ? this.action.getAskPlayerIndex()
-            : undefined,
-        };
+        switch (msg) {
+          case "askTarget": {
+            arg = {
+              userId: this.inGamePlayerList[this.activePlayerIndex].userId,
+            };
+            break;
+          }
+          case "askChallenge": {
+            arg = this.action.getAskPlayerIndex
+              ? {
+                  userId:
+                    this.inGamePlayerList[this.action.getAskPlayerIndex()]
+                      .userId,
+                }
+              : undefined;
+            break;
+          }
+          case "askCounterAction": {
+            arg = this.action.getAskPlayerIndex
+              ? {
+                  userId:
+                    this.inGamePlayerList[this.action.getAskPlayerIndex()]
+                      .userId,
+                }
+              : undefined;
+            break;
+          }
+          case "askCard": {
+            let askPlayer: Player | undefined;
+            if (this.action.id == 6) {
+              askPlayer = this.inGamePlayerList[this.activePlayerIndex];
+            } else if ([3, 5].includes(this.action.id)) {
+              askPlayer = this.action.getTargetIndex
+                ? this.inGamePlayerList[this.action.getTargetIndex()]
+                : undefined;
+            } else {
+              logger.error(
+                `${filename} - invalid action id ${this.action.id} in send game state`
+              );
+            }
+            if (askPlayer) {
+              arg = {
+                userId: askPlayer.userId,
+                hand: askPlayer.getHand(),
+                faceUp: askPlayer.getFaceUp(),
+              };
+            }
+            break;
+          }
+        }
       }
     } else {
       msg = this.state;
@@ -371,8 +408,8 @@ export class Game {
                     loserIndex: this.action.challenge.getLoserIndex(),
                   }
                 : undefined,
-              targetIndex: this.action.targetIndex
-                ? this.action.targetIndex
+              targetIndex: this.action.getTargetIndex
+                ? this.action.getTargetIndex()
                 : undefined,
             }
           : undefined,
@@ -506,7 +543,7 @@ interface Action {
   id: number;
   challenge?: Challenge | null;
   counteraction?: Counteraction | null;
-  targetIndex?: number | null;
+  getTargetIndex?(): number;
   transition(arg?: transitionArgument): void;
   setActionValid(result: boolean): void;
   getState(): string;
@@ -613,8 +650,11 @@ class ForeignAid implements Action {
             if (
               this.askPlayerIndex === this.callingGame.inGamePlayerList.length
             ) {
-              this.state = "effect";
-              this.transition();
+              this.callingGame.inGamePlayerList[
+                this.activePlayerIndex
+              ].addBalance(2);
+              this.state = "finish";
+              this.callingGame.transition();
               return;
             }
           }
@@ -658,7 +698,7 @@ class ForeignAid implements Action {
 class Coup implements Action {
   public readonly id = 3;
   private state: string;
-  public targetIndex: number | null;
+  private targetIndex: number | null;
   private actionValid: boolean = true;
   constructor(
     public readonly callingGame: Game,
@@ -679,6 +719,10 @@ class Coup implements Action {
 
   getState(): string {
     return this.state;
+  }
+
+  getTargetIndex() {
+    return this.targetIndex ? this.targetIndex : -1;
   }
 
   transition(arg?: transitionArgument): void {
@@ -804,11 +848,15 @@ class Tax implements Action {
             if (
               this.askPlayerIndex === this.callingGame.inGamePlayerList.length
             ) {
-              this.state = "effect";
-              this.transition();
+              this.callingGame.inGamePlayerList[
+                this.activePlayerIndex
+              ].addBalance(3);
+              this.state = "finish";
+              this.callingGame.transition();
               return;
             }
           }
+          logger.debug(`${filename} - askPlayerIndex: ${this.askPlayerIndex}`);
           this.callingGame.ioEmit("askChallenge", {
             userId:
               this.callingGame.inGamePlayerList[this.askPlayerIndex].userId,
@@ -849,7 +897,7 @@ class Assassinate implements Action {
   private askPlayerIndex: number = -1;
   public counteraction: Counteraction | null;
   public challenge: Challenge | null;
-  public targetIndex: number | null = null;
+  private targetIndex: number | null = null;
   private actionValid: boolean = true;
   constructor(
     public readonly callingGame: Game,
@@ -892,6 +940,10 @@ class Assassinate implements Action {
 
   getAskPlayerIndex(): number {
     return this.askPlayerIndex;
+  }
+
+  getTargetIndex() {
+    return this.targetIndex ? this.targetIndex : -1;
   }
 
   transition(arg?: transitionArgument): void {
@@ -1245,7 +1297,7 @@ class Steal implements Action {
   private askPlayerIndex: number;
   public counteraction: Counteraction | null;
   public challenge: Challenge | null;
-  public targetIndex: number | null;
+  private targetIndex: number | null;
   private actionValid: boolean = true;
   constructor(
     public readonly callingGame: Game,
@@ -1289,7 +1341,9 @@ class Steal implements Action {
   getAskPlayerIndex(): number {
     return this.askPlayerIndex;
   }
-
+  getTargetIndex() {
+    return this.targetIndex ? this.targetIndex : -1;
+  }
   actionEffect(): void {
     if (this.targetIndex !== null) {
       const targetBalance =
