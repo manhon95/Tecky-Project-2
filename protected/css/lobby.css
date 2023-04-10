@@ -1,0 +1,122 @@
+body {
+  min-width: 700px;
+}
+
+.username {
+  color: blue;
+  font-weight: bold;
+}
+.room {
+  border: 1px solid black;
+  border-radius: 3px;
+  background: var(--container-BG);
+  color: var(--dark-color-a);
+  display: flex;
+  flex-direction: column;
+}
+
+#new-room-name {
+  display: inline-block;
+  width: auto;
+}
+
+.create-btn {
+  padding: 5px;
+  background: #265499;
+  color: aliceblue;
+  border: solid 2px var(--button-boarder);
+  border-radius: 5px;
+  font-size: 15px;
+}
+
+/* #3b5a77, #040c16 */
+
+.room-sub-container {
+  background-color: var(--button-boarder);
+  border-radius: 5px;
+  height: 40px;
+  font-size: 25px;
+  align-items: center;
+  margin: 3px;
+  width: auto;
+  border: 1px solid black;
+}
+
+.room-info-container {
+  display: flex;
+  flex-direction: row;
+  color: aliceblue;
+  justify-content: space-around;
+}
+.room-name-container {
+  background-color: var(--button-boarder);
+  color: var(--light-color-b);
+  border-radius: 5px;
+  height: 40px;
+  font-size: 25px;
+  align-items: center;
+  margin: 3px;
+  width: auto;
+  border: 1px solid black;
+}
+
+.join-room {
+  padding: 5px;
+  background: #265499;
+  color: aliceblue;
+  border: solid 2px var(--button-boarder);
+  border-radius: 5px;
+  font-size: 15px;
+}
+
+.join-container {
+  max-width: 500px;
+  margin: 80px auto;
+  color: #fff;
+}
+
+.join-header {
+  text-align: center;
+  padding: 5px;
+  padding-top: 15px;
+  background: var(--dark-color-a);
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.join-main {
+  padding: 30px 40px;
+  background: var(--dark-color-b);
+}
+
+.join-main p {
+  margin-bottom: 20px;
+}
+
+.join-main .form-control {
+  margin-bottom: 20px;
+}
+
+.join-main label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.join-main input[type="text"] {
+  font-size: 16px;
+  padding: 5px;
+  height: 40px;
+  width: 100%;
+}
+
+.join-main select {
+  font-size: 16px;
+  padding: 5px;
+  height: 40px;
+  width: 100%;
+}
+
+.join-main .btn {
+  margin-top: 20px;
+  width: 100%;
+}

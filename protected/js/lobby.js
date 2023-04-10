@@ -1,5 +1,4 @@
 const usernameDisplay = document.querySelector(".username");
-const status = document.querySelector(".status");
 const onlineCount = document.querySelector(".online-count");
 const newRoomName = document.querySelector("#new-room-name");
 const roomList = document.querySelector(".room-list");
@@ -27,9 +26,9 @@ async function init() {
 
 function socketEventInit() {
   // on connect update status content
-  socket.on("connect", () => {
-    status.textContent = "connected: " + socket.id;
-  });
+  // socket.on("connect", () => {
+  //   status.textContent = "connected: " + socket.id;
+  // });
 
   // on new online update online counter
   socket.on("online-count", (data) => {
@@ -61,7 +60,6 @@ newRoomName.addEventListener("keypress", (event) => {
     createRoom();
   }
 });
-
 
 //debug msg to see if I can room capacity
 

@@ -17,7 +17,6 @@ import { logger } from "../logger";
 import path from "path";
 
 const filename = path.basename(__filename);
-
 export function addRoomSocketInitEvent(io: socket.Server) {
   io.on("connection", (socket) => {
     const req = socket.request as express.Request;

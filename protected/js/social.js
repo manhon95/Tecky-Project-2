@@ -1,5 +1,5 @@
 const template = document.querySelector("template");
-const username = document.querySelector(".username");
+
 const friendList = document.querySelector(".friend-list");
 let myId;
 
@@ -7,7 +7,6 @@ async function init() {
   const socket = io();
   myId = await getuserId();
   console.log(myId);
-  username.textContent = await getUsername(myId);
 
   showFriends(await loadFriends());
 

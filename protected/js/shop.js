@@ -1,4 +1,3 @@
-const username = document.querySelector(".username");
 const coins = document.querySelector(".coins");
 const template = document.querySelector("template");
 
@@ -7,7 +6,6 @@ let myId;
 async function init() {
   const socket = io();
   myId = await getuserId();
-  username.textContent = await getUsername(myId);
   showBadges(await getUnboughtBadges(myId));
   coins.textContent = await getCoins(myId);
 }
