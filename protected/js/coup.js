@@ -80,6 +80,7 @@ const challengeButtonResponse = {
 let myId;
 let chooseCards = false;
 let chooseTargets = false;
+let latestRecord;
 
 init();
 
@@ -266,6 +267,11 @@ function socketEventInit(socket, myId) {
     createActionRecord(arg);
   });
 
+  socket.on("addSubRecord", function (arg) {
+    logger.debug(`addRecord called with ${JSON.stringify(arg)}`);
+    createSubRecord(arg.msg);
+  });
+
   socket.on("answerRecordSnapshot", function (arg) {
     logger.debug(`answerRecordSnapshot called with ${JSON.stringify(arg)}`);
     loadGameBoard(arg);
@@ -382,6 +388,11 @@ function loadActionRecords(recordList) {
   }
   for (let record of recordList) {
     createActionRecord(record);
+    if (record.subMsg) {
+      record.subMsg.forEach((msg) => {
+        createSubRecord(msg);
+      });
+    }
   }
 }
 
@@ -390,7 +401,7 @@ function createActionRecord(record) {
   const newActionRecordNode = actionRecordNode.cloneNode(true);
   actionRecordBoard.appendChild(newActionRecordNode);
   newActionRecordNode.id = `record-${record.id}`;
-  newActionRecordNode.textContent = formatMessage(record.msg);
+  newActionRecordNode.innerHTML = formatMessage(record.msg);
   newActionRecordNode.setAttribute("currentAction", true);
   newActionRecordNode.addEventListener("click", (event) => {
     document
@@ -399,6 +410,7 @@ function createActionRecord(record) {
     newActionRecordNode.classList.add("active");
     socket.emit("askRecordSnapshot", { recordId: record.id });
   });
+  latestRecord = newActionRecordNode;
 }
 
 function formatMessage(message) {
@@ -411,5 +423,10 @@ function formatMessage(message) {
   Object.keys(actionNameMap).forEach((key) => {
     message = message.replace(`[a${key}]`, actionNameMap[key]);
   });
+  message = message.replace(`[b]`, `<i class="fa-solid fa-coins"></i>`);
   return message;
+}
+
+function createSubRecord(msg) {
+  latestRecord.innerHTML += `<br> - ${formatMessage(msg)}`;
 }
