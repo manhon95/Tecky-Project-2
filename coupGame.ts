@@ -4,6 +4,7 @@ import { updateWinner } from "./utils/matchDb";
 import fs from "fs";
 import { logger } from "./logger";
 import path from "path";
+import { changeRoomStatusToWaiting } from "./utils/roomInfo";
 
 const filename = path.basename(__filename);
 
@@ -516,6 +517,7 @@ export class Game {
               userId: this.inGamePlayerList[0].userId,
               gameName: this.name,
             });
+            changeRoomStatusToWaiting(this.name);
             updateWinner(this.id, this.inGamePlayerList[0].userId);
           } else {
             if (this.activePlayerIndex >= this.inGamePlayerList.length - 1) {
