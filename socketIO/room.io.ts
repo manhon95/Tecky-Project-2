@@ -82,6 +82,12 @@ function addRoomSocketEvent(socket: socket.Socket, io: socket.Server) {
       // count down and force redirect
       if (allPlayerReady) {
         // console.log("all ready, game start");
+        if (player) {
+          let playerRoom = player.room;
+          let roomIdx = rooms.findIndex((room) => room.name == playerRoom);
+          rooms[roomIdx].playing = true;
+          io.emit("new-inc", rooms[roomIdx]);
+        }
         let countdown = 3;
 
         /* ----------------------------- GAME START PART ---------------------------- */
@@ -108,13 +114,7 @@ function addRoomSocketEvent(socket: socket.Socket, io: socket.Server) {
               try {
                 const gameId = await createGameInDB(gameName, roomPlayerList);
                 createCoupGame(gameName, gameId, roomPlayerList);
-                if (player) {
-                  let playerRoom = player.room;
-                  let roomIdx = rooms.findIndex(
-                    (room) => room.name == playerRoom
-                  );
-                  rooms[roomIdx].playing = true;
-                }
+
                 io.emit("redirect-to-game", gameId);
               } catch (err) {
                 rollback();
