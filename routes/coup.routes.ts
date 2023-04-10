@@ -4,4 +4,4 @@ import { sendCoupPage } from "../coup";
 
 export const coupRoutes = Router();
 
-coupRoutes.get("/coup", hasLogin, sendCoupPage);
+coupRoutes.get("/user/coup", hasLogin, sendCoupPage);

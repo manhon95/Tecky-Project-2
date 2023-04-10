@@ -61,17 +61,27 @@ function socketEventInit() {
   });
 
   socket.on("redirect-to-game", (gameId) => {
-    location.href = `coup.html?game=${gameId}`;
+    location.href = `/user/coup?game=${gameId}`;
   });
 
   // Add users to DOM when received socketIO event
   async function outputPlayers(players) {
     // clear all node
+    console.log("running output player");
+    // console.log(playerList.firstChild);
+    // console.log(playerList);
+
+    // fixing the repeat print bug
+    // const playerNodeList = playerList.querySelectorAll("li");
+    // console.log(playerNodeList);
     while (playerList.firstChild) {
+      console.log("removed child", playerList.firstChild);
       playerList.removeChild(playerList.firstChild);
     }
 
     players.map(async (player) => {
+      // console.log(player.userId, myId);
+
       const playerNode = template.content
         .querySelector(".player")
         .cloneNode(true);
@@ -170,6 +180,7 @@ function socketEventInit() {
         playerName.style.color = "blue";
         playerName.style.fontWeight = "bold";
       }
+
       playerList.appendChild(playerNode);
     });
   }

@@ -25,6 +25,7 @@ export function playerJoin(
   const player = { socketId, username, room, ready, userId };
 
   players.push(player);
+  // console.log(`player joined `, players);
 
   return player;
 }
@@ -44,12 +45,15 @@ export function formatMessage(username: string, text: string) {
 // User leaves chat
 export function playerLeave(id: string) {
   const index = players.findIndex((player) => player.socketId === id);
+  let playerLeft = players.splice(index, 1)[0];
+  // console.log(`player left`, players);
   if (index === -1) return;
-  return players.splice(index, 1)[0];
+  return playerLeft;
 }
 
 // Get room players
 export function getRoomPlayers(room: string) {
+  // console.log("get room players", players);
   return players.filter((player) => player.room === room);
 }
 
