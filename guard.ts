@@ -3,16 +3,19 @@ import { HttpError } from "./utils/express";
 import "./middleware";
 import database from "./db";
 
-
-export async function hasLogin(req: Request, res: Response, next: NextFunction) {
+export async function hasLogin(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   const verify = await database.query(
     `select email_verify from "user" where id =($1)`,
     [req.session.user?.id]
   );
-  if (req.session.user?.id&&verify.rows[0].email_verify) {
+  if (req.session.user?.id && verify.rows[0].email_verify) {
     next();
   } else {
-    res.end("unauthorized");
+    res.redirect("/login");
   }
 }
 export function checkLoginToLobby(
@@ -38,7 +41,7 @@ export function getSessionUser(req: Request) {
   throw new HttpError(401, "This API is only for authenticated users");
 }
 export async function isAdmin(req: Request, res: Response, next: NextFunction) {
-  if (req.session.user?.id=="163") {
+  if (req.session.user?.id == "163") {
     next();
   } else {
     res.end("Admin only");

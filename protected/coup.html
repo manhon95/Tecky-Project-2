@@ -88,7 +88,7 @@
                     </div>
                   </div>
                   <div class="card-footer text-center border-0">
-                    <i class="fa-solid fa-coins fa-spin"></i>
+                    <i class="fa-solid fa-coins"></i>
                     <span id="balance">0</span>
                   </div>
                 </div>
@@ -230,8 +230,11 @@
             </div>
           </div>
           <div class="col-4 px-1">
-            <div class="p-3 h-100 bg-body-tertiary rounded-5 shadow">
-              <div id="record-board" class="list-group px-0 border-0 rounded-4">
+            <div class="p-3 bg-body-tertiary rounded-5 shadow">
+              <div
+                id="record-board"
+                class="list-group h-100 overflow-auto px-0 border-0 rounded-4"
+              >
                 <button
                   type="button"
                   class="action-record list-group-item list-group-item-action text-secondary-subtle bg-secondary border-0"
@@ -242,22 +245,9 @@
             </div>
           </div>
         </div>
-        <img id="aid" class="img-fluid" src="/img/aid.jpg" />
+        <img id="aid" class="collapse vh-50" src="/img/aid.jpg" />
       </main>
-      <footer>
-        <button
-          class="btn btn-primary"
-          type="button"
-          data-bs-toggle="offcanvas"
-          data-bs-target="#offcanvasBottom"
-          aria-controls="offcanvasBottom"
-        >
-          Toggle bottom offcanvas
-        </button>
-        <button id="try" class="btn btn-primary" type="button">
-          Try Toggle bottom offcanvas
-        </button>
-      </footer>
+      <footer></footer>
       <script src="/user/js/commonUtils.js"></script>
       <script src="/user/js/loadNavBar.js"></script>
       <script src="/user/js/coup.js"></script>

@@ -89,6 +89,7 @@ export type TransitionSave = {
   id: number;
   arg: transitionArgument;
   msg: string;
+  subMsg?: string[];
 };
 
 /* ---------------------------------- Game ---------------------------------- */
@@ -225,6 +226,25 @@ export class Game {
       this.save2();
     }
     this.recordCount++;
+  }
+
+  addSubRecord(msg: string) {
+    if (!this.snapshotMode) {
+      const lastTransitionRecords =
+        this.save2Buffer?.transitionRecords[this.recordCount - 1];
+      lastTransitionRecords.subMsg = lastTransitionRecords.subMsg
+        ? [...lastTransitionRecords.subMsg, msg]
+        : [msg];
+      logger.debug(
+        `${filename} - saving sub record to transition record ${
+          this.recordCount - 1
+        }: msg:${msg}`
+      );
+      this.ioEmit("addSubRecord", {
+        msg: msg,
+      });
+      this.save2();
+    }
   }
 
   shuffleDeck() {
@@ -1262,16 +1282,13 @@ class Exchange implements Action {
           this.callingGame.inGamePlayerList[this.activePlayerIndex].discardHand(
             arg.chosenCard
           );
-          console.log(
-            this.callingGame.inGamePlayerList[this.activePlayerIndex].getHand()
-          );
-          console.log(
-            this.callingGame.inGamePlayerList[this.activePlayerIndex].getHand()
-              .length
-          );
           if (
             this.callingGame.inGamePlayerList[this.activePlayerIndex].getHand()
-              .length == 2
+              .length +
+              this.callingGame.inGamePlayerList[
+                this.activePlayerIndex
+              ].getFaceUp().length ==
+            2
           ) {
             this.state = "finish";
             this.callingGame.transition();
@@ -1664,12 +1681,6 @@ class Challenge {
         );
       const targetBluff = matchCardId === undefined;
       this.loserIndex = targetBluff ? this.targetIndex : this.challengerIndex;
-      this.callingGame.ioEmit(
-        "message",
-        `User ${this.callingGame.inGamePlayerList[this.targetIndex].userId} ${
-          targetBluff ? "bluff" : "saying truth"
-        }!<br>`
-      );
       this.callingAction.setActionValid(!targetBluff);
       if (!targetBluff) {
         this.callingGame.addToDeck(matchCardId);
@@ -1681,6 +1692,11 @@ class Challenge {
           this.callingGame.drawCard(1)
         );
       }
+      this.callingGame.addSubRecord(
+        `[p${this.callingGame.inGamePlayerList[this.targetIndex].userId}] ${
+          targetBluff ? "bluff" : "have the card"
+        }!`
+      );
     }
   }
 

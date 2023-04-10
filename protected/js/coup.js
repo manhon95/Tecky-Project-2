@@ -80,6 +80,7 @@ const challengeButtonResponse = {
 let myId;
 let chooseCards = false;
 let chooseTargets = false;
+let latestRecord;
 
 init();
 
@@ -118,59 +119,59 @@ function init() {
           }
         });
       }
-      /* ----------------------------- Load Game Board ---------------------------- */
-      loadGameBoard(game);
-      /* ------------------------------- Button Init ------------------------------ */
-      actionButton.forEach((button) => {
-        button.disabled = true;
-        button.addEventListener("click", function () {
-          actionButtonOffcanvas.hide();
-          socket.emit("answerAction", { chosenAction: button.id });
-          actionButton.forEach((button) => {
-            button.disabled = true;
-          });
-        });
-      });
-
-      counteractionButton.forEach((button) => {
-        button.disabled = true;
-        button.addEventListener("click", function () {
-          counteractionButtonOffcanvas.hide();
-          socket.emit("answerCounteraction", {
-            counteraction: counteractionButtonResponse[button.id],
-          });
-          counteractionButton.forEach((button) => {
-            button.disabled = true;
-          });
-        });
-      });
-
-      challengeButton.forEach((button) => {
-        button.disabled = true;
-        button.addEventListener("click", function () {
-          challengeButtonOffcanvas.hide();
-          socket.emit("answerChallenge", {
-            challenge: challengeButtonResponse[button.id],
-          });
-          challengeButton.forEach((button) => {
-            button.disabled = true;
-          });
-        });
-      });
-
-      /* ----------------------------- Action Records ----------------------------- */
-      if (game.transitionRecords) {
-        logger.info(
-          `transitionRecords found: ${JSON.stringify(game.transitionRecords)}`
-        );
-        loadActionRecords(game.transitionRecords);
-      }
-      /* ------------------------------ socket event ------------------------------ */
-      socketEventInit(socket, myId);
-      /* ------------------------------- finish init ------------------------------ */
-      logger.debug(`Finish init`);
-      socket.emit("CoupInitFinished");
     }
+    /* ----------------------------- Load Game Board ---------------------------- */
+    loadGameBoard(game);
+    /* ------------------------------- Button Init ------------------------------ */
+    actionButton.forEach((button) => {
+      button.disabled = true;
+      button.addEventListener("click", function () {
+        actionButtonOffcanvas.hide();
+        socket.emit("answerAction", { chosenAction: button.id });
+        actionButton.forEach((button) => {
+          button.disabled = true;
+        });
+      });
+    });
+
+    counteractionButton.forEach((button) => {
+      button.disabled = true;
+      button.addEventListener("click", function () {
+        counteractionButtonOffcanvas.hide();
+        socket.emit("answerCounteraction", {
+          counteraction: counteractionButtonResponse[button.id],
+        });
+        counteractionButton.forEach((button) => {
+          button.disabled = true;
+        });
+      });
+    });
+
+    challengeButton.forEach((button) => {
+      button.disabled = true;
+      button.addEventListener("click", function () {
+        challengeButtonOffcanvas.hide();
+        socket.emit("answerChallenge", {
+          challenge: challengeButtonResponse[button.id],
+        });
+        challengeButton.forEach((button) => {
+          button.disabled = true;
+        });
+      });
+    });
+
+    /* ----------------------------- Action Records ----------------------------- */
+    if (game.transitionRecords) {
+      logger.info(
+        `transitionRecords found: ${JSON.stringify(game.transitionRecords)}`
+      );
+      loadActionRecords(game.transitionRecords);
+    }
+    /* ------------------------------ socket event ------------------------------ */
+    socketEventInit(socket, myId);
+    /* ------------------------------- finish init ------------------------------ */
+    logger.debug(`Finish init`);
+    socket.emit("CoupInitFinished");
   });
 }
 
@@ -255,7 +256,8 @@ function socketEventInit(socket, myId) {
       );
       if (remainHand) {
         remainHand.setAttribute("location", "face-up");
-        remainHand.src = cardPathMap[Math.floor(parseInt(arg.chosenCard) / 3)];
+        remainHand.src =
+          cardPathMap[Math.floor((parseInt(arg.chosenCard) - 1) / 3)];
       }
     }
   });
@@ -263,6 +265,11 @@ function socketEventInit(socket, myId) {
   socket.on("addRecord", function (arg) {
     logger.debug(`addRecord called with ${JSON.stringify(arg)}`);
     createActionRecord(arg);
+  });
+
+  socket.on("addSubRecord", function (arg) {
+    logger.debug(`addRecord called with ${JSON.stringify(arg)}`);
+    createSubRecord(arg.msg);
   });
 
   socket.on("answerRecordSnapshot", function (arg) {
@@ -357,7 +364,7 @@ function loadPlayers(playerList) {
       );
       if (remainHand) {
         remainHand.setAttribute("location", "face-up");
-        remainHand.src = cardPathMap[Math.floor(parseInt(cardId) / 3)];
+        remainHand.src = cardPathMap[Math.floor((parseInt(cardId) - 1) / 3)];
       }
     }
   }
@@ -381,6 +388,11 @@ function loadActionRecords(recordList) {
   }
   for (let record of recordList) {
     createActionRecord(record);
+    if (record.subMsg) {
+      record.subMsg.forEach((msg) => {
+        createSubRecord(msg);
+      });
+    }
   }
 }
 
@@ -389,7 +401,7 @@ function createActionRecord(record) {
   const newActionRecordNode = actionRecordNode.cloneNode(true);
   actionRecordBoard.appendChild(newActionRecordNode);
   newActionRecordNode.id = `record-${record.id}`;
-  newActionRecordNode.textContent = formatMessage(record.msg);
+  newActionRecordNode.innerHTML = formatMessage(record.msg);
   newActionRecordNode.setAttribute("currentAction", true);
   newActionRecordNode.addEventListener("click", (event) => {
     document
@@ -398,6 +410,7 @@ function createActionRecord(record) {
     newActionRecordNode.classList.add("active");
     socket.emit("askRecordSnapshot", { recordId: record.id });
   });
+  latestRecord = newActionRecordNode;
 }
 
 function formatMessage(message) {
@@ -410,5 +423,10 @@ function formatMessage(message) {
   Object.keys(actionNameMap).forEach((key) => {
     message = message.replace(`[a${key}]`, actionNameMap[key]);
   });
+  message = message.replace(`[b]`, `<i class="fa-solid fa-coins"></i>`);
   return message;
+}
+
+function createSubRecord(msg) {
+  latestRecord.innerHTML += `<br> - ${formatMessage(msg)}`;
 }

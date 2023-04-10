@@ -49,10 +49,7 @@ export class Player {
       userId: this.userId,
       balance: this.balance,
     });
-    this.game.ioEmit(
-      "message",
-      `User ${this.userId} balance add ${amount}<br>`
-    );
+    this.game.addSubRecord(`[p${this.userId}] gain [b]${amount}`);
   }
 
   lowerBalance(amount: number) {
@@ -61,10 +58,7 @@ export class Player {
       userId: this.userId,
       balance: this.balance,
     });
-    this.game.ioEmit(
-      "message",
-      `User ${this.userId} balance lower ${amount}<br>`
-    );
+    this.game.addSubRecord(`[p${this.userId}] lose [b]${amount}`);
   }
 
   addHand(newCards: number[]): void {
@@ -101,7 +95,7 @@ export class Player {
       this.game.ioEmit("outGame", {
         userId: this.userId,
       });
-      this.game.ioEmit("message", `User ${this.userId} Out Game!<br>`);
+      this.game.addSubRecord(`[p${this.userId}] out game!`);
     }
   }
 }
