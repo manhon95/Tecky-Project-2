@@ -194,8 +194,8 @@ async function loadMatchHistory() {
   // console.log(template.content);
   if (obj.gamePlayed != 0) {
     winRate.textContent = obj.winRate + "%";
-    obj.history.slice(0).reverse().map((match) => {
-       console.log(template.content);
+    obj.history.slice(0, 9).map((match) => {
+      console.log(template.content);
       const historyNode = template.content
         .querySelector(".match-history")
         .cloneNode(true);

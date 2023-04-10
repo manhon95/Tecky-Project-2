@@ -194,7 +194,8 @@ FROM user_match AS um
   JOIN user_match AS um2 ON m.id = um2.match_id
   JOIN "user" AS u2 ON um2.player_id = u2.id
 WHERE um.player_id = $1
-GROUP BY m.id, m.match_name, m.match_date, u.id, u.user_name;
+GROUP BY m.id, m.match_name, m.match_date, u.id, u.user_name
+ORDER BY m.match_date DESC;
 `,
     [userId]
   );
