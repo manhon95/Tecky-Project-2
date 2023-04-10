@@ -61,7 +61,7 @@ function socketEventInit() {
   });
 
   socket.on("redirect-to-game", (gameId) => {
-    location.href = `coup.html?game=${gameId}`;
+    location.href = `coup?game=${gameId}`;
   });
 
   // Add users to DOM when received socketIO event

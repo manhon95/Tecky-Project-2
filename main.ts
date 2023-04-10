@@ -15,7 +15,7 @@ import { commonRoutes } from "./routes/common.routes";
 import { profileRoutes } from "./routes/profile.routes";
 import { socialRoutes } from "./routes/social.routes";
 import { verifyRoutes } from "./routes/verify.routes";
-import { coupRoutes } from "./routes/coup.route";
+import { coupRoutes } from "./routes/coup.routes";
 
 const app = express();
 const server = http.createServer(app);
