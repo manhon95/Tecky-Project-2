@@ -18,11 +18,20 @@ const myBalance = document.querySelector(`#my #balance`);
 const CardNode = document.querySelector(`#my .card`);
 const myInfo = document.querySelector("#my");
 const actionButton = document.querySelectorAll("#turn-button-board .btn");
+const actionButtonOffcanvas = new bootstrap.Offcanvas(
+  document.querySelector("#turn-button-offcanvas")
+);
 const counteractionButton = document.querySelectorAll(
   "#counteraction-button-board .btn"
 );
+const counteractionButtonOffcanvas = new bootstrap.Offcanvas(
+  document.querySelector("#counteraction-button-offcanvas")
+);
 const challengeButton = document.querySelectorAll(
   "#challenge-button-board .btn"
+);
+const challengeButtonOffcanvas = new bootstrap.Offcanvas(
+  document.querySelector("#challenge-button-offcanvas")
 );
 /* --------------------------------- Utils; --------------------------------- */
 const socket = io();
@@ -75,12 +84,6 @@ let chooseTargets = false;
 init();
 
 function init() {
-  // document.querySelector("#try").addEventListener("click", function (event) {
-  //   const bsOffcanvas = new bootstrap.Offcanvas(
-  //     document.querySelector(".offcanvas")
-  //   );
-  //   bsOffcanvas.toggle();
-  // });
   socket.emit("askCoupInit", { game: { id: gameId } });
   socket.on("ansCoupInit", function (game) {
     /* --------------------------------- My Info -------------------------------- */
@@ -121,6 +124,7 @@ function init() {
       actionButton.forEach((button) => {
         button.disabled = true;
         button.addEventListener("click", function () {
+          actionButtonOffcanvas.hide();
           socket.emit("answerAction", { chosenAction: button.id });
           actionButton.forEach((button) => {
             button.disabled = true;
@@ -131,6 +135,7 @@ function init() {
       counteractionButton.forEach((button) => {
         button.disabled = true;
         button.addEventListener("click", function () {
+          counteractionButtonOffcanvas.hide();
           socket.emit("answerCounteraction", {
             counteraction: counteractionButtonResponse[button.id],
           });
@@ -143,6 +148,7 @@ function init() {
       challengeButton.forEach((button) => {
         button.disabled = true;
         button.addEventListener("click", function () {
+          challengeButtonOffcanvas.hide();
           socket.emit("answerChallenge", {
             challenge: challengeButtonResponse[button.id],
           });
@@ -177,6 +183,9 @@ function socketEventInit(socket, myId) {
 
   socket.on("askAction", function (arg) {
     logger.debug(`askAction called with ${JSON.stringify(arg)}`);
+    if (arg.userId == myId) {
+      actionButtonOffcanvas.show();
+    }
     actionButton.forEach((button) => {
       button.disabled = !(arg.userId == myId);
     });
@@ -184,12 +193,18 @@ function socketEventInit(socket, myId) {
 
   socket.on("askCounterAction", function (arg) {
     logger.debug(`askCounterAction called with ${JSON.stringify(arg)}`);
+    if (arg.userId == myId) {
+      counteractionButtonOffcanvas.show();
+    }
     counteractionButton.forEach((button) => {
       button.disabled = !(arg.userId == myId);
     });
   });
   socket.on("askChallenge", function (arg) {
     logger.debug(`askChallenge called with ${JSON.stringify(arg)}`);
+    if (arg.userId == myId) {
+      challengeButtonOffcanvas.show();
+    }
     challengeButton.forEach((button) => {
       button.disabled = !(arg.userId == myId);
     });
