@@ -102,6 +102,16 @@ function showNewRoom(room) {
   roomNode.querySelector(".count").textContent = room.count;
   roomNode.querySelector(".capacity").textContent = roomCapacity;
   roomNode.querySelector(".game-status").textContent = "WAITING";
+  // playing hide irrelevant info
+  roomNode.querySelector(".room-count-container").style.display = room.playing
+    ? "none"
+    : "inline-block";
+  roomNode.querySelector(".game-status").textContent = room.playing
+    ? "PLAYING"
+    : "WAITING";
+  roomNode.querySelector(".join-room").style.display = room.playing
+    ? "none"
+    : "inline-block";
   roomNode.querySelector(".join-room").addEventListener("click", async (e) => {
     let currentCount = +roomNode.querySelector(".count").textContent;
     if (currentCount + 1 > roomCapacity) {
