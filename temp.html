@@ -12,10 +12,16 @@
       crossorigin="anonymous"
     />
     <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css"
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css
-  "
+      integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ"
+      crossorigin="anonymous"
     />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+      crossorigin="anonymous"
+    ></script>
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/nav-bar-style.css" />
   </head>
@@ -31,9 +37,9 @@
     }
 
     header.navbar {
-      width: 100vw;
+      width: 100%;
       height: 100px;
-      background-color: #fff;
+      background-color: #899fff;
       box-shadow: 0px 3px 8px rgba(0, 0, 0, 25%);
       display: flex;
       align-items: center;
@@ -48,7 +54,7 @@
     }
 
     header .navb-logo img {
-      width: 180px;
+      width: 100px;
       height: 60px;
     }
 
@@ -61,6 +67,17 @@
 
     header .item {
       text-align: center;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: #102447;
+      padding: 5px 0;
+      transition: all 0.1s ease;
+      border-bottom: 0px solid #64d6f4;
+      border-top: 0px solid #64d6f4;
+      cursor: pointer;
+    }
+    .buttonGroup .item {
+      text-align: center;
       font-size: 20px;
       letter-spacing: 3px;
       color: #102447;
@@ -71,51 +88,140 @@
       cursor: pointer;
     }
 
+
     header .item:hover {
       border-bottom: 3px solid #64d6f4;
       border-top: 3px solid #64d6f4;
+      opacity: 50%;
     }
-
-    header .item-button a {
-      background-color: #2478da;
-      width: 150px;
-      height: 50px;
+    .dropdown-menu{
+      background: linear-gradient(-45deg,#779bff,#517bfc);
+    }
+    header .dropdown-menu a {
+      width: 100%;
+      height: 30px;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 16px;
+      font-size: 10px;
       font-weight: 600;
-      color: #fff;
+      color: #000;
       transition: all 0.5s ease;
     }
 
-    header .item-button a:hover {
-      background-color: #64d6f4;
-    }
     .profileImg {
-      width: 50px;
+      width: 70px;
       height: 50px;
     }
+
+    #dropdown {
+      display: none;
+      height: 50px;
+    }
+
+    .dropdown-toggle {
+      height: 100% !important;
+      background: #265499;
+    }
+    .dropdown-toggle:hover {
+      background: #4783dd;
+    }
+
+    #profiledropdown{
+      height: 50px;
+    }
+
+    @media screen and (max-width: 1000px) {
+      #dropdown {
+        display: flex;
+      }
+
+      .buttonGroup {
+        display: none !important;
+      }
+    }
   </style>
+
   <body>
     <header class="navbar">
       <div class="container-fluid">
         <div class="navb-logo">
           <a href=""><img src="./assets/coup-logo.jpg" alt="" /></a>
         </div>
-        <div class="navb-items d-flex gap-3">
-          <div class="item">
-            <a href="social.html">Social</a>
-          </div>
-          <div class="item">
-            <a href="lobby.html">Game lobby</a>
-          </div>
-          <div class="item-button d-flex">
-            <div>
-              <img src="temp.bmp" alt="" class="profileImg" />
+        <div class="navb-items d-flex ">
+
+          <div class="buttonGroup d-flex me-3 gap-3">
+            <div class="item">
+              <a href="/user/social">Social</a>
             </div>
-            <a href="./profile.html" type="button">profile</a>
+            <div class="item">
+              <a href="/user/lobby">Game lobby</a>
+            </div>
+            <div class="item">
+              <a href="shop.html">Shop</a>
+            </div>
           </div>
+
+          <div class="item-button d-flex">
+            <div id="dropdown" class="dropdown me-3">
+              <button
+                class="btn btn-secondary dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Dropdown button
+              </button>
+              <ul class="dropdown-menu">
+                <li>
+                  <div class="item dropdown-item">
+                    <a href="/user/social">Social</a>
+                  </div>
+                </li>
+                <li>
+                  <div class="item dropdown-item">
+                    <a href="/user/lobby">Game lobby</a>
+                  </div>
+                </li>
+                <li>
+                  <div class="item dropdown-item">
+                    <a href="shop.html">Shop</a>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div>
+            <img id="profilePic" src="" alt="" class="profileImg" />
+          </div>
+
+          <div id="profiledropdown" class="dropdown">
+            <button
+              class="btn btn-secondary dropdown-toggle"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <span id="profileName">vfdbdf</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <div class="item dropdown-item">
+                  <a href="/user/profile">View my profile</a>
+                </div>
+              </li>
+              <li>
+                <div class="item dropdown-item">
+                  <a type="button" id="logOutButton" class="logOutButton"
+                    >Log Out</a
+                  >
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <!-- <a id="profileName" href="/user/profile" type="button"></a> -->
         </div>
       </div>
     </header>

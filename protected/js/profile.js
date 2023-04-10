@@ -17,6 +17,10 @@ const changePassword = document.querySelector("#changePassword");
 const changePasswordSubmitGroup = document.querySelector(
   "#changePasswordSubmitGroup"
 );
+const successMessage = document.querySelector("#successMessage");
+const setPasswordMessage = document.querySelector("#setPasswordMessage");
+const setPasswordMessage2 = document.querySelector("#setPasswordMessage2");
+const newPasswordSubmit = document.querySelector("#newPasswordSubmit")
 const newPasswordForm = document.querySelector("#newPasswordForm");
 
 let myId;
@@ -25,7 +29,7 @@ init();
 
 async function init() {
   const socket = io();
-  myId = await getUserId();
+  myId = await getuserId();
   await loadProfile();
   await loadUserBadges();
   await loadActiveBadge();
@@ -71,11 +75,11 @@ async function loadProfile() {
   const result = await res.json();
   userId.textContent = result.profile.id;
   userName.textContent = result.profile.user_name;
-  userBirthday.textContent = result.profile.birthday;
+  // userBirthday.textContent = result.profile.birthday;
   userElo.textContent = result.profile.elo;
   return result;
 }
-async function getUserId() {
+async function getuserId() {
   let res = await fetch("/user-id");
   let result = await res.json();
   return result.id;
@@ -97,6 +101,7 @@ async function upLoadProfilePicture(event) {
   }
 
   profilePic.src = `./assets/profilePicture/${Result}`;
+  profilePicture.src =  `./assets/profilePicture/${Result}`
 }
 
 async function loadUserBadges() {
@@ -213,7 +218,8 @@ async function loadMatchHistory() {
 /* -------------------------- get verification code ------------------------- */
 changePassword.addEventListener("click", async () => {
   changePasswordSubmitGroup.classList.remove("hidden");
-  changePassword.classList.add("hidden");
+  changePassword.classList = ("hidden");
+  successMessage.classList = ("hidden")
   await fetch("/getPasswordVerifyCode", {
     method: "get",
   });
@@ -232,21 +238,37 @@ changePasswordSubmitGroup.addEventListener("submit", async function (event) {
     body: JSON.stringify({ code: form.changePasswordCode.value }),
   });
   let result = await res.json();
-  console.log(result);
   if (result.pass) {
     changePasswordSubmitGroup.classList.add("hidden");
     newPasswordForm.classList.remove("hidden");
+    changePasswordCode.value = ""
+    changePasswordSubmit.disabled = false;
   } else {
     codeMessage.textContent = result.message;
+    changePasswordSubmit.disabled = false;
   }
 });
 
 /* --------------------------- input new password --------------------------- */
 newPasswordForm.addEventListener("submit", async function (event) {
   event.preventDefault();
-  document.querySelector("#newPasswordSubmit").disabled = true;
+  newPasswordSubmit.disabled = true;
   const form = event.target;
-
+  let checkStatus = true
+  if (form.newPassword.value.length < 8) {
+    setPasswordMessage.textContent = "Password must be 8 or more character";
+    checkStatus = false;
+  } else {
+    setPasswordMessage.textContent = "";
+  }
+  if (form.newPassword.value != form.newPasswordConfirm.value) {
+    setPasswordMessage2.textContent ="Confirm password is different";
+    checkStatus = false;
+  } else {
+    setPasswordMessage2.textContent = "";
+  }
+console.log(checkStatus)
+  if(checkStatus){
   const res = await fetch("/changeNewPassword", {
     method: "post",
     headers: {
@@ -258,5 +280,14 @@ newPasswordForm.addEventListener("submit", async function (event) {
     }),
   });
   let result = await res.json();
-  document.querySelector("#setPasswordMessage").textContent = result.message;
+  newPasswordForm.classList.add("hidden")
+  changePassword.classList.remove("hidden")
+  newPasswordSubmit.disabled = false;
+  newPassword.value = ""
+  newPasswordConfirm.value = ""
+  successMessage.classList = ("show")
+}else{
+  newPasswordSubmit.disabled = false;
+  
+}
 });

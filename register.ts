@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 import database from "./db";
 import "./middleware";
 import { hashPassword } from "./utils/hash";
-import { sendEmailVerificationCode } from "./utils/sendEmailCode";
 dotenv.config();
 
 export async function saveUserDetails(req: Request, res: Response) {
@@ -66,28 +65,21 @@ export async function saveUserDetails(req: Request, res: Response) {
     report["email"] = false;
   }
   if (checkStatus) {
-
-    let verificationCode = String(await sendEmailVerificationCode(email))
-  
+    const verificationCode = String("1234") //await sendEmailVerificationCode(email));
     const newPassword = await hashPassword(password);
     //save email, userName, password,elo into database
     await database.query(
       /* sql */ `insert into "user" (email, user_name, password, birthday, elo, coins, profilepic, email_verify) 
       values ($1,$2,$3,$4,$5,$6,'default_profilePic.jpg', false)`,
       [email, userName, newPassword, birthday, elo, coins]
-      );
+    );
     const id = await database.query(
       `select id from "user" where user_name=($1)`,
       [userName]
     );
     report["success"] = "success";
-    console.log(verificationCode)
-    req.session.verificationCode = verificationCode
-    req.session.user = {
-      id: id.rows[0].id,
-      username: userName,
-      profilePic: null,
-    };
+    req.session.verificationCode = verificationCode;
+    req.session.email = email
     req.session.save();
   } else {
     res.status(400);

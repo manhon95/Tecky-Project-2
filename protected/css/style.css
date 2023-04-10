@@ -3,9 +3,13 @@
 :root {
   --dark-color-a: #667aff;
   --dark-color-b: #7386ff;
-  --light-color: #e6e9ff;
+  --light-color: #d2d8ff;
   --success-color: #5cb85c;
   --error-color: #d9534f;
+  --button-BG: #265499;
+  --button-text: aliceblue;
+  --container-BG: #c0c5f3;
+  --button-boarder: #0b2a91;
 }
 
 * {

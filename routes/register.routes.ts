@@ -5,8 +5,8 @@ import path from "path";
 
 export const registerRoutes = Router();
 
+registerRoutes.post("/register", saveUserDetails);
+
 registerRoutes.get("/register", (req: Request, res: Response) => {
   res.sendFile(path.resolve("public", "register.html"));
 });
-
-registerRoutes.post("/register", saveUserDetails);

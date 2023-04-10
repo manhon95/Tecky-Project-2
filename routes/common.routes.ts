@@ -2,7 +2,7 @@ import express, { Router } from "express";
 import {
   getProfile,
   getProfilePic,
-  getSessionUserId,
+  getSessionuserId,
   getUsername,
 } from "../utils/user";
 import fs from "fs";
@@ -28,7 +28,7 @@ commonRoutes.use("/profilePic", express.static(uploadDir));
 
 commonRoutes.get("/usernames/:id", hasLogin, getUsername);
 
-commonRoutes.get("/user-id", hasLogin, getSessionUserId);
+commonRoutes.get("/user-id", hasLogin, getSessionuserId);
 
 commonRoutes.get("/profiles/:id", getProfile);
 

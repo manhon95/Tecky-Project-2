@@ -1,11 +1,10 @@
 import { Server } from "socket.io";
-
 import express from "express";
-import { addCoupSocketFunction } from "../coupGame/coupSocketFunction";
+import { addCoupSocketInitEvent } from "./coup.io";
+import { addRoomSocketInitEvent } from "./room.io";
 import { sessionMiddleware } from "../middleware";
 import { env } from "../env";
 import { onlineCount } from "../utils/user";
-import { addRoomSocketInitEvent } from "./room.io";
 
 // counter for socketIO connection
 export let io: Server;
@@ -38,8 +37,7 @@ export function initSocketServer(httpServer: any) {
     });
     // console.log(req.session.user?.id);
     /* ---------------------------------- TODO ---------------------------------- */
-
-    addCoupSocketFunction(io, socket, req.session);
   });
   addRoomSocketInitEvent(io);
+  addCoupSocketInitEvent(io);
 }

@@ -4,7 +4,7 @@ import { env } from "../env";
 export async function sendEmailVerificationCode(email: String) {
   //-----------------------here insert send email content--------
   const verificationCode = Math.random().toString(36).slice(7);
-  let transporter = nodemailer.createTransport({
+  const transporter = nodemailer.createTransport({
     service: "outlook",
     auth: {
       user: `${env.NODEMAILER_EMAIL}`, // generated ethereal user

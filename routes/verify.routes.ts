@@ -8,3 +8,4 @@ verifyRoutes.get("/verify", (req: Request, res: Response) => {
     res.sendFile(path.resolve("public", "verify.html"))})
 
 verifyRoutes.post("/verify", verify)
+

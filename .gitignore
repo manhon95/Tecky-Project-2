@@ -6,3 +6,4 @@ package-lock.json
 protected/assets/profilePicture
 sampleData/
 sql_commands
+coupSave/

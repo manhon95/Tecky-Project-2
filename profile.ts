@@ -4,8 +4,8 @@ import formidable from "formidable";
 import fs from "fs";
 import "./middleware";
 import dayjs from "dayjs";
-import { sendEmailVerificationCode } from "./utils/sendEmailCode";
 import { hashPassword } from "./utils/hash";
+import { sendEmailVerificationCode } from "./utils/sendEmailCode";
 /* ------------------------ function for Router handler ----------------------- */
 
 export async function patchUsername(req: Request, res: Response) {
