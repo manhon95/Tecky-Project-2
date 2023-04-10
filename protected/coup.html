@@ -27,6 +27,7 @@
     <script type="text/javascript" src="/user/js/log4javascript.js"></script>
     <style>
       :root {
+        --bs-primary: #7d5700;
         --bs-primary-rgb: 125, 87, 0;
         --bs-primary-bg-subtle: #ffffff;
         /* --bs-primary-text-emphasis: #271900; */
@@ -37,6 +38,17 @@
         --bs-body-bg-rgb: 255, 255, 255;
         --bs-secondary-bg-rgb: 238, 224, 207;
         --bs-tertiary-bg-rgb: 255, 251, 255;
+      }
+      .btn-primary {
+        color: #ffffff;
+        background-color: #7d5700;
+        border-color: #7d5700;
+      }
+
+      .btn-primary:hover {
+        color: #ffffff;
+        background-color: #694300;
+        border-color: #694300;
       }
     </style>
   </head>
@@ -101,95 +113,118 @@
                   </p>
                 </div>
               </div>
-              <div id="turn-button-board">
-                <div class="row d-flex justify-content-around">
-                  <button
-                    id="income"
-                    type="button"
-                    class="col-3 btn btn-secondary"
-                  >
-                    Income
-                  </button>
-                  <button
-                    id="foreign-aid"
-                    type="button"
-                    class="col-3 btn btn-secondary"
-                  >
-                    Foreign Aid
-                  </button>
-                  <button
-                    id="coup"
-                    type="button"
-                    class="col-3 btn btn-secondary"
-                  >
-                    Coup
-                  </button>
-                </div>
-                <div class="row d-flex justify-content-around">
-                  <button
-                    id="tax"
-                    type="button"
-                    class="col-2 btn btn-secondary"
-                  >
-                    Tax
-                  </button>
-                  <button
-                    id="assassinate"
-                    type="button"
-                    class="col-2 btn btn-secondary"
-                  >
-                    Assassinate
-                  </button>
-                  <button
-                    id="exchange"
-                    type="button"
-                    class="col-2 btn btn-secondary"
-                  >
-                    Exchange
-                  </button>
-                  <button
-                    id="steal"
-                    type="button"
-                    class="col-2 btn btn-secondary"
-                  >
-                    Steal
-                  </button>
-                </div>
-              </div>
-              <div id="challenge-button-board">
-                <div class="row d-flex justify-content-around">
-                  <button
-                    id="challenge"
-                    type="button"
-                    class="col-4 btn btn-secondary"
-                  >
-                    Challenge
-                  </button>
-                  <button
-                    id="no-challenge"
-                    type="button"
-                    class="col-4 btn btn-secondary"
-                  >
-                    No Challenge
-                  </button>
+              <div
+                id="turn-button-offcanvas"
+                class="offcanvas offcanvas-bottom h-auto bg-secondary"
+                data-bs-scroll="true"
+                data-bs-backdrop="false"
+                tabindex="-1"
+              >
+                <div id="turn-button-board">
+                  <div class="row p-3 d-flex justify-content-evenly">
+                    <button
+                      id="income"
+                      type="button"
+                      class="col-1 rounded-pill btn btn-primary shadow"
+                    >
+                      Income
+                    </button>
+                    <button
+                      id="foreign-aid"
+                      type="button"
+                      class="col-1 rounded-pill btn btn-primary shadow"
+                    >
+                      Foreign Aid
+                    </button>
+                    <button
+                      id="coup"
+                      type="button"
+                      class="col-1 rounded-pill btn btn-primary shadow"
+                    >
+                      Coup
+                    </button>
+                    <button
+                      id="tax"
+                      type="button"
+                      class="col-1 rounded-pill btn btn-primary shadow"
+                    >
+                      Tax
+                    </button>
+                    <button
+                      id="assassinate"
+                      type="button"
+                      class="col-1 rounded-pill btn btn-primary shadow"
+                    >
+                      Assassinate
+                    </button>
+                    <button
+                      id="exchange"
+                      type="button"
+                      class="col-1 rounded-pill btn btn-primary shadow"
+                    >
+                      Exchange
+                    </button>
+                    <button
+                      id="steal"
+                      type="button"
+                      w-13
+                      class="col-1 rounded-pill btn btn-primary shadow"
+                    >
+                      Steal
+                    </button>
+                  </div>
                 </div>
               </div>
-              <div id="counteraction-button-board">
-                <div class="row d-flex justify-content-around">
-                  <button
-                    id="counter"
-                    type="button"
-                    class="col-4 btn btn-secondary"
-                  >
-                    Counter
-                  </button>
-                  <button
-                    id="no-counter"
-                    type="button"
-                    class="col-4 btn btn-secondary"
-                  >
-                    No Counter
-                  </button>
+              <div
+                id="challenge-button-offcanvas"
+                class="offcanvas offcanvas-bottom h-auto bg-secondary"
+                data-bs-scroll="true"
+                data-bs-backdrop="false"
+                tabindex="-1"
+              >
+                <div id="challenge-button-board">
+                  <div class="row p-3 d-flex justify-content-evenly">
+                    <button
+                      id="challenge"
+                      type="button"
+                      class="col-3 rounded-pill btn btn-primary shadow"
+                    >
+                      Challenge
+                    </button>
+                    <button
+                      id="no-challenge"
+                      type="button"
+                      class="col-3 rounded-pill btn btn-primary shadow"
+                    >
+                      No Challenge
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div
+                id="counteraction-button-offcanvas"
+                class="offcanvas offcanvas-bottom h-auto bg-secondary"
+                data-bs-scroll="true"
+                data-bs-backdrop="false"
+                tabindex="-1"
+              >
+                <div id="counteraction-button-board">
+                  <div class="row p-3 d-flex justify-content-evenly">
+                    <button
+                      id="counter"
+                      type="button"
+                      class="col-3 rounded-pill btn btn-primary shadow"
+                    >
+                      Counter
+                    </button>
+                    <button
+                      id="no-counter"
+                      type="button"
+                      class="col-3 rounded-pill btn btn-primary shadow"
+                    >
+                      No Counter
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -210,7 +245,7 @@
         <img id="aid" class="img-fluid" src="/img/aid.jpg" />
       </main>
       <footer>
-        <!-- <button
+        <button
           class="btn btn-primary"
           type="button"
           data-bs-toggle="offcanvas"
@@ -222,27 +257,6 @@
         <button id="try" class="btn btn-primary" type="button">
           Try Toggle bottom offcanvas
         </button>
-        <div
-          class="offcanvas offcanvas-bottom"
-          data-bs-scroll="true"
-          data-bs-backdrop="false"
-          tabindex="-1"
-          id="offcanvasBottom"
-          aria-labelledby="offcanvasBottomLabel"
-        >
-          <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="offcanvasBottomLabel">
-              Offcanvas bottom
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="offcanvas"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="offcanvas-body small">...</div>
-        </div> -->
       </footer>
       <script src="/user/js/commonUtils.js"></script>
       <script src="/user/js/loadNavBar.js"></script>

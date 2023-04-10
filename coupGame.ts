@@ -1262,13 +1262,20 @@ class Exchange implements Action {
           this.callingGame.inGamePlayerList[this.activePlayerIndex].discardHand(
             arg.chosenCard
           );
+          console.log(
+            this.callingGame.inGamePlayerList[this.activePlayerIndex].getHand()
+          );
+          console.log(
+            this.callingGame.inGamePlayerList[this.activePlayerIndex].getHand()
+              .length
+          );
           if (
-            (this.callingGame.inGamePlayerList[
-              this.activePlayerIndex
-            ].getHand().length = 2)
+            this.callingGame.inGamePlayerList[this.activePlayerIndex].getHand()
+              .length == 2
           ) {
             this.state = "finish";
             this.callingGame.transition();
+            return;
           }
         }
         this.callingGame.ioEmit("askCard", {
