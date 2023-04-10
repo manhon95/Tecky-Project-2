@@ -118,59 +118,59 @@ function init() {
           }
         });
       }
-      /* ----------------------------- Load Game Board ---------------------------- */
-      loadGameBoard(game);
-      /* ------------------------------- Button Init ------------------------------ */
-      actionButton.forEach((button) => {
-        button.disabled = true;
-        button.addEventListener("click", function () {
-          actionButtonOffcanvas.hide();
-          socket.emit("answerAction", { chosenAction: button.id });
-          actionButton.forEach((button) => {
-            button.disabled = true;
-          });
-        });
-      });
-
-      counteractionButton.forEach((button) => {
-        button.disabled = true;
-        button.addEventListener("click", function () {
-          counteractionButtonOffcanvas.hide();
-          socket.emit("answerCounteraction", {
-            counteraction: counteractionButtonResponse[button.id],
-          });
-          counteractionButton.forEach((button) => {
-            button.disabled = true;
-          });
-        });
-      });
-
-      challengeButton.forEach((button) => {
-        button.disabled = true;
-        button.addEventListener("click", function () {
-          challengeButtonOffcanvas.hide();
-          socket.emit("answerChallenge", {
-            challenge: challengeButtonResponse[button.id],
-          });
-          challengeButton.forEach((button) => {
-            button.disabled = true;
-          });
-        });
-      });
-
-      /* ----------------------------- Action Records ----------------------------- */
-      if (game.transitionRecords) {
-        logger.info(
-          `transitionRecords found: ${JSON.stringify(game.transitionRecords)}`
-        );
-        loadActionRecords(game.transitionRecords);
-      }
-      /* ------------------------------ socket event ------------------------------ */
-      socketEventInit(socket, myId);
-      /* ------------------------------- finish init ------------------------------ */
-      logger.debug(`Finish init`);
-      socket.emit("CoupInitFinished");
     }
+    /* ----------------------------- Load Game Board ---------------------------- */
+    loadGameBoard(game);
+    /* ------------------------------- Button Init ------------------------------ */
+    actionButton.forEach((button) => {
+      button.disabled = true;
+      button.addEventListener("click", function () {
+        actionButtonOffcanvas.hide();
+        socket.emit("answerAction", { chosenAction: button.id });
+        actionButton.forEach((button) => {
+          button.disabled = true;
+        });
+      });
+    });
+
+    counteractionButton.forEach((button) => {
+      button.disabled = true;
+      button.addEventListener("click", function () {
+        counteractionButtonOffcanvas.hide();
+        socket.emit("answerCounteraction", {
+          counteraction: counteractionButtonResponse[button.id],
+        });
+        counteractionButton.forEach((button) => {
+          button.disabled = true;
+        });
+      });
+    });
+
+    challengeButton.forEach((button) => {
+      button.disabled = true;
+      button.addEventListener("click", function () {
+        challengeButtonOffcanvas.hide();
+        socket.emit("answerChallenge", {
+          challenge: challengeButtonResponse[button.id],
+        });
+        challengeButton.forEach((button) => {
+          button.disabled = true;
+        });
+      });
+    });
+
+    /* ----------------------------- Action Records ----------------------------- */
+    if (game.transitionRecords) {
+      logger.info(
+        `transitionRecords found: ${JSON.stringify(game.transitionRecords)}`
+      );
+      loadActionRecords(game.transitionRecords);
+    }
+    /* ------------------------------ socket event ------------------------------ */
+    socketEventInit(socket, myId);
+    /* ------------------------------- finish init ------------------------------ */
+    logger.debug(`Finish init`);
+    socket.emit("CoupInitFinished");
   });
 }
 
@@ -255,7 +255,8 @@ function socketEventInit(socket, myId) {
       );
       if (remainHand) {
         remainHand.setAttribute("location", "face-up");
-        remainHand.src = cardPathMap[Math.floor(parseInt(arg.chosenCard) / 3)];
+        remainHand.src =
+          cardPathMap[Math.floor((parseInt(arg.chosenCard) - 1) / 3)];
       }
     }
   });
@@ -357,7 +358,7 @@ function loadPlayers(playerList) {
       );
       if (remainHand) {
         remainHand.setAttribute("location", "face-up");
-        remainHand.src = cardPathMap[Math.floor(parseInt(cardId) / 3)];
+        remainHand.src = cardPathMap[Math.floor((parseInt(cardId) - 1) / 3)];
       }
     }
   }
