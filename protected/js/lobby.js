@@ -47,6 +47,9 @@ function socketEventInit() {
     roomElem.querySelector(".game-status").textContent = room.playing
       ? "PLAYING"
       : "WAITING";
+    roomElem.querySelector(".room-count-container").style.display = room.playing
+      ? "none"
+      : "inline-block";
     roomElem.querySelector(".join-room").style.display = room.playing
       ? "none"
       : "inline-block";
