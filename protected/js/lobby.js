@@ -47,7 +47,10 @@ function socketEventInit() {
     roomElem.querySelector(".game-status").textContent = room.playing
       ? "PLAYING"
       : "WAITING";
-    roomElem.querySelector(".join-room").disabled = room.playing;
+    roomElem.querySelector(".join-room").style.display = room.playing
+      ? "none"
+      : "inline-block";
+
     if (!room.playing) {
       roomCount.textContent = room.count;
     }

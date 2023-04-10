@@ -39,62 +39,7 @@
           <h3><i class="fas fa-comments"></i> Room Name:</h3>
           <h2 id="room-name"></h2>
           <h3><i class="fas fa-users"></i> Players</h3>
-          <ul id="player-list">
-            <template>
-              <li class="player">
-                <img
-                  src="./assets/badge/noob.png"
-                  alt=""
-                  class="player-badge"
-                />
-                <span class="player-name">Ivan</span>
-                <div class="player-ready-state">READY</div>
-                <div class="friend-profile profile">
-                  <div>
-                    <span class="profile-username">Ivan Yiu</span>
-                    <img src="" alt="" class="profile-pic" />
-                  </div>
-                  <div>
-                    <span>elo:</span>
-                    <span class="profile-elo">1000</span>
-                  </div>
-                  <div>
-                    <span>total game:</span>
-                    <span class="profile-game-played">10</span>
-                  </div>
-                  <div>
-                    <span>game won:</span>
-                    <span class="profile-game-won">7</span>
-                  </div>
-                  <div>
-                    <span>win rate:</span>
-                    <span class="profile-win-rate">70%</span>
-                  </div>
-                  <div>
-                    <span>bday:</span>
-                    <span class="profile-birthday">7</span>
-                  </div>
-                  <div class="friend-status">friend</div>
-                </div>
-                <div class="non-friend-profile profile">
-                  <div>
-                    <span class="profile-username">Ivan Yiu</span>
-                    <img src="" alt="" class="profile-pic" />
-                  </div>
-                  <div>
-                    <span>elo:</span>
-                    <span class="profile-elo">1000</span>
-                  </div>
-                  <div>
-                    <span>total game:</span>
-                    <span class="profile-game-played">10</span>
-                  </div>
-                  <div class="friend-status">not friend</div>
-                  <button class="add-friend-btn">add</button>
-                </div>
-              </li>
-            </template>
-          </ul>
+          <ul id="player-list"></ul>
         </div>
         <div class="chat-messages"></div>
       </main>
@@ -111,6 +56,56 @@
         </form>
       </div>
     </div>
+    <template>
+      <li class="player">
+        <img src="./assets/badge/noob.png" alt="" class="player-badge" />
+        <span class="player-name">Ivan</span>
+        <div class="player-ready-state">READY</div>
+        <div class="friend-profile profile">
+          <div>
+            <span class="profile-username">Ivan Yiu</span>
+            <img src="" alt="" class="profile-pic" />
+          </div>
+          <div>
+            <span>elo:</span>
+            <span class="profile-elo">1000</span>
+          </div>
+          <div>
+            <span>total game:</span>
+            <span class="profile-game-played">10</span>
+          </div>
+          <div>
+            <span>game won:</span>
+            <span class="profile-game-won">7</span>
+          </div>
+          <div>
+            <span>win rate:</span>
+            <span class="profile-win-rate">70%</span>
+          </div>
+          <div>
+            <span>bday:</span>
+            <span class="profile-birthday">7</span>
+          </div>
+          <div class="friend-status">friend</div>
+        </div>
+        <div class="non-friend-profile profile">
+          <div>
+            <span class="profile-username">Ivan Yiu</span>
+            <img src="" alt="" class="profile-pic" />
+          </div>
+          <div>
+            <span>elo:</span>
+            <span class="profile-elo">1000</span>
+          </div>
+          <div>
+            <span>total game:</span>
+            <span class="profile-game-played">10</span>
+          </div>
+          <div class="friend-status">not friend</div>
+          <button class="add-friend-btn">add</button>
+        </div>
+      </li>
+    </template>
     <a
       href="https://www.freepik.com/free-vector/army-rank-badges-gold-military-insignia-signs_39204058.htm#query=gaming%20badge&position=25&from_view=search&track=ais"
       >Image by upklyak</a
