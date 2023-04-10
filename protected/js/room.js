@@ -86,6 +86,7 @@ function socketEventInit() {
         .querySelector(".player")
         .cloneNode(true);
 
+      playerNode.dataset.id = player.userId;
       // get userMatch history & profile & profile picture
       let matchRes = await fetch(`/matchHistory/${player.userId}`);
       let matchObj = await matchRes.json();
@@ -180,6 +181,7 @@ function socketEventInit() {
         playerName.style.color = "blue";
         playerName.style.fontWeight = "bold";
       }
+      const playerNodeList = playerList.querySelectorAll("li");
 
       playerList.appendChild(playerNode);
     });
