@@ -1,0 +1,56 @@
+body {
+  min-width: 700px;
+}
+
+thead {
+  display: table-header-group;
+}
+.shop-header {
+  display: flex;
+  align-items: flex-end;
+}
+.coin-display {
+  margin: 5px 5px 5px auto;
+  display: inline-block;
+  border-radius: 3px;
+  padding: 5px;
+  background-color: var(--button-boarder);
+  color: aliceblue;
+  font-size: 20px;
+}
+
+.item-list {
+  border-radius: 3px;
+  border: 3px solid black;
+}
+.list-header {
+  display: inline-block;
+  color: aliceblue;
+  border-radius: 5px;
+  padding: 5px;
+  margin-left: 5px;
+  margin-top: 5px;
+  background-color: var(--dark-color-b);
+}
+.shop-container {
+  background-color: var(--container-BG);
+}
+
+.badge {
+  background-color: var(--button-boarder);
+  color: aliceblue;
+}
+.badge-image {
+  height: 100px;
+  width: 100px;
+}
+
+.badge-list {
+  margin: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.buy-btn {
+  margin-left: 5px;
+}

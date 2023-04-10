@@ -17,9 +17,9 @@ import { logger } from "../logger";
 import path from "path";
 
 const filename = path.basename(__filename);
-
 export function addRoomSocketInitEvent(io: socket.Server) {
   io.on("connection", (socket) => {
+    const randomTime = Math.floor(Math.random() * 500);
     const req = socket.request as express.Request;
     socket.on("askRoomInit", ({ username, room, myId }) => {
       let rid = rooms.findIndex((rmName) => rmName.name == room);
@@ -28,9 +28,9 @@ export function addRoomSocketInitEvent(io: socket.Server) {
         logger.warn(`${filename} - Unauthorized access`);
         return;
       }
-      if (rooms[rid].playing) {
-        rooms[rid].playing = false;
-      }
+      // if (rooms[rid].playing) {
+      //   rooms[rid].playing = false;
+      // }
       const player = playerJoin(socket.id, username, room, false, myId);
 
       rooms[rid].count++;
@@ -51,7 +51,11 @@ export function addRoomSocketInitEvent(io: socket.Server) {
         );
 
       // Send players and room info
-      updateRoomPlayerInfo(io, player.room);
+
+      // updateRoomPlayerInfo(io, player.room);
+      setTimeout(() => {
+        updateRoomPlayerInfo(io, player.room);
+      }, randomTime);
 
       //put all server logic here when the Page is loaded
       addRoomSocketEvent(socket, io); //remain socket event is added when Page is Load
@@ -99,7 +103,7 @@ function addRoomSocketEvent(socket: socket.Socket, io: socket.Server) {
                 roomPlayerList.push(player.userId.toString());
               });
               // pass arg to victor function here
-              console.log(roomPlayerList);
+              // console.log(roomPlayerList);
               begin();
               try {
                 const gameId = await createGameInDB(gameName, roomPlayerList);
@@ -165,8 +169,10 @@ function addRoomSocketEvent(socket: socket.Socket, io: socket.Server) {
 }
 
 function updateRoomPlayerInfo(io: socket.Server, room: string) {
+  const players = getRoomPlayers(room);
+  // console.log(players, "players before send");
   io.to(room).emit("room-players", {
     room: room,
-    players: getRoomPlayers(room),
+    players,
   });
 }

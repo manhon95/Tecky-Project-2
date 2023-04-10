@@ -10,7 +10,7 @@ declare module "express-session" {
       profilePic: string | null;
     };
     email: string | null;
-    verificationCode: String
+    verificationCode: String;
     grant?: GrantSession;
   }
 }
@@ -22,9 +22,6 @@ export const sessionMiddleware = session({
     Math.random().toString(36).slice(2),
   resave: false,
   saveUninitialized: false,
-  cookie: {
-    maxAge: 1000 * 60 * 60, // 1hr
-  },
 });
 
 export function addMiddleware(app: Express) {

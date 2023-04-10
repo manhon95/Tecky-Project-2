@@ -1,6 +1,6 @@
 /* -------------------------------- Utilities ------------------------------- */
-body{
-   min-width: 700px;
+body {
+  min-width: 700px;
 }
 table {
   margin-top: 1rem;
@@ -8,16 +8,17 @@ table {
   border: solid 3px var(--button-boarder);
 }
 
-th{
-
+th {
 }
 
-.tableAlign{
-    display: flex;
-    justify-content: center;
+.tableAlign {
+  display: flex;
+  justify-content: center;
 }
 
-table,th,td {
+table,
+th,
+td {
   /* border: 1px solid black; */
   text-align: center;
 }
@@ -25,168 +26,161 @@ table,th,td {
 .badge-name {
   color: black;
 }
-    
-.hidden{
-display:none !important;
+
+.hidden {
+  display: none !important;
 }
-.show{
-display:block;
+.show {
+  display: block;
 }
 
 .inline-blk {
-display: inline-block;
+  display: inline-block;
 }
 
-.textAlign{
-    text-align: center;
+.textAlign {
+  text-align: center;
 }
 
-.maincontainer{
-    display: flex;
-    flex-wrap: wrap;
-    box-sizing: border-box;
-
+.maincontainer {
+  display: flex;
+  flex-wrap: wrap;
+  box-sizing: border-box;
 }
 
-.containerLeft{
-    width: calc(50% - 5px);
-    height: 100%;
-    margin-top: 10px;
-    margin-right: 5px;
-
+.containerLeft {
+  width: calc(50% - 5px);
+  height: 100%;
+  margin-top: 10px;
+  margin-right: 5px;
 }
 
-.containerBG{
-    background: var(--container-BG);
+.containerBG {
+  background: var(--container-BG);
 }
 
-.containerRight{
-    width: calc(50% - 5px);
-    margin-top: 10px;
-    margin-left: 5px;
+.containerRight {
+  width: calc(50% - 5px);
+  margin-top: 10px;
+  margin-left: 5px;
 }
-.headerText{
-    font-size: larger;
-    font-weight: bolder;
-    color: #d1e5f5;
+.headerText {
+  font-size: larger;
+  font-weight: bolder;
+  color: #d1e5f5;
 }
 
 /* ------------------------------ user details ------------------------------ */
-.profilePictureOuter{
-    border: solid 2px #3a5577;
-    border-radius: 8px;
-    overflow: hidden;
+.profilePictureOuter {
+  border: solid 2px #3a5577;
+  border-radius: 8px;
+  overflow: hidden;
 }
-.font25{
-    font-size: 25px;
-}
-
-.profileHeader{
-    background: linear-gradient(#3b5a77, #040c16);
-    height: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.font25 {
+  font-size: 25px;
 }
 
-.profilContainerInnerLeft{
-    height: 200px;
-    padding: 20px 20px 10px 20px;
+.profileHeader {
+  background: linear-gradient(#3b5a77, #040c16);
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.profilContainerInnerRight{
-    width: 100%;
+.profilContainerInnerLeft {
+  height: 200px;
+  padding: 20px 20px 10px 20px;
 }
 
-input[type="submit"]{
-    padding: 5px;
-    background: #265499;
-    color: aliceblue;
-    border: solid 2px var(--button-boarder);
-    border-left: solid 1px var(--light-color);
-    border-radius: 0px 8px 8px 0px;
-    font-size: 15px;
+.profilContainerInnerRight {
+  width: 100%;
 }
 
-#changeName{
-    height: 34px;
+input[type="submit"] {
+  padding: 5px;
+  background: #265499;
+  color: aliceblue;
+  border: solid 2px var(--button-boarder);
+  border-left: solid 1px var(--light-color-a);
+  border-radius: 0px 8px 8px 0px;
+  font-size: 15px;
+}
+
+#changeName {
+  height: 34px;
 }
 .custom-file-upload {
-    border: 1px solid #ccc;
-    display: inline-block;
-    padding: 6px 6px;
-    cursor: pointer;
-    background: #265499;
-    color: aliceblue;
-    border: solid 2px var(--button-boarder);
-    border-right: solid 1px var(--light-color);
-    border-radius: 8px 0px 0px 8px;
-    font-size: 15px;
+  border: 1px solid #ccc;
+  display: inline-block;
+  padding: 6px 6px;
+  cursor: pointer;
+  background: #265499;
+  color: aliceblue;
+  border: solid 2px var(--button-boarder);
+  border-right: solid 1px var(--light-color-a);
+  border-radius: 8px 0px 0px 8px;
+  font-size: 15px;
 }
 
-button{
-    padding: 5px;
-    background: #265499;
-    color: aliceblue;
-    border: solid 2px var(--button-boarder);
-    border-radius: 5px;
-    font-size: 15px;
-
+button {
+  padding: 5px;
+  background: #265499;
+  color: aliceblue;
+  border: solid 2px var(--button-boarder);
+  border-radius: 5px;
+  font-size: 15px;
 }
 
 .profilePic[type="file"] {
-    display: none;
+  display: none;
 }
 
-#profilePicture{
-    width: 150px;
-    height: 80%;
+#profilePicture {
+  width: 150px;
+  height: 80%;
 }
 
 /* ----------------------------- bedgeCollection ---------------------------- */
-.activeBadge{
-    width: 200px;
+.activeBadge {
+  width: 200px;
 }
 
-h1{
-    font-size: 35px;
-    text-align: center;
+h1 {
+  font-size: 35px;
+  text-align: center;
 }
-.bedgeCollection{
-    width: 100%;
+.bedgeCollection {
+  width: 100%;
 }
-.badgeContainer{
-    margin-top: 10px;
-    border: solid 2px #3a5577;
-    border-radius: 8px;
-    overflow: hidden;
+.badgeContainer {
+  margin-top: 10px;
+  border: solid 2px #3a5577;
+  border-radius: 8px;
+  overflow: hidden;
+}
 
-    }
-    
 /* ------------------------------ Match History ----------------------------- */
-.matchHistoryContainer{
-    border: solid 2px #3a5577;
-height: 100%;
-border-radius: 8px;
-overflow: hidden;
+.matchHistoryContainer {
+  border: solid 2px #3a5577;
+  height: 100%;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-#winRate{
-    font-size: 20px;
-    font-weight: bolder;
+#winRate {
+  font-size: 20px;
+  font-weight: bolder;
 }
 /* --------------------------- small screen layout -------------------------- */
-@media screen and (max-width: 901px){
-    .containerLeft{
+@media screen and (max-width: 901px) {
+  .containerLeft {
     width: 100%;
     margin-right: 0px;
+  }
 
-}
-
-.containerRight{
+  .containerRight {
     width: 100%;
     margin-left: 0px;
-
-}
-
+  }
 }

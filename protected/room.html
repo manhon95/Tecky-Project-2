@@ -9,56 +9,29 @@
       integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk="
       crossorigin="anonymous"
     />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>    <link rel="stylesheet" href="css/style.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/nav-bar-style.css" />
-
-    <style>
-      body{
-   min-width: 700px;
-}
-
-      .player {
-        display: flex;
-        gap: 1rem;
-        position: relative;
-      }
-      .player-ready-state {
-        background-color: white;
-        border: 1px solid black;
-        color: red;
-      }
-      .player-ready-state.ready {
-        color: green;
-      }
-      .player .profile {
-        color: black;
-        background: white;
-        position: absolute;
-        top: 0;
-        left: 0;
-        transform: translate(0, -100%);
-        display: none;
-        z-index: 2;
-      }
-      .player-badge {
-        width: 30px;
-        height: 30px;
-      }
-      .profile-pic {
-        width: 20px;
-        height: 20px;
-      }
-    </style>
-    <title>ChatCord App</title>
+    <link rel="stylesheet" href="css/room.css" />
+    <title>waiting room</title>
   </head>
   <body>
     <header class="navbar"></header>
     <div class="chat-container">
       <header class="chat-header">
         <h1><i class="fas fa-smile"></i> Coup Game</h1>
-        <button class="ready-btn">toggle ready state</button>
+        <button class="btn ready-btn">toggle ready</button>
         <button class="btn leave-btn">Leave Room</button>
       </header>
       <main class="chat-main">
@@ -66,62 +39,7 @@
           <h3><i class="fas fa-comments"></i> Room Name:</h3>
           <h2 id="room-name"></h2>
           <h3><i class="fas fa-users"></i> Players</h3>
-          <ul id="player-list">
-            <template>
-              <li class="player">
-                <img
-                  src="./assets/badge/noob.png"
-                  alt=""
-                  class="player-badge"
-                />
-                <span class="player-name">Ivan</span>
-                <div class="player-ready-state">READY</div>
-                <div class="friend-profile profile">
-                  <div>
-                    <span class="profile-username">Ivan Yiu</span>
-                    <img src="" alt="" class="profile-pic" />
-                  </div>
-                  <div>
-                    <span>elo:</span>
-                    <span class="profile-elo">1000</span>
-                  </div>
-                  <div>
-                    <span>total game:</span>
-                    <span class="profile-game-played">10</span>
-                  </div>
-                  <div>
-                    <span>game won:</span>
-                    <span class="profile-game-won">7</span>
-                  </div>
-                  <div>
-                    <span>win rate:</span>
-                    <span class="profile-win-rate">70%</span>
-                  </div>
-                  <div>
-                    <span>bday:</span>
-                    <span class="profile-birthday">7</span>
-                  </div>
-                  <div class="friend-status">friend</div>
-                </div>
-                <div class="non-friend-profile profile">
-                  <div>
-                    <span class="profile-username">Ivan Yiu</span>
-                    <img src="" alt="" class="profile-pic" />
-                  </div>
-                  <div>
-                    <span>elo:</span>
-                    <span class="profile-elo">1000</span>
-                  </div>
-                  <div>
-                    <span>total game:</span>
-                    <span class="profile-game-played">10</span>
-                  </div>
-                  <div class="friend-status">not friend</div>
-                  <button class="add-friend-btn">add</button>
-                </div>
-              </li>
-            </template>
-          </ul>
+          <ul id="player-list"></ul>
         </div>
         <div class="chat-messages"></div>
       </main>
@@ -138,6 +56,56 @@
         </form>
       </div>
     </div>
+    <template>
+      <li class="player">
+        <img src="./assets/badge/noob.png" alt="" class="player-badge" />
+        <span class="player-name">Ivan</span>
+        <div class="player-ready-state">READY</div>
+        <div class="friend-profile profile">
+          <div>
+            <span class="profile-username">Ivan Yiu</span>
+            <img src="" alt="" class="profile-pic" />
+          </div>
+          <div>
+            <span>elo:</span>
+            <span class="profile-elo">1000</span>
+          </div>
+          <div>
+            <span>total game:</span>
+            <span class="profile-game-played">10</span>
+          </div>
+          <div>
+            <span>game won:</span>
+            <span class="profile-game-won">7</span>
+          </div>
+          <div>
+            <span>win rate:</span>
+            <span class="profile-win-rate">70%</span>
+          </div>
+          <div>
+            <span>bday:</span>
+            <span class="profile-birthday">7</span>
+          </div>
+          <div class="friend-status">friend</div>
+        </div>
+        <div class="non-friend-profile profile">
+          <div>
+            <span class="profile-username">Ivan Yiu</span>
+            <img src="" alt="" class="profile-pic" />
+          </div>
+          <div>
+            <span>elo:</span>
+            <span class="profile-elo">1000</span>
+          </div>
+          <div>
+            <span>total game:</span>
+            <span class="profile-game-played">10</span>
+          </div>
+          <div class="friend-status">not friend</div>
+          <button class="add-friend-btn">add</button>
+        </div>
+      </li>
+    </template>
     <a
       href="https://www.freepik.com/free-vector/army-rank-badges-gold-military-insignia-signs_39204058.htm#query=gaming%20badge&position=25&from_view=search&track=ais"
       >Image by upklyak</a

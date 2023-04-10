@@ -1,4 +1,3 @@
-const username = document.querySelector(".username");
 const coins = document.querySelector(".coins");
 const template = document.querySelector("template");
 
@@ -7,7 +6,6 @@ let myId;
 async function init() {
   const socket = io();
   myId = await getuserId();
-  username.textContent = await getUsername(myId);
   showBadges(await getUnboughtBadges(myId));
   coins.textContent = await getCoins(myId);
 }
@@ -33,7 +31,7 @@ function showBadges(badges) {
     badgeNode.querySelector(".badge-image").src = badge.url;
     badgeNode.querySelector(".badge-price").textContent = `$${badge.price}`;
     badgeNode.querySelector(".buy-btn").addEventListener("click", async () => {
-      console.log("tries to post");
+      // console.log("tries to post");
       let res = await fetch(`/users/${myId}/badges/${badge.id}`, {
         method: "POST",
         headers: {
@@ -41,7 +39,7 @@ function showBadges(badges) {
         },
       });
       let result = await res.json();
-      console.log(result);
+      // console.log(result);
       if (result.error) {
         showError({ title: "Can't Purchase", text: result.error });
         return;
