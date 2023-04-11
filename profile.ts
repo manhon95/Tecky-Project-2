@@ -203,11 +203,14 @@ ORDER BY m.match_date DESC;
 }
 
 export async function getPasswordVerifyCode(req: Request, res: Response) {
+console.log(req.session.user?.id)
+
   let result = await database.query('select email from "user" where id=($1);', [
     req.session.user?.id,
   ]);
-  let verificationCode = "1234";
-  // await sendEmailVerificationCode(result.rows[0].email);
+  console.log(result.rows[0].email)
+
+  let verificationCode = await sendEmailVerificationCode(result.rows[0].email);
   req.session.verificationCode = verificationCode;
   res.end();
 }

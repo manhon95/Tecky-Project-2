@@ -41,7 +41,7 @@ export function getSessionUser(req: Request) {
   throw new HttpError(401, "This API is only for authenticated users");
 }
 export async function isAdmin(req: Request, res: Response, next: NextFunction) {
-  if (req.session.user?.id == "163") {
+  if (req.session.user?.id == "196") {
     next();
   } else {
     res.end("Admin only");

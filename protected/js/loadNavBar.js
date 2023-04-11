@@ -15,89 +15,94 @@ async function loadProfileNamePic() {
 loadProfileNamePic();
 
 
-
 navBarHeader = document.querySelector(".navbar");
 navBarHeader.innerHTML = /*html*/ `
-<div class="container-fluid">
-<div class="navb-logo">
-  <a href=""><img src="./assets/coup-logo.jpg" alt="" /></a>
-</div>
-<div class="navb-items d-flex ">
-
-  <div class="buttonGroup d-flex me-3 gap-3">
-    <div class="item">
-      <a href="/user/social">Social</a>
-    </div>
-    <div class="item">
-      <a href="/user/lobby">Game lobby</a>
-    </div>
-    <div class="item">
-      <a href="shop.html">Shop</a>
-    </div>
-  </div>
-
-  <div class="item-button d-flex">
-    <div id="dropdown" class="dropdown me-3">
-      <button
-        class="btn btn-secondary dropdown-toggle"
-        type="button"
-        data-bs-toggle="dropdown"
-        aria-expanded="false"
-      >
-        Dropdown button
-      </button>
-      <ul class="dropdown-menu">
-        <li>
-          <div class="item dropdown-item">
-            <a href="/user/social">Social</a>
-          </div>
-        </li>
-        <li>
-          <div class="item dropdown-item">
-            <a href="/user/lobby">Game lobby</a>
-          </div>
-        </li>
-        <li>
-          <div class="item dropdown-item">
-            <a href="shop.html">Shop</a>
-          </div>
-        </li>
-      </ul>
-    </div>
-  </div>
-
-  <div>
-    <img id="profilePic" src="" alt="" class="profileImg" />
-  </div>
-
-  <div id="profiledropdown" class="dropdown">
-    <button
-      class="btn btn-secondary dropdown-toggle"
-      type="button"
-      data-bs-toggle="dropdown"
-      aria-expanded="false"
-    >
-      <span id="profileName">vfdbdf</span>
-    </button>
-    <ul class="dropdown-menu dropdown-menu-end">
-      <li>
-        <div class="item dropdown-item">
-          <a href="/user/profile">View my profile</a>
+      <div class="container-fluid">
+        <div class="navb-logo">
+          <a href=""><img src="./assets/coup-logo.jpg" alt="" /></a>
         </div>
-      </li>
-      <li>
-        <div class="item dropdown-item">
-          <a type="button" id="logOutButton" class="logOutButton"
-            >Log Out</a
-          >
-        </div>
-      </li>
-    </ul>
-  </div>
+        <div class="navb-items d-flex ">
 
-  <!-- <a id="profileName" href="/user/profile" type="button"></a> -->
-</div>
-</div>
+          <div class="buttonGroup d-flex me-3 gap-3">
+            <div class="item">
+              <a href="/user/social">Social</a>
+            </div>
+            <div class="item">
+              <a href="/user/lobby">Game lobby</a>
+            </div>
+            <div class="item">
+              <a href="shop.html">Shop</a>
+            </div>
+          </div>
+
+          <div class="item-button d-flex">
+            <div id="dropdown" class="dropdown me-3">
+              <button
+                class="btn btn-secondary dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Dropdown button
+              </button>
+              <ul class="dropdown-menu">
+                <li>
+                  <div class="item dropdown-item">
+                    <a href="/user/social">Social</a>
+                  </div>
+                </li>
+                <li>
+                  <div class="item dropdown-item">
+                    <a href="/user/lobby">Game lobby</a>
+                  </div>
+                </li>
+                <li>
+                  <div class="item dropdown-item">
+                    <a href="shop.html">Shop</a>
+                  </div>
+                </li>
+                <li>
+                  <div class="item dropdown-item">
+                    <button id="bugReport">bug report</button>
+                  </div>
+                </li>
+
+              </ul>
+            </div>
+          </div>
+
+          <div>
+            <img id="profilePic" src="" alt="" class="profileImg" />
+          </div>
+
+          <div id="profiledropdown" class="dropdown">
+            <button
+              class="btn btn-secondary dropdown-toggle"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <span id="profileName">vfdbdf</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <div class="item dropdown-item">
+                  <a href="/user/profile">View my profile</a>
+                </div>
+              </li>
+              <li>
+                <div class="item dropdown-item">
+                  <a type="button" id="logOutButton" class="logOutButton"
+                    >Log Out</a
+                  >
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <!-- <a id="profileName" href="/user/profile" type="button"></a> -->
+        </div>
+      </div>
 `;
 
 //Log out function
@@ -109,3 +114,30 @@ document
     });
     location.href = "/login";
   });
+
+
+      document.querySelector('#bugReport').addEventListener("click", async()=>{
+        const {value: text} = Swal.fire({
+          title: 'please provide the game ID and describe the problem',
+          input: 'text',
+          inputAttributes: {
+            autocapitalize: 'off'
+          },
+          showCancelButton: true,
+          confirmButtonText: 'Submit',
+          showLoaderOnConfirm: true,
+          preConfirm: async(text) => {
+              const res = await fetch("/bugReport", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({value :text}),
+  });
+  const result = await res.json();
+  Swal.fire(result.message)
+          }
+  
+})
+
+})

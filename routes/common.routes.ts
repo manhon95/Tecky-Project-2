@@ -1,4 +1,4 @@
-import express, { Router } from "express";
+import express, {Request, Response, Router } from "express";
 import {
   getProfile,
   getProfilePic,
@@ -10,6 +10,10 @@ import formidable from "formidable";
 import { hasLogin } from "../guard";
 import { logOutClearSession } from "../logout";
 import { getProfilePicture } from "../profile";
+import { reportBugs } from "../bugReport";
+import jsonfile from "jsonfile"
+import path from "path";
+
 
 // This is for routes using in more than one pages(don't know how to classify put them in here first)
 
@@ -36,3 +40,12 @@ commonRoutes.get("/profiles/:id", getProfile);
 commonRoutes.post("/login/logout", logOutClearSession);
 
 commonRoutes.get("/profilePic", getProfilePicture);
+
+commonRoutes.post("/bugReport", async (req: Request ,res: Response)=>{
+  let file = await jsonfile.readFile(path.join(__dirname, "../bugReport.json"));
+  let report = req.body.value
+  file.push({report})
+  jsonfile.writeFileSync(path.join(__dirname, "../bugReport.json"), file);
+  res.json({message: "thank you for reporting, we will looking into it soon"})
+});
+  
