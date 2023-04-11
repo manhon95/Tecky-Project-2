@@ -43,11 +43,9 @@ commonRoutes.get("/profilePic", getProfilePicture);
 
 commonRoutes.post("/bugReport", async (req: Request ,res: Response)=>{
   let file = await jsonfile.readFile(path.join(__dirname, "../bugReport.json"));
-  console.log(file)
   let report = req.body.value
   file.push({report})
-  console.log(report)
   jsonfile.writeFileSync(path.join(__dirname, "../bugReport.json"), file);
-  res.json({message: "test"})
+  res.json({message: "thank you for reporting, we will looking into it soon"})
 });
   

@@ -118,13 +118,13 @@ document
 
       document.querySelector('#bugReport').addEventListener("click", async()=>{
         const {value: text} = Swal.fire({
-          title: 'Submit your Github username',
+          title: 'please provide the game ID and describe the problem',
           input: 'text',
           inputAttributes: {
             autocapitalize: 'off'
           },
           showCancelButton: true,
-          confirmButtonText: 'Look up',
+          confirmButtonText: 'Submit',
           showLoaderOnConfirm: true,
           preConfirm: async(text) => {
               const res = await fetch("/bugReport", {
@@ -135,8 +135,7 @@ document
     body: JSON.stringify({value :text}),
   });
   const result = await res.json();
-  console.log(result.message)
-
+  Swal.fire(result.message)
           }
   
 })

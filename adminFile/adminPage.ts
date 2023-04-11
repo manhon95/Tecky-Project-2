@@ -5,10 +5,12 @@ import "../middleware";
 export async function findAccount(req: Request, res: Response) {
   try {
     const result = await database.query(
-      /* sql */ 'select email, user_name, elo, coins,email_verify from "user" where email=($1)',
-      [req.body.email]
-    );
+            /* sql */ `select id, email, user_name, elo, coins, email_verify from "user" where email like $1`,
 
+      // /* sql */ `select id, email, user_name, elo, coins, email_verify from "user" where email=($1)`,
+      [`%${req.body.email}%`]
+    );
+console.log(result)
     let account = {
       id: result.rows[0].id,
       userName: result.rows[0].user_name,
@@ -18,7 +20,7 @@ export async function findAccount(req: Request, res: Response) {
       emailVerification: result.rows[0].email_verify,
     };
     console.log(account);
-    res.json(account);
+    res.json(result.rows);
   } catch {
     res.json({ message: "No email found" });
   }
@@ -61,15 +63,13 @@ export async function changCoinsAmount(req: Request, res: Response) {
 export async function verification(req: Request, res: Response) {
   try {
     const result = await database.query(
-      /* sql */ `select id, email, user_name, elo, coins,email_verify from "user" where email=($1)`,
-      [req.body.email]
-    );
+      /* sql */ `select id, email, user_name, elo, coins,email_verify from "user" where email= $1`,
+      [req.body.email]);
     await database.query(
       /* sql */ `update "user" set email_verify = $1 where email = $2 `,
       [req.body.verification, req.body.email]
     );
 
-    console.log(result.rows[0].id);
     let account = {
       id: result.rows[0].id,
       userName: result.rows[0].user_name,

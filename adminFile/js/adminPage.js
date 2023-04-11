@@ -50,14 +50,29 @@ searchUserForm.addEventListener("submit", async function (event) {
       body: JSON.stringify(formObject),
     });
     const result = await res.json();
+    while(userDetailsList.firstChild) {
+      console.log("clear");
+      userDetailsList.removeChild(userDetailsList.firstChild);
+    }
+    result.map(account => {
+      const userDetails = template.content.querySelector(".userDetails").cloneNode(true);
+      userDetails.querySelector(".id").textContent = account.id
+      userDetails.querySelector(".userName").textContent = account.elo
+      userDetails.querySelector(".email").textContent = account.email
+      userDetails.querySelector(".coins").textContent = account.coins
+      userDetails.querySelector(".elo").textContent = account.elo
+      userDetails.querySelector(".emailVerification").textContent = account.emailVerification
+      userDetailsList.appendChild(userDetails);
+      })
+  
 
-       userDetails.querySelector(".id").textContent = result.id
-       userDetails.querySelector(".userName").textContent = result.elo
-       userDetails.querySelector(".email").textContent = result.email
-       userDetails.querySelector(".coins").textContent = result.coins
-       userDetails.querySelector(".elo").textContent = result.elo
-       userDetails.querySelector(".emailVerification").textContent = result.emailVerification
-       userDetailsList.appendChild(userDetails);
+      //  userDetails.querySelector(".id").textContent = result.id
+      //  userDetails.querySelector(".userName").textContent = result.elo
+      //  userDetails.querySelector(".email").textContent = result.email
+      //  userDetails.querySelector(".coins").textContent = result.coins
+      //  userDetails.querySelector(".elo").textContent = result.elo
+      //  userDetails.querySelector(".emailVerification").textContent = result.emailVerification
+      //  userDetailsList.appendChild(userDetails);
   });
 
   changeCoinsAmountForm.addEventListener("submit", async function (event) {
