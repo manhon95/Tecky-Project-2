@@ -415,10 +415,16 @@ function createActionRecord(record) {
 
 function formatMessage(message) {
   Object.keys(userIdNameMap).forEach((key) => {
-    message = message.replace(`[p${key}]`, userIdNameMap[key]);
+    message = message.replace(
+      `[p${key}]`,
+      `<i class="fa-solid fa-chess-pawn fa-bounce"></i> ${userIdNameMap[key]}`
+    );
   });
   Object.keys(cardIdNameMap).forEach((key) => {
-    message = message.replace(`[c${key}]`, cardIdNameMap[key]);
+    message = message.replace(
+      `[c${key}]`,
+      `<i class="fa-solid fa-heart fa-flip"></i> ${cardIdNameMap[key]}`
+    );
   });
   Object.keys(actionNameMap).forEach((key) => {
     message = message.replace(`[a${key}]`, actionNameMap[key]);
