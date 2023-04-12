@@ -59,11 +59,13 @@ export async function saveUserDetails(req: Request, res: Response) {
     report["duplicate-email"] = "Email already used*";
     checkStatus = false;
   }
+
   if (emailFromDB.rows[0] == undefined && email.match(emailFormat)) {
     report["email"] = true;
   } else {
     report["email"] = false;
   }
+
   if (checkStatus) {
     const verificationCode = await sendEmailVerificationCode(email);
     const newPassword = await hashPassword(password);
@@ -79,7 +81,7 @@ export async function saveUserDetails(req: Request, res: Response) {
     );
     report["success"] = "success";
     req.session.verificationCode = verificationCode;
-    req.session.email = email
+    req.session.email = email;
     req.session.save();
   } else {
     res.status(400);

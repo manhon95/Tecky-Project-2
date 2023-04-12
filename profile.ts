@@ -9,8 +9,8 @@ import { sendEmailVerificationCode } from "./utils/sendEmailCode";
 /* ------------------------ function for Router handler ----------------------- */
 
 export async function patchUsername(req: Request, res: Response) {
-  updateUsernameInDB(+req.params.id, req.body.newName);
-  res.json({});
+  let success = await updateUsernameInDB(+req.params.id, req.body.newName);
+  res.json({ status: success });
 }
 
 export async function getUserBadges(req: Request, res: Response) {
@@ -56,23 +56,27 @@ export async function getMatchHistory(req: Request, res: Response) {
 }
 /* ----------------------- function for Database query ---------------------- */
 async function updateUsernameInDB(id: number, newName: string) {
-  let result = await database.query(
-    /* sql */ `
-  select user_name from "user" where user_name = $1
-  `,
-    [newName]
-  );
-  let row = result.rows[0];
-  if (!row) {
-    // if no existing same name
-    await database.query(
-      /*sql*/ `
-  update "user" set user_name = $1 where id = ${id}
+  try {
+    let result = await database.query(
+      /* sql */ `
+    select user_name from "user" where user_name = $1
     `,
       [newName]
     );
+    let row = result.rows[0];
+    if (!row) {
+      // if no existing same name
+      await database.query(
+        /*sql*/ `
+    update "user" set user_name = $1 where id = $2
+      `,
+        [newName, id]
+      );
+    }
+    return true;
+  } catch (error) {
+    return false;
   }
-  return true;
 }
 
 const uploadDir = "protected/assets/profilePicture";
@@ -117,10 +121,12 @@ export async function upLoadProfilePicture(req: Request, res: Response) {
 export async function getProfilePicture(req: Request, res: Response) {
   let id = req.session.user?.id;
   const userInfo = {};
+
   let oldImage = await database.query(
     'select profilePic, user_name from "user" where id = ($1)',
     [id]
   );
+
   userInfo["oldImageName"] = oldImage.rows[0].profilepic;
   userInfo["userName"] = oldImage.rows[0].user_name;
   res.json(userInfo);
@@ -203,12 +209,12 @@ ORDER BY m.match_date DESC;
 }
 
 export async function getPasswordVerifyCode(req: Request, res: Response) {
-console.log(req.session.user?.id)
+  console.log(req.session.user?.id);
 
   let result = await database.query('select email from "user" where id=($1);', [
     req.session.user?.id,
   ]);
-  console.log(result.rows[0].email)
+  console.log(result.rows[0].email);
 
   let verificationCode = await sendEmailVerificationCode(result.rows[0].email);
   req.session.verificationCode = verificationCode;

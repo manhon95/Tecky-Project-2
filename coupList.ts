@@ -45,8 +45,10 @@ export function deleteCoupGame(gameId: string) {
 
 export function getGameById(gameId: string): Game {
   logger.debug(`${filename} - In getGameById`);
+
   if (!gameList.has(gameId)) {
     loadCoupGame(gameId);
   }
+
   return gameList.get(gameId);
 }

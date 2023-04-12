@@ -15,6 +15,9 @@ const { room } = Qs.parse(location.search, {
 let myId, username;
 
 init();
+function timer(t) {
+  return new Promise((rec) => setTimeout(() => rec(), t));
+}
 
 async function init() {
   //put all init in this function
@@ -22,23 +25,35 @@ async function init() {
   const res = await fetch("/user-id");
   const result = await res.json();
   myId = result.id;
+
   username = await getUsername(myId);
   console.log(room, username);
   roomName.innerText = room;
   //uncomment below if socketIo is used, replace {Page} to the page name
 
-  socket.emit("askRoomInit", { username, room, myId });
   // Message submit
 
   htmlInit();
   socketEventInit();
+
+  socket.emit("askRoomInit", { username, room, myId });
 }
+
+let debounce = false;
 
 /* -------------------------- all socketEvent here -------------------------- */
 function socketEventInit() {
   // Get room and users
   socket.on("room-players", async ({ room, players }) => {
+    if (debounce) {
+      return;
+    }
+
+    debounce = true;
+
+    // await timer(ranTime());
     await outputPlayers(players);
+    setTimeout(() => (debounce = false), 80);
   });
 
   // Message from server
@@ -56,6 +71,7 @@ function socketEventInit() {
       title: `being added by ${senderName}`,
       text: "Check in the social center",
       showConfirmButton: false,
+      backdrop: false,
       timer: 1000,
     });
   });
@@ -74,12 +90,16 @@ function socketEventInit() {
     // fixing the repeat print bug
     // const playerNodeList = playerList.querySelectorAll("li");
     // console.log(playerNodeList);
-    while (playerList.firstChild) {
-      console.log("removed child", playerList.firstChild);
-      playerList.removeChild(playerList.firstChild);
-    }
+    // while (playerList.firstChild) {
+    //   console.log("removed child", playerList.firstChild);
+    //   playerList.removeChild(playerList.firstChild);
+    // }
 
-    players.map(async (player) => {
+    console.log(players);
+
+    playerList.innerHTML = "";
+
+    for (let player of players) {
       // console.log(player.userId, myId);
 
       const playerNode = template.content
@@ -90,8 +110,10 @@ function socketEventInit() {
       // get userMatch history & profile & profile picture
       let matchRes = await fetch(`/matchHistory/${player.userId}`);
       let matchObj = await matchRes.json();
+
       let profileRes = await fetch(`/profiles/${player.userId}`);
       let profileObj = await profileRes.json();
+
       let profilePicUrl = profileObj.profilePicUrl;
       // console.log(profilePicUrl);
       //  profilePic.src = Result.oldImageName.includes("https")? Result.oldImageName : `./assets/profilePicture/${Result.oldImageName}`
@@ -159,11 +181,13 @@ function socketEventInit() {
               matchObj.gamePlayed;
           }
         });
+
         addFriendBtn.addEventListener("click", async () => {
           // firing a add friend request
           await fetch(`/friend-requests/${myId}/${player.userId}`, {
             method: "POST",
           });
+
           Swal.fire({
             position: "top-end",
             icon: "success",
@@ -171,6 +195,7 @@ function socketEventInit() {
             showConfirmButton: false,
             timer: 1000,
           });
+
           // update the friend request receiver immediately
           socket.emit("add-friend", {
             receiverSocketId: player.socketId,
@@ -181,10 +206,13 @@ function socketEventInit() {
         playerName.style.color = "blue";
         playerName.style.fontWeight = "bold";
       }
-      const playerNodeList = playerList.querySelectorAll("li");
 
+      console.log("PLAYER hi");
       playerList.appendChild(playerNode);
-    });
+    }
+
+    // players.forEach(async (player) => {
+    // });
   }
 
   // Output message to DOM

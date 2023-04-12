@@ -16,21 +16,31 @@ import { begin, commit, rollback } from "../db";
 import { logger } from "../logger";
 import path from "path";
 
+function timer(t: number) {
+  return new Promise((rec) => setTimeout(() => rec(true), t));
+}
+
+const rngTime = () => Math.floor(Math.random() * 300);
+
 const filename = path.basename(__filename);
 export function addRoomSocketInitEvent(io: socket.Server) {
   io.on("connection", (socket) => {
-    const randomTime = Math.floor(Math.random() * 500);
     const req = socket.request as express.Request;
+
     socket.on("askRoomInit", ({ username, room, myId }) => {
+      const randomTime = Math.floor(Math.random() * 1000);
+
       let rid = rooms.findIndex((rmName) => rmName.name == room);
       // if room.playing == true, set it back to false(people returning to lobby)
       if (!rooms[rid]) {
         logger.warn(`${filename} - Unauthorized access`);
         return;
       }
+
       // if (rooms[rid].playing) {
       //   rooms[rid].playing = false;
       // }
+
       const player = playerJoin(socket.id, username, room, false, myId);
 
       rooms[rid].count++;
@@ -168,8 +178,10 @@ function addRoomSocketEvent(socket: socket.Socket, io: socket.Server) {
   });
 }
 
-function updateRoomPlayerInfo(io: socket.Server, room: string) {
+async function updateRoomPlayerInfo(io: socket.Server, room: string) {
   const players = getRoomPlayers(room);
+
+  await timer(rngTime());
   // console.log(players, "players before send");
   io.to(room).emit("room-players", {
     room: room,

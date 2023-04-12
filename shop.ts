@@ -16,8 +16,10 @@ export async function getUserCoins(req: Request, res: Response) {
 export async function postBadgeOwner(req: Request, res: Response) {
   const userId = +req.params.userId;
   const badgeId = +req.params.badgeId;
+
   const badgePrice = await readBadgePriceFromDB(badgeId);
   const userCoins = await readUserCoinsFromDB(userId);
+
   console.log({ userCoins, badgePrice });
   if (userCoins < badgePrice) {
     throw new HttpError(400, "Not enough coins");

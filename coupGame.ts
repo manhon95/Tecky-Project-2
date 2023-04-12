@@ -107,6 +107,7 @@ export class Game {
   private readonly save2Buffer: GameSave2;
   private deckShuffleCount = 0;
   private recordCount = 0;
+
   constructor(
     public readonly id: string,
     private readonly io: Server,
@@ -122,16 +123,20 @@ export class Game {
     this.snapshotMode = loadData.snapshotMode;
     if (loadData.save2) {
       const contents = fs.readFileSync(`coupSave/${this.id}.json`);
+
       this.save2Buffer = JSON.parse(contents.toString());
       this.name = this.save2Buffer.name;
       this.deck = [...this.save2Buffer.startingDeck];
+
       //create player list from user id list
       this.playerList = this.save2Buffer.playerIdList.map(
         (playerId) => new Player(playerId, this)
       );
+
       this.inGamePlayerList = this.playerList.filter(
         (player) => player.getState() === "inGame"
       );
+
       if (loadData.recordId !== undefined) {
         const recordId = loadData.recordId;
         this.save2Buffer.transitionRecords =
@@ -139,6 +144,7 @@ export class Game {
             (transition) => transition.id <= recordId
           );
       }
+
       this.save2Buffer.transitionRecords.forEach((transition) => {
         logger.debug(
           `${filename} - Loading transition record ${
@@ -159,6 +165,7 @@ export class Game {
         transitionRecords: [],
         shuffleRecords: [],
       };
+
       this.deck = [...this.save2Buffer.startingDeck];
       //create player list from user id list
       this.playerList = this.save2Buffer.playerIdList.map(
@@ -531,12 +538,14 @@ export class Game {
       case "resolvingAction": {
         if (this.action?.getState() == "finish") {
           this.action = null;
+
           if (this.checkVictory()) {
             this.state = "finish";
             this.ioEmit("finish", {
               userId: this.inGamePlayerList[0].userId,
               gameName: this.name,
             });
+
             changeRoomStatusToWaiting(this.name);
             updateWinner(this.id, this.inGamePlayerList[0].userId);
           } else {
@@ -545,6 +554,7 @@ export class Game {
             } else {
               this.activePlayerIndex++;
             }
+
             this.state = "askAction";
             this.ioEmit("askAction", {
               userId: this.inGamePlayerList[this.activePlayerIndex].userId,
@@ -577,6 +587,7 @@ class Income implements Action {
   public readonly id = 1;
   private state: string;
   private actionValid: boolean = true;
+
   constructor(
     public readonly callingGame: Game,
     public readonly activePlayerIndex: number,
@@ -596,6 +607,7 @@ class Income implements Action {
   transition(arg?: transitionArgument): void {
     this.callingGame.inGamePlayerList[this.activePlayerIndex].addBalance(1);
     this.state = "finish";
+
     this.callingGame.transition();
     this.callingGame.save();
   }
@@ -604,10 +616,13 @@ class Income implements Action {
 /* ------------------------------- Foreign Aid ------------------------------ */
 class ForeignAid implements Action {
   public readonly id = 2;
+
   private state: string;
   private askPlayerIndex: number = -1;
+
   public counteraction: Counteraction | null = null;
   private actionValid: boolean = true;
+
   constructor(
     public readonly callingGame: Game,
     public readonly activePlayerIndex: number,
@@ -915,12 +930,16 @@ class Tax implements Action {
 /* ------------------------------ Assassinate; ------------------------------ */
 class Assassinate implements Action {
   public readonly id = 5;
+
   private state: string;
   private askPlayerIndex: number = -1;
+
   public counteraction: Counteraction | null;
   public challenge: Challenge | null;
+
   private targetIndex: number | null = null;
   private actionValid: boolean = true;
+
   constructor(
     public readonly callingGame: Game,
     public readonly activePlayerIndex: number,
