@@ -696,7 +696,11 @@ class ForeignAid implements Action {
           this.counteraction?.transition(arg);
         } else {
           this.counteraction = null;
-          if (this.actionValid) {
+          if (
+            this.actionValid &&
+            this.callingGame.playerList[this.activePlayerIndex].getState() ==
+              "inGame"
+          ) {
             this.callingGame.playerList[this.activePlayerIndex].addBalance(2);
           }
           this.state = "finish";
@@ -881,7 +885,11 @@ class Tax implements Action {
           this.challenge?.transition(arg);
         } else {
           this.challenge = null;
-          if (this.actionValid) {
+          if (
+            this.actionValid &&
+            this.callingGame.playerList[this.activePlayerIndex].getState() ==
+              "inGame"
+          ) {
             this.callingGame.playerList[this.activePlayerIndex].addBalance(3);
           }
           this.state = "finish";
@@ -1024,7 +1032,11 @@ class Assassinate implements Action {
       case "resolveChallenge": {
         if (this.challenge?.getState() !== "finish") {
           this.challenge?.transition(arg);
-        } else if (this.actionValid) {
+        } else if (
+          this.actionValid &&
+          this.callingGame.playerList[this.activePlayerIndex].getState() ==
+            "inGame"
+        ) {
           this.challenge = null;
           this.callingGame.playerList[this.activePlayerIndex].lowerBalance(3);
           this.askPlayerIndex = -1;
@@ -1217,7 +1229,11 @@ class Exchange implements Action {
       case "resolveChallenge": {
         if (this.challenge?.getState() !== "finish") {
           this.challenge?.transition(arg);
-        } else if (this.actionValid) {
+        } else if (
+          this.actionValid &&
+          this.callingGame.playerList[this.activePlayerIndex].getState() ==
+            "inGame"
+        ) {
           this.challenge = null;
           this.callingGame.playerList[this.activePlayerIndex].addHand(
             this.callingGame.drawCard(2)
@@ -1411,7 +1427,11 @@ class Steal implements Action {
       case "resolveChallenge": {
         if (this.challenge?.getState() !== "finish") {
           this.challenge?.transition(arg);
-        } else if (this.actionValid) {
+        } else if (
+          this.actionValid &&
+          this.callingGame.playerList[this.activePlayerIndex].getState() ==
+            "inGame"
+        ) {
           this.challenge = null;
           this.askPlayerIndex = -1;
           this.state = "askCounterAction";
@@ -1471,7 +1491,11 @@ class Steal implements Action {
           this.counteraction?.transition(arg);
         } else {
           this.counteraction = null;
-          if (this.actionValid) {
+          if (
+            this.actionValid &&
+            this.callingGame.playerList[this.activePlayerIndex].getState() ==
+              "inGame"
+          ) {
             this.actionEffect();
           }
           this.state = "finish";
@@ -1580,7 +1604,12 @@ class Counteraction implements Action {
         if (this.challenge?.getState() !== "finish") {
           this.challenge?.transition(arg);
         } else {
-          if (this.actionValid) {
+          if (
+            this.actionValid &&
+            this.callingGame.playerList[
+              this.counteractionPlayerIndex
+            ].getState() == "inGame"
+          ) {
             this.callingAction.setActionValid(false);
           }
           this.state = "finish";
