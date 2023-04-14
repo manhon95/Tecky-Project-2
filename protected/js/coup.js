@@ -186,6 +186,8 @@ function socketEventInit(socket, myId) {
     logger.debug(`askAction called with ${JSON.stringify(arg)}`);
     if (arg.userId == myId) {
       actionButtonOffcanvas.show();
+    } else {
+      actionButtonOffcanvas.hide();
     }
     actionButton.forEach((button) => {
       button.disabled = !(arg.userId == myId);
@@ -196,6 +198,8 @@ function socketEventInit(socket, myId) {
     logger.debug(`askCounterAction called with ${JSON.stringify(arg)}`);
     if (arg.userId == myId) {
       counteractionButtonOffcanvas.show();
+    } else {
+      counteractionButtonOffcanvas.hide();
     }
     counteractionButton.forEach((button) => {
       button.disabled = !(arg.userId == myId);
@@ -205,6 +209,8 @@ function socketEventInit(socket, myId) {
     logger.debug(`askChallenge called with ${JSON.stringify(arg)}`);
     if (arg.userId == myId) {
       challengeButtonOffcanvas.show();
+    } else {
+      challengeButtonOffcanvas.hide();
     }
     challengeButton.forEach((button) => {
       button.disabled = !(arg.userId == myId);
