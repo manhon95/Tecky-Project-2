@@ -185,7 +185,12 @@ export class Game {
   }
 
   drawCard(count: number) {
-    return this.deck.splice(0, count);
+    logger.debug(`${filename} - deck before: ${this.deck}`);
+    const cardDrawn = this.deck.splice(0, count);
+    logger.debug(
+      `${filename} - card drawn: ${cardDrawn} deck after: ${this.deck}`
+    );
+    return cardDrawn;
   }
 
   ioEmit(event: string, arg: any) {
@@ -242,22 +247,19 @@ export class Game {
     }
   }
 
-  shuffleDeck() {
-    let shuffledDeck = this.shuffle(this.deck);
+  shuffleDeck(): void {
+    this.deck = this.shuffle(this.deck);
     if (this.save2Buffer) {
       if (this.deckShuffleCount > this.save2Buffer.shuffleRecords.length - 1) {
-        this.save2Buffer.shuffleRecords.push(shuffledDeck);
+        this.save2Buffer.shuffleRecords.push(this.deck);
         logger.debug(`${filename} - new shuffled deck record pushed`);
         this.save2();
       } else {
-        shuffledDeck = this.save2Buffer.shuffleRecords[this.deckShuffleCount];
-        logger.debug(
-          `${filename} - shuffled deck record load: ${shuffledDeck}`
-        );
+        this.deck = this.save2Buffer.shuffleRecords[this.deckShuffleCount];
+        logger.debug(`${filename} - shuffled deck record load: ${this.deck}`);
         this.deckShuffleCount++;
       }
     }
-    return shuffledDeck;
   }
 
   shuffle<T>(array: T[]): T[] {
