@@ -43,7 +43,9 @@ export function addCoupSocketInitEvent(io: socket.Server) {
       }
       const userId = req.session.user?.id;
       if (!userId) {
-        logger.warn(`${filename} - userId not found session user id: ${req.session.user?.id}`);
+        logger.warn(
+          `${filename} - userId not found session user id: ${req.session.user?.id}`
+        );
         return;
       }
       socket.join(game.id);
@@ -62,14 +64,18 @@ function addCoupSocketEvent(
   game: Game,
   userId: string
 ) {
-  socket.on("CoupInitFinished", () => {
+  socket.on("askGameState", () => {
     game.sendState(socket);
   });
+
   socket.on("askRecordSnapshot", async (arg) => {
     socket.emit(
       "answerRecordSnapshot",
       await createCoupJson(game.createSnapshot(arg.recordId), userId)
     );
+  });
+  socket.on("askCurrentTurn", async (arg) => {
+    socket.emit("answerCurrentTurn", await createCoupJson(game, userId));
   });
   socket.on("answerAction", (arg) => {
     logger.debug(

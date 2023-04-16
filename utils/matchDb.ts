@@ -50,7 +50,9 @@ export async function inMatch(playerId: string, matchId: string) {
     "select count(*) from user_match where player_id = $1 and match_id = $2",
     [playerId, matchId]
   );
-  logger.debug(`${filename} - inMatch result: ` + result.rows[0]);
+  logger.debug(
+    `${filename} - inMatch result: ${JSON.stringify(result.rows[0])}`
+  );
   if (result.rows[0] > 1) {
     logger.warn(
       `${filename} - player_id: ${playerId} - match_id: ${matchId} have more than one entry in database`

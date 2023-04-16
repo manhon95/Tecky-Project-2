@@ -13,10 +13,10 @@ const playersInfoBoard = document.querySelector("#players-info-board");
 const playerNode = document.querySelector("#players-1");
 const actionRecordBoard = document.querySelector("#record-board");
 const actionRecordNode = document.querySelector(".action-record");
-const myCardBoard = document.querySelector("#my #card-board");
-const myBalance = document.querySelector(`#my #balance`);
-const CardNode = document.querySelector(`#my .card`);
 const myInfo = document.querySelector("#my");
+const myCardBoard = document.querySelector("#my #card-board");
+const CardNode = document.querySelector(`#my .card`);
+const myBalance = document.querySelector(`#my #balance`);
 const actionButton = document.querySelectorAll("#turn-button-board .btn");
 const actionButtonOffcanvas = new bootstrap.Offcanvas(
   document.querySelector("#turn-button-offcanvas")
@@ -33,10 +33,17 @@ const challengeButton = document.querySelectorAll(
 const challengeButtonOffcanvas = new bootstrap.Offcanvas(
   document.querySelector("#challenge-button-offcanvas")
 );
+const currentTurnButton = document.querySelector(
+  "#current-turn-button-board .btn"
+);
+const currentTurnOffcanvas = new bootstrap.Offcanvas(
+  document.querySelector("#current-turn-button-offcanvas")
+);
 /* --------------------------------- Utils; --------------------------------- */
 const socket = io();
 const url = new URL(location.href);
 const searchParams = new URLSearchParams(url.search);
+let snapshotMode = false;
 /* ---------------------------------- Game ---------------------------------- */
 const gameId = searchParams.get("game");
 const cardPathMap = [
@@ -160,6 +167,14 @@ function init() {
       });
     });
 
+    currentTurnButton.disabled = true;
+    currentTurnButton.addEventListener("click", function () {
+      currentTurnOffcanvas.hide();
+      socket.emit("askCurrentTurn");
+      currentTurnButton.disabled = true;
+      snapshotMode = false;
+    });
+
     /* ----------------------------- Action Records ----------------------------- */
     if (game.transitionRecords) {
       logger.info(
@@ -171,7 +186,7 @@ function init() {
     socketEventInit(socket, myId);
     /* ------------------------------- finish init ------------------------------ */
     logger.debug(`Finish init`);
-    socket.emit("CoupInitFinished");
+    socket.emit("askGameState");
   });
 }
 
@@ -184,6 +199,9 @@ function socketEventInit(socket, myId) {
 
   socket.on("askAction", function (arg) {
     logger.debug(`askAction called with ${JSON.stringify(arg)}`);
+    if (snapshotMode) {
+      return;
+    }
     if (arg.userId == myId) {
       actionButtonOffcanvas.show();
     } else {
@@ -196,6 +214,9 @@ function socketEventInit(socket, myId) {
 
   socket.on("askCounterAction", function (arg) {
     logger.debug(`askCounterAction called with ${JSON.stringify(arg)}`);
+    if (snapshotMode) {
+      return;
+    }
     if (arg.userId == myId) {
       counteractionButtonOffcanvas.show();
     } else {
@@ -207,6 +228,9 @@ function socketEventInit(socket, myId) {
   });
   socket.on("askChallenge", function (arg) {
     logger.debug(`askChallenge called with ${JSON.stringify(arg)}`);
+    if (snapshotMode) {
+      return;
+    }
     if (arg.userId == myId) {
       challengeButtonOffcanvas.show();
     } else {
@@ -281,6 +305,12 @@ function socketEventInit(socket, myId) {
   socket.on("answerRecordSnapshot", function (arg) {
     logger.debug(`answerRecordSnapshot called with ${JSON.stringify(arg)}`);
     loadGameBoard(arg);
+  });
+
+  socket.on("answerCurrentTurn", function (arg) {
+    logger.debug(`answerCurrentTurn called with ${JSON.stringify(arg)}`);
+    loadGameBoard(arg);
+    socket.emit("askGameState");
   });
 
   socket.on("finish", function (arg) {
@@ -414,7 +444,13 @@ function createActionRecord(record) {
       .querySelectorAll(".action-record")
       .forEach((recordNode) => recordNode.classList.remove("active"));
     newActionRecordNode.classList.add("active");
+    actionButtonOffcanvas.hide();
+    challengeButtonOffcanvas.hide();
+    counteractionButtonOffcanvas.hide();
+    currentTurnOffcanvas.show();
     socket.emit("askRecordSnapshot", { recordId: record.id });
+    currentTurnButton.disabled = false;
+    snapshotMode = true;
   });
   latestRecord = newActionRecordNode;
 }

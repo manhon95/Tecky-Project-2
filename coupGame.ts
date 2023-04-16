@@ -457,7 +457,7 @@ export class Game {
 
   createSnapshot(recordId: number): Game {
     logger.info(
-      `${filename} - Creating snapshot at Game#${this.id} record:${recordId}`
+      `${filename} - creating snapshot at Game#${this.id} record:${recordId}`
     );
     return new Game(this.id, this.io, {
       snapshotMode: true,
@@ -544,8 +544,27 @@ export class Game {
               while (
                 this.playerList[this.activePlayerIndex].getState() !== "inGame"
               ) {
-                this.activePlayerIndex++;
+                if (this.activePlayerIndex >= this.playerList.length - 1) {
+                  this.activePlayerIndex = 0;
+                } else {
+                  this.activePlayerIndex++;
+                }
               }
+              logger.debug(
+                `${filename} - active player index: ${
+                  this.activePlayerIndex
+                }, id: ${
+                  this.playerList[this.activePlayerIndex].userId
+                }, state: ${this.playerList[
+                  this.activePlayerIndex
+                ].getState()}, balance:${this.playerList[
+                  this.activePlayerIndex
+                ].getBalance()}, hand:${this.playerList[
+                  this.activePlayerIndex
+                ].getHand()}, faceUp:${this.playerList[
+                  this.activePlayerIndex
+                ].getFaceUp()}`
+              );
             }
             this.state = "askAction";
             this.ioEmit("askAction", {
@@ -1034,8 +1053,10 @@ class Assassinate implements Action {
           this.challenge?.transition(arg);
         } else if (
           this.actionValid &&
+          this.targetIndex !== null &&
           this.callingGame.playerList[this.activePlayerIndex].getState() ==
-            "inGame"
+            "inGame" &&
+          this.callingGame.playerList[this.targetIndex].getState() == "inGame"
         ) {
           this.challenge = null;
           this.callingGame.playerList[this.activePlayerIndex].lowerBalance(3);
@@ -1097,7 +1118,13 @@ class Assassinate implements Action {
       case "resolveCounterAction": {
         if (this.counteraction?.getState() !== "finish") {
           this.counteraction?.transition(arg);
-        } else if (this.actionValid && this.targetIndex !== null) {
+        } else if (
+          this.actionValid &&
+          this.targetIndex !== null &&
+          this.callingGame.playerList[this.activePlayerIndex].getState() ==
+            "inGame" &&
+          this.callingGame.playerList[this.targetIndex].getState() == "inGame"
+        ) {
           this.counteraction = null;
           this.state = "askCard";
           this.transition();
@@ -1429,8 +1456,10 @@ class Steal implements Action {
           this.challenge?.transition(arg);
         } else if (
           this.actionValid &&
+          this.targetIndex !== null &&
           this.callingGame.playerList[this.activePlayerIndex].getState() ==
-            "inGame"
+            "inGame" &&
+          this.callingGame.playerList[this.targetIndex].getState() == "inGame"
         ) {
           this.challenge = null;
           this.askPlayerIndex = -1;
@@ -1493,8 +1522,10 @@ class Steal implements Action {
           this.counteraction = null;
           if (
             this.actionValid &&
+            this.targetIndex !== null &&
             this.callingGame.playerList[this.activePlayerIndex].getState() ==
-              "inGame"
+              "inGame" &&
+            this.callingGame.playerList[this.targetIndex].getState() == "inGame"
           ) {
             this.actionEffect();
           }
