@@ -23,5 +23,5 @@ export async function commit() {
 }
 
 export async function rollback() {
-  await client.query("ROLLBACK");
+  await client.query("ROLLBACK;");
 }
